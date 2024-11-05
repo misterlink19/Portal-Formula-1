@@ -21,8 +21,11 @@ public class AficionadoTests {
 
     @Test
     public void testGetAllAficionados() {
-        List<Aficionado> aficionados = aficionadoService.getAllAficionados();
-        assertNotNull(aficionados);
-        assertFalse(aficionados.isEmpty());
+    List<Aficionado> aficionados = aficionadoService.getAllAficionados();
+    assertNotNull(aficionados, "La lista de aficionados es nula");
+    if (!aficionados.isEmpty()) {
+        assertFalse(aficionados.isEmpty(), "La lista de aficionados está vacía pero se esperaba que tuviera elementos");
+        }
     }
+
 }
