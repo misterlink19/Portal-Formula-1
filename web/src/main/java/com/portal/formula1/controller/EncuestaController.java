@@ -32,6 +32,11 @@ public class EncuestaController {
     @Autowired
     private VotoDAO votoDAO;
 
+    @GetMapping
+    public String mostrarMenuEncuestas() {
+        return "encuesta";
+    }
+
     @GetMapping("/crearEncuestas")
     public ModelAndView mostrarFormularioCreacion() {
         ModelAndView mv = new ModelAndView("crearEncuesta");
@@ -61,7 +66,7 @@ public class EncuestaController {
 
     @PostMapping("/{permalink}/votos")
     public ModelAndView crearVoto(@PathVariable String permalink, @RequestBody Voto voto) {
-        ModelAndView mv = new ModelAndView ("votoConfirmado");
+        ModelAndView mv = new ModelAndView("votoConfirmado");
         Encuesta encuesta = encuestaService.obtenerEncuestaPorPermalink(permalink);
         voto.setEncuesta(encuesta);
         Voto nuevoVoto = votoDAO.save(voto);
