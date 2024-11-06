@@ -8,6 +8,7 @@ import com.portal.formula1.model.Encuesta;
 import com.portal.formula1.repository.EncuestaDAO;
 import com.portal.formula1.service.EncuestaService;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -33,6 +35,9 @@ public class EncuestaServiceTests {
 
     @Mock
     private EntityManager entityManager;
+
+    @Mock
+    private Query query;
 
     @InjectMocks
     private EncuestaService encuestaService;
@@ -89,5 +94,24 @@ public class EncuestaServiceTests {
         Encuesta result = encuestaService.obtenerEncuestaPorPermalink(permalink);
 
         assertEquals(permalink, result.getPermalink());
+    }
+
+     /**
+     * Verifica que el servicio retorna todos los pilotos correctamente desde la
+     * base de datos usando una consulta nativa.
+     */
+    @Test
+    public void testGetTodosLosPilotos() {
+        String sql = "SELECT Nombre, Apellidos, Siglas, Dorsal, RutaImagen, Pais, Twitter FROM Piloto";
+        Query query = mock(Query.class);
+        List<Object[]> pilotos = Arrays.asList(new Object[]{"Lewis", "Hamilton", "HAM", 44, "/img/hamilton.jpg", "Reino Unido", "@LewisHamilton"},
+                new Object[]{"Max", "Verstappen", "VER", 33, "/img/verstappen.jpg", "Países Bajos", "@Max33Verstappen"}
+        );
+        when(entityManager.createNativeQuery(sql)).thenReturn(query);
+        when(query.getResultList()).thenReturn(pilotos);
+        List<Object[]> result = encuestaService.getTodosLosPilotos();
+        assertEquals(2, result.size());
+        assertEquals("Lewis", result.get(0)[0]);
+        assertEquals("Max", result.get(1)[0]);
     }
 }
