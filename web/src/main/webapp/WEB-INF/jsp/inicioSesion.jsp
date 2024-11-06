@@ -12,7 +12,6 @@
     <%@ include file="header.jsp" %>
     <title>Inicio de Sesión</title>
     <style>
-        /* Estilos para centrar el panel en la pantalla */
         .login-container {
             min-height: 100vh;
             display: flex;
@@ -27,6 +26,7 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
     </style>
+        
 </head>
 <body>
     <div class="login-container">
@@ -38,10 +38,10 @@
                 <form action="/" method="post" class="needs-validation" novalidate>
                     <!-- Campo de Correo Electrónico (Usuario) -->
                     <div class="mb-3">
-                        <label for="usuario" class="form-label">Correo Electrónico</label>
-                        <input type="email" class="form-control" id="usuario" name="usuario" required>
+                        <label for="usuario" class="form-label">Usuario</label>
+                        <input type="text" class="form-control" id="usuario" name="usuario" required>
                         <div class="invalid-feedback">
-                            Por favor ingrese un correo electrónico válido.
+                            Este campo no puede estar vacío.
                         </div>
                     </div>
                     
@@ -59,10 +59,14 @@
                     </div>
                 </form>
             </div>
+            <c:if test="${not empty error}">
+                <div class="alert alert-danger" role="alert">
+                    ${error}
+                </div>
+            </c:if>
         </div>
     </div>
     <script>
-        // Validación de formulario de Bootstrap
         (function () {
             var forms = document.querySelectorAll('.needs-validation');
             Array.prototype.slice.call(forms).forEach(function (form) {
