@@ -42,9 +42,19 @@ public class EncuestaService {
         return encuestaDAO.findById(permalink).orElseThrow();
     }
     
-    public List<Object[]> getTodosLosPilotos(){
-        String sql ="SELECT Nombre, Apellidos, Siglas, Dorsal, RutaImagen, Pais, Twitter FROM Piloto ";
+    public List<Object[]> getTodosLosPilotos() {
+        if (entityManager == null) {
+            throw new IllegalStateException("EntityManager is null");
+        }
+
+        String sql = "SELECT Nombre, Apellidos, Siglas, Dorsal, RutaImagen, Pais, Twitter FROM Piloto";
         Query query = entityManager.createNativeQuery(sql);
+
+        if (query == null) {
+            throw new IllegalStateException("Query is null");
+        }
+
         return query.getResultList();
     }
+
 }
