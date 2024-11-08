@@ -3,7 +3,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #f8f9fa;
 }
 .login-card {
     width: 25vw;
@@ -11,5 +10,14 @@
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
+.fondo {
+    background-image: url('../images/fondo2.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed;
+    background-color: #000000;
+}
+
 
 
