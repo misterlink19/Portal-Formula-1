@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Aficionados</title>
+    <style>
+        table {
+            width: 50%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>Lista de Aficionados</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Edad</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="aficionado : ${aficionados}">
+                <td th:text="${aficionado.nombre}">Nombre</td>
+                <td th:text="${aficionado.rol}">Edad</td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(aficionados)}">
+                <td colspan="2">No hay aficionados disponibles.</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
