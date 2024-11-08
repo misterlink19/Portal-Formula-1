@@ -1,0 +1,42 @@
+<!DOCTYPE HTML>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Crear Noticia</title>
+    <!-- Tu CSS desde la carpeta estática -->
+    <link type="text/css" th:href="@{/styles/crear.css}" rel="stylesheet">
+</head>
+<body>
+    <div class="form-container">
+        <h1>Crear Noticia</h1>
+
+        <!-- Formulario para crear una noticia -->
+        <form th:action="@{/crear}" th:object="${noticia}" method="post" enctype="multipart/form-data">
+            
+            <!-- Mostrar errores globales -->
+            <div th:if="${#fields.hasGlobalErrors()}" class="error">
+                <p th:each="err : ${#fields.globalErrors()}" th:text="${err}">Mensaje de error</p>
+            </div>
+
+            <label for="titulo">Título:</label>
+            <input type="text" id="titulo" th:field="*{titulo}" required maxlength="100" />
+            <div th:if="${#fields.hasErrors('titulo')}" class="error">
+                <p th:errors="*{titulo}">El título tiene errores</p>
+            </div>
+
+            <label for="texto">Descripción:</label>
+            <textarea id="texto" th:field="*{texto}" required minlength="500" maxlength="2000"></textarea>
+            <div th:if="${#fields.hasErrors('texto')}" class="error">
+                <p th:errors="*{texto}">La descripción tiene errores</p>
+            </div>
+
+            <label for="imagen">Imagen (opcional):</label>
+            <input type="file" id="imagen" name="imagen" accept="image/jpeg, image/png" />
+            <div th:if="${#fields.hasErrors('imagen')}" class="error">
+                <p th:errors="*{imagen}">La imagen tiene errores</p>
+            </div>
+
+            <button type="submit">Publicar</button>
+        </form>
+    </div>
+</body>
+</html>

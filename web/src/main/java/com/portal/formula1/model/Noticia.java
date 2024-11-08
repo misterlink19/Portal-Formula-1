@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -19,9 +20,8 @@ public class Noticia {
     @Column(name = "id", unique = true, nullable = false)
     private Integer id;
     
-    @Basic(optional = false)
     @Column(name = "permalink", unique = true)
-    @NotBlank(message = "El permalink es obligatorio.")
+    @NotBlank(message = "El permalink no puede estar vacío")
     @Size(max = 100, message = "El permalink no puede superar 100 caracteres")
     private String permalink;
     
@@ -31,7 +31,6 @@ public class Noticia {
     @Size(max = 100, message = "El titulo no puede superar 100 caracteres")
     private String titulo;
     
-    @Basic(optional = false)
     @Column(name = "imagen")
     private String imagen;
     
@@ -41,19 +40,28 @@ public class Noticia {
     @Size(min = 500, max = 2000, message = "La descripción debe tener entre 500 y 2000 caracteres")
     private String texto;
     
+    // Relación con el usuario creador (comentada hasta definir la clase Usuario)
     /*
     @ManyToOne
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario creador;
     */
-
+    @Column(name = "fecha_publicacion", nullable = false, updatable = false)
     private LocalDateTime fechaPublicacion;
+    
+    /*
+    El método @PrePersist se ejecuta antes de que la entidad se guarde por primera vez en la base de datos, 
+    estableciendo automáticamente la fecha de publicación al momento actual.
+    */
+    @PrePersist
+    protected void onCreate() {
+        this.fechaPublicacion = LocalDateTime.now();
+    }
     
     public Noticia() {
     } 
     
-    public Noticia(Integer id, String permalink, String titulo, String imagen, String texto) {
-        this.id = id;
+    public Noticia(String permalink, String titulo, String imagen, String texto) {
         this.permalink = permalink;
         this.titulo = titulo;
         this.imagen = imagen;
@@ -102,7 +110,14 @@ public class Noticia {
 
     @Override
     public String toString() {
-        return "Noticia{" + "id=" + id + ", permalink=" + permalink + ", titulo=" + titulo + ", imagen=" + imagen + ", texto=" + texto + '}';
+        return "Noticia{" +
+                "id=" + id +
+                ", permalink='" + permalink + '\'' +
+                ", titulo='" + titulo + '\'' +
+                ", imagen='" + imagen + '\'' +
+                ", texto='" + texto + '\'' +
+                ", fechaPublicacion=" + fechaPublicacion +
+                '}';
     }
     
     public LocalDateTime getFechaPublicacion() {

@@ -1,26 +1,12 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.util.List" %>
-<%@ page import="com.portal.formula1.model.Noticia" %>
-
-
-<%
-    List<Noticia> noticias = (List<Noticia>) request.getAttribute("noticias");
-
-%>
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-    "http://www.w3.org/TR/html4/loose.dtd">
-
+<!DOCTYPE HTML>
 <html>
 <head>
     <title>Crear Noticia</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f2f5;
             margin: 0;
             padding: 0;
             display: flex;
@@ -30,17 +16,24 @@
         }
 
         .form-container {
-            background-color: rgba(255, 255, 255, 0.9);
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 20px 40px;
-            width: 400px;
-            text-align: center;
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px 40px;
+            width: 100%;
+            max-width: 500px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .form-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
         }
 
         h1 {
             color: #333;
             margin-bottom: 20px;
+            font-size: 24px;
         }
 
         label {
@@ -56,8 +49,24 @@
             width: 100%;
             padding: 10px;
             margin: 5px 0 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            background-color: #f9f9f9;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus,
+        input[type="file"]:focus {
+            border-color: #007bff;
+            outline: none;
+            background-color: #fff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+
+        textarea {
+            resize: none;
+            height: 100px;
         }
 
         button {
@@ -65,56 +74,75 @@
             color: white;
             padding: 10px 20px;
             border: none;
-            border-radius: 5px;
+            border-radius: 10px;
             cursor: pointer;
             font-size: 16px;
+            transition: background-color 0.3s, transform 0.2s;
+            width: 100%;
         }
 
         button:hover {
             background-color: #0056b3;
+            transform: translateY(-2px);
         }
 
         .error {
             color: red;
             font-size: 14px;
             margin-top: -15px;
+            margin-bottom: 10px;
         }
 
         .message {
             color: green;
             font-size: 14px;
         }
-
     </style>
 </head>
 <body>
     <div class="form-container">
         <h1>Crear Noticia</h1>
         
-        <c:if test="${not empty error}">
+        <%
+            if (request.getAttribute("error") != null) {
+        %>
             <div class="error">
-                <p>${error}</p>
+                <p><%= request.getAttribute("error") %></p>
             </div>
-        </c:if>
+        <%
+            }
+        %>
         
-        <form action="/admin/noticias/crear" method="post" enctype="multipart/form-data">
+        <form action="<%= request.getContextPath() %>/admin/noticias/crear" method="post" enctype="multipart/form-data">
             <label for="titulo">Título:</label>
-            <input type="text" id="titulo" name="titulo" value="${noticia.titulo}" required maxlength="100">
-            <c:if test="${not empty fieldErrors.titulo}">
-                <p class="error">${fieldErrors.titulo}</p>
-            </c:if>
+            <input type="text" id="titulo" name="titulo" value="<%= request.getAttribute("noticia") != null ? ((com.portal.formula1.model.Noticia) request.getAttribute("noticia")).getTitulo() : "" %>" required maxlength="100">
+            <%
+                if (request.getAttribute("fieldErrors") != null && ((java.util.Map<String, String>) request.getAttribute("fieldErrors")).containsKey("titulo")) {
+            %>
+                <p class="error"><%= ((java.util.Map<String, String>) request.getAttribute("fieldErrors")).get("titulo") %></p>
+            <%
+                }
+            %>
             
-            <label for="descripcion">Descripción:</label>
-            <textarea id="descripcion" name="descripcion" required minlength="500" maxlength="2000">${noticia.descripcion}</textarea>
-            <c:if test="${not empty fieldErrors.descripcion}">
-                <p class="error">${fieldErrors.descripcion}</p>
-            </c:if>
+            <label for="texto">Descripción:</label>
+            <textarea id="texto" name="texto" required minlength="500" maxlength="2000"><%= request.getAttribute("noticia") != null ? ((com.portal.formula1.model.Noticia) request.getAttribute("noticia")).getTexto() : "" %></textarea>
+            <%
+                if (request.getAttribute("fieldErrors") != null && ((java.util.Map<String, String>) request.getAttribute("fieldErrors")).containsKey("texto")) {
+            %>
+                <p class="error"><%= ((java.util.Map<String, String>) request.getAttribute("fieldErrors")).get("texto") %></p>
+            <%
+                }
+            %>
             
             <label for="imagen">Imagen (opcional):</label>
             <input type="file" id="imagen" name="imagen" accept="image/jpeg, image/png">
-            <c:if test="${not empty fieldErrors.imagen}">
-                <p class="error">${fieldErrors.imagen}</p>
-            </c:if>
+            <%
+                if (request.getAttribute("fieldErrors") != null && ((java.util.Map<String, String>) request.getAttribute("fieldErrors")).containsKey("imagen")) {
+            %>
+                <p class="error"><%= ((java.util.Map<String, String>) request.getAttribute("fieldErrors")).get("imagen") %></p>
+            <%
+                }
+            %>
             
             <button type="submit">Publicar</button>
         </form>

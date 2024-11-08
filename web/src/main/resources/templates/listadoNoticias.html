@@ -1,0 +1,38 @@
+<!DOCTYPE HTML>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Listado de Noticias</title>
+    <link type="text/css" th:href="@{/styles/listado.css}" rel="stylesheet">
+</head>
+<body>
+    <div class="news-container">
+        <h1>Listado de Noticias</h1>
+
+        <!-- Formulario de búsqueda -->
+        <form th:action="@{/buscar}" method="get">
+            <input type="text" name="query" placeholder="Buscar por título o descripción">
+            <button type="submit">Buscar</button>
+        </form>
+
+        <!-- Mensajes de éxito o error -->
+        <div th:if="${mensaje}" class="success">
+            <p th:text="${mensaje}"></p>
+        </div>
+        <div th:if="${error}" class="error">
+            <p th:text="${error}"></p>
+        </div>
+
+        <!-- Listado de noticias -->
+        <div th:if="${noticias != null and #lists.size(noticias) > 0}">
+            <div th:each="noticia : ${noticias}">
+                <h2 th:text="${noticia.titulo}"></h2>
+                <p th:text="${noticia.texto.substring(0, 100) + '...'}"></p> <!-- Mostrar los primeros 100 caracteres -->
+                <p><a th:href="@{/detalle(id=${noticia.id})}">Leer más</a></p>
+            </div>
+        </div>
+        <div th:if="${noticias == null or #lists.size(noticias) == 0}">
+            <p>No hay noticias disponibles.</p>
+        </div>
+    </div>
+</body>
+</html>
