@@ -53,6 +53,7 @@
             <scope>test</scope>
         </dependency>
         <!-- Dependencias para JSP -->
+        <!--
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-jasper</artifactId>
@@ -62,6 +63,13 @@
             <artifactId>jstl</artifactId>
             <version>1.2</version>
         </dependency>
+        -->
+        <!-- Dependencias para Thymeleaf -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>

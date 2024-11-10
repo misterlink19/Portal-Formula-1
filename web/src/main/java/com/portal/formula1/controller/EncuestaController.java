@@ -4,20 +4,18 @@
  */
 package com.portal.formula1.controller;
 
+import java.util.List;
+
 import com.portal.formula1.model.Encuesta;
 import com.portal.formula1.model.Voto;
 import com.portal.formula1.repository.VotoDAO;
 import com.portal.formula1.service.EncuestaService;
-import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-
 /**
  *
  * @author Misterlink
@@ -26,6 +24,8 @@ import org.springframework.web.servlet.ModelAndView;
 @RequestMapping("/encuestas")
 public class EncuestaController {
 
+    private static final Logger logger = LoggerFactory.getLogger(EncuestaController.class);
+
     @Autowired
     private EncuestaService encuestaService;
 
@@ -33,29 +33,31 @@ public class EncuestaController {
     private VotoDAO votoDAO;
 
     @GetMapping
-    public String mostrarMenuEncuestas() {
-        return "encuesta";
+    public ModelAndView mostrarMenuEncuestas() {
+        logger.debug("Entrando a mostrarMenuEncuestas");
+        return new ModelAndView("encuesta");
     }
 
-    @GetMapping("/crearEncuestas")
+    @GetMapping({"/crearEncuestas", "/crearEncuesta"})
     public ModelAndView mostrarFormularioCreacion() {
+        logger.debug("Entrando a mostrarFormularioCreacion");
         ModelAndView mv = new ModelAndView("crearEncuesta");
+        mv.addObject("encuesta", new Encuesta());
         List<Object[]> pilotos = encuestaService.getTodosLosPilotos();
         mv.addObject("pilotos", pilotos);
         return mv;
     }
 
     @PostMapping
-    public ModelAndView crearEncuesta(@RequestBody Encuesta encuesta) {
-        ModelAndView mv = new ModelAndView();
+    public ModelAndView crearEncuesta(@ModelAttribute Encuesta encuesta) {
+        logger.debug("Entrando a crearEncuesta");
         Encuesta nuevaEncuesta = encuestaService.crearEncuesta(encuesta);
-        mv.addObject("encuesta", nuevaEncuesta);
-        mv.setViewName("redirect:/encuestas/" + nuevaEncuesta.getPermalink());
-        return mv;
+        return new ModelAndView("redirect:/encuestas/" + nuevaEncuesta.getPermalink());
     }
 
     @GetMapping("/{permalink}")
     public ModelAndView mostrarEncuesta(@PathVariable String permalink) {
+        logger.debug("Entrando a mostrarEncuesta con permalink: {}", permalink);
         ModelAndView mv = new ModelAndView("votarEncuesta");
         Encuesta encuesta = encuestaService.obtenerEncuestaPorPermalink(permalink);
         List<Object[]> pilotos = encuestaService.getTodosLosPilotos();
@@ -65,7 +67,8 @@ public class EncuestaController {
     }
 
     @PostMapping("/{permalink}/votos")
-    public ModelAndView crearVoto(@PathVariable String permalink, @RequestBody Voto voto) {
+    public ModelAndView crearVoto(@PathVariable String permalink, @ModelAttribute Voto voto) {
+        logger.debug("Entrando a crearVoto con permalink: {}", permalink);
         ModelAndView mv = new ModelAndView("votoConfirmado");
         Encuesta encuesta = encuestaService.obtenerEncuestaPorPermalink(permalink);
         voto.setEncuesta(encuesta);

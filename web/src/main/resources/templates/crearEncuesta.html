@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Crear Encuesta</title>
+</head>
+<body>
+<h1>Crear Nueva Encuesta</h1>
+<form th:action="@{/encuestas}" th:object="${encuesta}" method="post">
+  <label for="titulo">Título:</label>
+  <input type="text" id="titulo" th:field="*{titulo}" required/>
+
+  <label for="descripcion">Descripción:</label>
+  <textarea id="descripcion" th:field="*{descripcion}" required></textarea>
+
+  <label for="fechaLimite">Fecha Límite:</label>
+  <input type="datetime-local" id="fechaLimite" th:field="*{fechaLimite}" required/>
+
+  <h2>Selecciona Pilotos</h2>
+  <ul>
+    <li th:each="piloto : ${pilotos}">
+      <input type="checkbox" th:name="pilotos" th:value="${piloto[0]}"/> <span th:text="${piloto[0]} + ' ' + ${piloto[1]} + ' (' + ${piloto[2]} + ')'"></span>
+    </li>
+  </ul>
+
+  <button type="submit">Crear Encuesta</button>
+</form>
+</body>
+</html>
