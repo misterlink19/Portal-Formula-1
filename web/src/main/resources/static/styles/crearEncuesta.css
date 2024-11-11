@@ -1,0 +1,65 @@
+
+fieldset {
+    margin-top: 20px;
+}
+
+.card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.scrollable-container {
+    height: 300px;
+    overflow-y: auto;
+}
+.image-container {
+    position: relative;
+    display: inline-block;
+}
+
+.card-img-top {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.flag-icon {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 30px;
+    height: 20px;
+    border-radius: 3px;
+    background-color: white;
+}
+
+.text-center {
+    text-align: center;
+}
+
+textarea {
+    min-height: 150px;
+}
+
+input, textarea {
+    margin-bottom: 15px;
+}
+
+.container {
+    max-width: 800px;
+    margin: auto;
+}
+
+.form-group label {
+    display: block;
+    text-align: left;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.btn {
+    margin: 5px;
+}

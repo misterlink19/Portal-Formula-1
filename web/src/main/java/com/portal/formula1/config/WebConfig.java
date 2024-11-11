@@ -26,5 +26,4 @@ public class WebConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/images/**")
                 .excludePathPatterns("/favicon.ico");
     }
-    
 }

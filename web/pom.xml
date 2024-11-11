@@ -44,7 +44,7 @@
             <groupId>org.springframework.session</groupId>
             <artifactId>spring-session-jdbc</artifactId>
         </dependency>
-        
+
         <!-- Dependencia de conexión a MySQL -->
         <dependency>
             <groupId>com.mysql</groupId>
@@ -70,9 +70,38 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-core</artifactId>
         </dependency>
-    </dependencies>
 
+       <!-- Dependencia del Layout -->
+       <dependency>
+           <groupId>nz.net.ultraq.thymeleaf</groupId>
+           <artifactId>thymeleaf-layout-dialect</artifactId>
+       </dependency>
 
+    <!-- Dependencias para JSP -->
+    <!--
+    <dependency>
+        <groupId>org.apache.tomcat.embed</groupId>
+        <artifactId>tomcat-embed-jasper</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>jstl</artifactId>
+        <version>1.2</version>
+    </dependency>
+    -->
+
+       <!--- Dependencias para pruebas con mockito -->
+    <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+    <groupId>org.mockito</groupId>
+    <artifactId>mockito-junit-jupiter</artifactId>
+    <scope>test</scope>
+    </dependency>
+   </dependencies>
     <build>
         <plugins>
             <plugin>
