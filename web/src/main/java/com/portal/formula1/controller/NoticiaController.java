@@ -10,11 +10,10 @@ import com.portal.formula1.model.Noticia;
 import com.portal.formula1.service.ImagenService;
 import com.portal.formula1.service.NoticiaService;
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,7 +26,9 @@ import javax.validation.Valid;
 @RequestMapping("/")
 public class NoticiaController {
 
-    private final NoticiaService noticiaService;
+    @Autowired
+    private NoticiaService noticiaService;
+
     private final ImagenService imagenService;
     private static final Logger logger = LoggerFactory.getLogger(NoticiaController.class);
 
@@ -70,15 +71,15 @@ public class NoticiaController {
     }
 
 
-        @GetMapping("/listado")
+    @GetMapping("/listado")
             public ModelAndView listarNoticias() {
             ModelAndView mv = new ModelAndView("listadoNoticias");
             List<Noticia> noticias = noticiaService.obtenerNoticias();
             mv.addObject("noticias", noticias);
             return mv;
-        }
+    }
             
-    @PostMapping("/eliminar")
+    @DeleteMapping("/eliminar")
         public ModelAndView eliminarNoticia(@RequestParam("id") Integer id, RedirectAttributes redirectAttributes) {
         noticiaService.eliminarNoticia(id);
         redirectAttributes.addFlashAttribute("mensaje", "Noticia eliminada exitosamente.");

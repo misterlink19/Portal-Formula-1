@@ -50,7 +50,7 @@ public class Noticia {
     private LocalDateTime fechaPublicacion;
     
     /*
-    El método @PrePersist se ejecuta antes de que la entidad se guarde por primera vez en la base de datos, 
+    El método PrePersist se ejecuta antes de que la entidad se guarde por primera vez en la base de datos,
     estableciendo automáticamente la fecha de publicación al momento actual.
     */
     @PrePersist

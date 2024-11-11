@@ -8,6 +8,7 @@ import com.portal.formula1.model.Noticia;
 import com.portal.formula1.repository.NoticiaDAO;
 import jakarta.transaction.Transactional;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -18,14 +19,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class NoticiaService {
-    
-    private final NoticiaDAO noticiaDAO;
+
+    @Autowired
+    private NoticiaDAO noticiaDAO;
+
     private static final int MAX_PERMALINK_LENGTH = 100;
-    
-    public NoticiaService(NoticiaDAO noticiaDAO) {
-        this.noticiaDAO = noticiaDAO;
-    }
-    
+
     public Noticia guardarNoticia(Noticia noticia) {
         noticia.setPermalink(generarPermalink(noticia.getTitulo()));
         return noticiaDAO.save(noticia);
