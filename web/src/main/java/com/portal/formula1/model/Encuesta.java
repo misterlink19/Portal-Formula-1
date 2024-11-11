@@ -4,23 +4,20 @@
  */
 package com.portal.formula1.model;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
- *
  * @author Misterlink
  */
 
 @Entity
-@Table(name = "Encuesta")
+@Table(name = "encuesta")
 public class Encuesta {
 
     @Id
@@ -39,18 +36,23 @@ public class Encuesta {
     @Column(name = "fecha_limite")
     private LocalDateTime fechaLimite;
 
-//    @Transient //Para que no se almacene en la base de datos por ahora
-//    private final List<String> pilotos = Arrays.asList(
-//            "Carlos Sainz",
-//            "Charles Leclerc",
-//            "Lando Norris",
-//            "George Russell",
-//            "Lewis Hamilton",
-//            "Max Verstappen",
-//            "Sergio Perez");
-
     @OneToMany(mappedBy = "encuesta", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Voto> votos;
+
+    //Para manejar la coleccion de pilotos y relacionarlo con su encuesta
+    @ElementCollection
+    @CollectionTable(name = "encuesta_piloto", joinColumns = @JoinColumn(name = "encuesta_id"))
+    @Column(name = "piloto_id")
+    private Set<String> pilotos = new HashSet<>();
+
+    // Para que genere el codigo permalink antes de registrarlo en la base datos
+    @PrePersist
+    public void prePersist() {
+        if (this.permalink == null) {
+            this.permalink = UUID.randomUUID().toString();
+        }
+    }
+
 
     public Encuesta() {
     }
@@ -110,4 +112,8 @@ public class Encuesta {
     public void setVotos(List<Voto> votos) {
         this.votos = votos;
     }
+
+    public Set<String> getPilotos() {return pilotos;}
+
+    public void setPilotos(Set<String> pilotos) { this.pilotos = pilotos;}
 }

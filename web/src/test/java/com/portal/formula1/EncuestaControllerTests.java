@@ -11,6 +11,8 @@ import com.portal.formula1.service.EncuestaService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
@@ -66,25 +68,33 @@ public class EncuestaControllerTests {
                 .andExpect(model().attributeExists("pilotos"));
     }
 
+
     /**
      * Asegura que el controlador puede procesar correctamente una solicitud
      * POST para crear una encuesta y redirige a la URL correcta.
      */
     @Test
     public void testCrearEncuesta() throws Exception {
-        Encuesta encuesta = new Encuesta("Título de prueba", "Descripción de prueba", LocalDateTime.now(), LocalDateTime.now().plusDays(1));
-        when(encuestaService.crearEncuesta(any(Encuesta.class))).thenReturn(encuesta);
+        Encuesta encuesta = new Encuesta();
+        encuesta.setTitulo("Título de prueba");
+        encuesta.setDescripcion("Descripción de prueba");
+        encuesta.setFechaLimite(LocalDateTime.parse("2024-12-31T23:59:59"));
+        when(encuestaService.crearEncuesta(any(Encuesta.class), any(Set.class))).thenReturn(encuesta);
 
         mockMvc.perform(post("/encuestas")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"titulo\":\"Título de prueba\",\"descripcion\":\"Descripción de prueba\",\"fechaLimite\":\"2024-12-31T23:59:59\"}"))
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .param("titulo", "Título de prueba")
+                        .param("descripcion", "Descripción de prueba")
+                        .param("fechaLimite", "2024-12-31T23:59:59")
+                        .param("pilotosSeleccionados", "HAM"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/encuestas/" + encuesta.getPermalink()));
     }
 
+
     /**
      * Comprueba que se puede mostrar una encuesta específica y que el modelo
-     * contiene los datos adecuados
+     * contiene los datos adecuados.
      */
     @Test
     public void testMostrarEncuesta() throws Exception {
@@ -93,6 +103,11 @@ public class EncuestaControllerTests {
         pilotos.add(new Object[]{"Lewis", "Hamilton", "HAM", 44, "/img/hamilton.jpg", "Reino Unido", "@LewisHamilton"});
         when(encuestaService.obtenerEncuestaPorPermalink("test-permalink")).thenReturn(encuesta);
         when(encuestaService.getTodosLosPilotos()).thenReturn(pilotos);
-        mockMvc.perform(get("/encuestas/test-permalink")).andExpect(status().isOk()).andExpect(view().name("votarEncuesta")).andExpect(model().attributeExists("encuesta")).andExpect(model().attributeExists("pilotos"));
+
+        mockMvc.perform(get("/encuestas/test-permalink"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("votarEncuesta"))
+                .andExpect(model().attributeExists("encuesta"))
+                .andExpect(model().attributeExists("pilotos"));
     }
 }

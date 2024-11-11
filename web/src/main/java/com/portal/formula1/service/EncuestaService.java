@@ -11,6 +11,8 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,10 +33,11 @@ public class EncuestaService {
         return encuestaDAO.findAll();
     }
 
-    public Encuesta crearEncuesta(Encuesta encuesta) {
+    public Encuesta crearEncuesta(Encuesta encuesta, Set<String> pilotos) {
         if (encuesta.getFechaInicio() == null) {
             encuesta.setFechaInicio(LocalDateTime.now());
         }
+        encuesta.getPilotos().addAll(pilotos);
         return encuestaDAO.save(encuesta);
     }
 

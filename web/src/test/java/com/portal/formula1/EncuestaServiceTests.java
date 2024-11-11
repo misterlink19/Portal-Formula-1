@@ -11,6 +11,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,9 +37,6 @@ public class EncuestaServiceTests {
     @Mock
     private EntityManager entityManager;
 
-    @Mock
-    private Query query;
-
     @InjectMocks
     private EncuestaService encuestaService;
 
@@ -62,7 +60,7 @@ public class EncuestaServiceTests {
         List<Encuesta> result = encuestaService.getAllEncuestas();
 
         assertEquals(2, result.size());
-        assertEquals("Título 1", result.get(0).getTitulo());
+        assertEquals("Título 1", result.getFirst().getTitulo());
     }
 
     /**
@@ -74,7 +72,7 @@ public class EncuestaServiceTests {
         Encuesta encuesta = new Encuesta("Título de prueba", "Descripción de prueba", LocalDateTime.now(), LocalDateTime.now().plusDays(1));
         when(encuestaDAO.save(any(Encuesta.class))).thenReturn(encuesta);
 
-        Encuesta result = encuestaService.crearEncuesta(encuesta);
+        Encuesta result = encuestaService.crearEncuesta(encuesta,new HashSet<>(List.of("HAM")));
 
         assertEquals("Título de prueba", result.getTitulo());
         verify(encuestaDAO, times(1)).save(encuesta);
