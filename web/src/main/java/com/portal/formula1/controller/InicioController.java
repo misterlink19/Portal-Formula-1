@@ -62,7 +62,7 @@ public class InicioController {
             session.setAttribute(SESSION_USUARIO, user);
         } else {
             mv.setViewName("inicioSesion");
-            mv.addObject("error", "Credenciales inválidas, intente de nuevo.");
+            mv.addObject("error", "Correo electrónico o contraseña incorrectos");
         }
         return mv;
     }

@@ -10,6 +10,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import lombok.Setter;
+
 import java.io.Serializable;
 
 /**
@@ -22,25 +24,30 @@ public class UsuarioRegistrado implements Serializable {
     
     private static final long serialVersionUID = 1L;
     
+    @Setter
     @Id
     @Column(name = "usuario", unique = true, nullable = false)
     private String usuario;
 
+    @Setter
     @Basic(optional = false)
     @Column(name = "nombre")
     @NotBlank(message = "El nombre no puede estar vacío.")
     private String nombre;
 
+    @Setter
     @Basic(optional = false)
     @Column(name = "email")
     @NotBlank(message = "El email no puede estar vacío.")
     private String email;
 
+    @Setter
     @Basic(optional = false)
     @Column(name = "contrasena")
     @NotBlank(message = "La contraseña no puede estar vacía.")
     private String contrasena;
 
+    @Setter
     @Basic(optional = false)
     @Column(name = "rol")
     @NotBlank(message = "El campo rol no puede estar vacío.")
@@ -65,4 +72,5 @@ public class UsuarioRegistrado implements Serializable {
     public String getRol() {
         return rol;
     }
+
 }
