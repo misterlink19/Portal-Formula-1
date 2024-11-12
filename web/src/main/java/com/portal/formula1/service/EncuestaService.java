@@ -63,4 +63,9 @@ public class EncuestaService {
         return query.getResultList();
     }
 
+    public Encuesta obtenerUltimaEncuestaDisponible() {
+        return encuestaDAO.findFirstByFechaLimiteAfterOrderByFechaLimiteAsc(LocalDateTime.now())
+                .orElseThrow(() -> new NoSuchElementException("No hay encuestas disponibles en este momento"));
+    }
+
 }

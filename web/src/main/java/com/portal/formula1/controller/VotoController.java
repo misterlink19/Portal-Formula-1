@@ -94,4 +94,18 @@ public class VotoController {
         }
         return mv;
     }
+
+    @GetMapping("/votar")
+    public ModelAndView redirigirAVotar() {
+        ModelAndView mv = new ModelAndView();
+        try {
+            Encuesta ultimaEncuesta = encuestaService.obtenerUltimaEncuestaDisponible();
+            mv.setViewName("redirect:/votos/" + ultimaEncuesta.getPermalink() + "/votar");
+        } catch (NoSuchElementException e) {
+            mv.setViewName("error");
+            mv.addObject("mensajeError", "No hay encuestas disponibles en este momento.");
+        }
+        return mv;
+    }
+
 }

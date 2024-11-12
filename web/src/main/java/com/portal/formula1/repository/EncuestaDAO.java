@@ -8,11 +8,15 @@ import com.portal.formula1.model.Encuesta;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 /**
  *
  * @author Misterlink
  */
 @Repository
 public interface EncuestaDAO extends JpaRepository<Encuesta, String>{
-    
+
+    Optional<Encuesta> findFirstByFechaLimiteAfterOrderByFechaLimiteAsc(LocalDateTime now);
 }
