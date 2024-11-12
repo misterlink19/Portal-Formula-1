@@ -11,6 +11,8 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +44,8 @@ public class EncuestaService {
     }
 
     public Encuesta obtenerEncuestaPorPermalink(String permalink) {
-        return encuestaDAO.findById(permalink).orElseThrow();
+        Optional<Encuesta> encuestaOptional = encuestaDAO.findById(permalink);
+        return encuestaOptional.orElseThrow(() -> new NoSuchElementException("Encuesta no encontrada con permalink: " + permalink));
     }
     
     public List<Object[]> getTodosLosPilotos() {

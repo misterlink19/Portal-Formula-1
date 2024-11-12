@@ -9,6 +9,7 @@
   <title>Crear Encuesta</title>
   <!-- Flatpickr CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link type="text/css" th:href="@{/styles/crearEncuesta.css}" rel="stylesheet">
 </head>
 
 <!-- Poner en su body o div donde quieren que su contenido se cargue,
@@ -16,7 +17,7 @@
 que se ejcute el layout-->
 <body onload="setInitialDateTime()" layout:fragment="body">
 <h1 class="text-center">Crear Nueva Encuesta</h1>
-<form th:action="@{/encuestas}" th:object="${encuesta}" method="post" class="mt-4" onsubmit="return validarFormulario()">
+<form th:action="@{/templates/encuestas}" th:object="${encuesta}" method="post" class="mt-4" onsubmit="return validarFormulario()">
   <fieldset class="border p-4 text-center">
 
     <div class="form-group row justify-content-center">

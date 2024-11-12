@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voto Confirmado</title>
+</head>
+<body layout:fragment="body">
+<main role="main" class="container">
+    <h1>Voto Confirmado</h1>
+    <p>Gracias por participar en la votación.</p>
+    <a th:href="@{/templates/encuestas}" class="btn btn-secondary mt-3">Volver a Encuestas</a>
+</main>
+</body>
+</html>

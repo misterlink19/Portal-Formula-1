@@ -106,7 +106,7 @@ public class EncuestaControllerTests {
 
         mockMvc.perform(get("/encuestas/test-permalink"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("votarEncuesta"))
+                .andExpect(view().name("verEncuesta"))
                 .andExpect(model().attributeExists("encuesta"))
                 .andExpect(model().attributeExists("pilotos"));
     }

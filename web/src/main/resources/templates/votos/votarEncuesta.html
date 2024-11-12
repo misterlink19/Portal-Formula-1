@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Votar en Encuesta</title>
+    <link type="text/css" th:href="@{/styles/votarEncuesta.css}" rel="stylesheet">
+</head>
+<body layout:fragment="body">
+<main role="main" class="container">
+    <h1 class="text-center" th:text="'Votación: ' + ${encuesta.titulo}">Votación</h1>
+    <p class="text-center" th:text="${encuesta.descripcion}"></p>
+    <form th:action="@{'/votos/' + ${encuesta.permalink} + '/votar'}" th:object="${voto}" method="post">
+        <div class="box">
+            <div class="team-section">
+                <h5>Seleccione una opción</h5>
+                <div class="row row-cols-1 row-cols-md-5 g-4">
+                    <div class="col" th:each="piloto : ${pilotos}">
+                        <div class="card h-100">
+                            <div class="image-container">
+                                <img th:src="@{${piloto[4]}}" alt="Piloto" class="card-img-top">
+                                <img th:src="@{'/images/pilotos/bandera/' + ${piloto[5]} + '.png'}" alt="Bandera" class="flag-icon">
+                            </div>
+                            <div class="card-body text-center">
+                                <h5 class="card-title" th:text="${piloto[0] + ' ' + piloto[1]}"></h5>
+                                <div>
+                                    <input type="radio" th:field="*{opcionSeleccionada}" th:value="${piloto[3]}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group row justify-content-center mt-4">
+            <div class="col-md-4">
+                <label for="nombreVotante"><b>Nombre del Aficionado:</b></label>
+                <input type="text" class="form-control" id="nombreVotante" th:field="*{nombreVotante}" required>
+            </div>
+            <div class="col-md-4">
+                <label for="correoVotante"><b>Correo electrónico:</b></label>
+                <input type="email" class="form-control" id="correoVotante" th:field="*{correoVotante}" required>
+            </div>
+        </div>
+
+        <div class="form-group row justify-content-center mt-4">
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100">Votar</button>
+            </div>
+            <div class="col-md-3">
+                <button type="reset" class="btn btn-danger w-100">Reset</button>
+            </div>
+        </div>
+    </form>
+</main>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    if ([[${mensajeError != null}]]) {
+        alert('[[${mensajeError}]]');
+    }
+    /*]]>*/
+</script>
+</body>
+</html>
