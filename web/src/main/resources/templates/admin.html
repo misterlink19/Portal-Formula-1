@@ -1,11 +1,13 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
 </head>
-<body>
+<body layout:fragment="body">
     <!-- Sintaxis de Thymeleaf para acceder a propiedades -->
     <h1>Bienvenido usuario administrador: <span th:text="${usuario.nombre}"></span></h1>
 </body>

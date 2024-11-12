@@ -18,11 +18,11 @@ que se ejcute el layout-->
 <h1 class="text-center">Crear Nueva Encuesta</h1>
 <form th:action="@{/encuestas}" th:object="${encuesta}" method="post" class="mt-4" onsubmit="return validarFormulario()">
   <fieldset class="border p-4 text-center">
-    <legend>Detalles de la Encuesta</legend>
+
     <div class="form-group row justify-content-center">
       <div class="col-md-8">
         <label for="titulo">Título</label>
-        <input type="text" class="form-control" th:field="*{titulo}" id="titulo" maxlength="40" required>
+        <input type="text" class="form-control" th:field="*{titulo}" id="titulo" maxlength="255" required>
       </div>
     </div>
     <div class="form-group row justify-content-center">
@@ -54,7 +54,7 @@ que se ejcute el layout-->
               </div>
               <div class="card-body text-center">
                 <h5 class="card-title" th:text="${piloto[0]} + ' ' + ${piloto[1]}"></h5>
-                <input type="checkbox" th:name="pilotosSeleccionados" th:value="${piloto[2]}" onchange="actualizarContadorPilotos()">
+                <input type="checkbox" th:name="pilotosSeleccionados" th:value="${piloto[3]}" onchange="actualizarContadorPilotos()">
               </div>
             </div>
           </div>

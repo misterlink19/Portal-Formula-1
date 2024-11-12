@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +11,7 @@
     <!-- Tu CSS desde la carpeta estática -->
     <link type="text/css" th:href="@{/styles/portal.css}" rel="stylesheet">
 </head>
-<body class="fondo">
+<body class="fondo" layout:fragment="body">
     <div class="login-container">
         <div class="card login-card">
             <div class="card-body">

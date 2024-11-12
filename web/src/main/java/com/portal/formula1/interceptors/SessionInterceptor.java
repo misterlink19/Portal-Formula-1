@@ -21,17 +21,21 @@ import org.springframework.web.servlet.ModelAndView;
 public class SessionInterceptor  implements HandlerInterceptor {
     
     public SessionInterceptor(){
+
         routeRoles.put("/admin","ADMIN" );
+//        routeRoles.put("/encuestas/crearEncuesta", "ADMIN");
     }
+
     private final Map<String, String> routeRoles = new HashMap<>();
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-//        Quitar de comentario si quieren probrar las funcionalidades del apartado de encuestas
-        String requestURI = request.getRequestURI();
-        // Permitir acceso a las rutas de encuestas sin autenticación
-        if (requestURI.startsWith("/encuestas")) {
-            return true;
-        }
+
+        // Quitar de comentario si quieren probrar las funcionalidades del apartado de encuestas
+//        String requestURI = request.getRequestURI();
+//        // Permitir acceso a las rutas de encuestas sin autenticación
+//        if (requestURI.startsWith("/encuestas")) {
+//            return true;
+//        }
 
 
         UsuarioRegistrado user = (UsuarioRegistrado) request.getSession().getAttribute("usuario");
