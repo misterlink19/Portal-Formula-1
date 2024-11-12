@@ -29,14 +29,27 @@ public class NoticiaController {
     @Autowired
     private NoticiaService noticiaService;
 
-    private final ImagenService imagenService;
+    @Autowired
+    private ImagenService imagenService;
+
     private static final Logger logger = LoggerFactory.getLogger(NoticiaController.class);
 
-    public NoticiaController(NoticiaService noticiaService, ImagenService imagenService) {
-        this.noticiaService = noticiaService;
-        this.imagenService = imagenService;
+    @GetMapping("/favicon.ico")
+    @ResponseBody
+    void returnNoFavicon() {
+        // No hacer nada
     }
 
+    // Muestra el listado de noticias en la página principal
+    @GetMapping
+    public ModelAndView listarNoticias() {
+        ModelAndView mv = new ModelAndView("listadoNoticias");
+        List<Noticia> noticias = noticiaService.obtenerNoticias();
+        mv.addObject("noticias", noticias);
+        return mv;
+    }
+
+    // Muestra el formulario para crear una nueva noticia
     @GetMapping("/crear")
     public ModelAndView mostrarFormularioCreacion() {
         ModelAndView mv = new ModelAndView("crearNoticia");
@@ -45,65 +58,83 @@ public class NoticiaController {
     }
 
     @PostMapping("/crear")
-    public ModelAndView crearNoticia(@Valid Noticia noticia,
-                                 BindingResult result,
-                                 @RequestParam("imagen") MultipartFile imagen,
-                                 RedirectAttributes redirectAttributes) {
-    if (!imagen.isEmpty() && !imagenService.isValidImage(imagen)) {
-        result.rejectValue("imagen", "error.noticia", "La imagen debe ser JPG o PNG y no exceder 2MB");
+    public ModelAndView crearNoticia(@Valid @ModelAttribute("noticia") Noticia noticia,
+                                     BindingResult result,
+                                     @RequestParam("imagenArchivo") MultipartFile imagenArchivo,
+                                     RedirectAttributes redirectAttributes) {
+
+    ModelAndView mv = new ModelAndView("crearNoticia");
+    if (result.hasErrors()) {
+        return mv;
+    }
+    try {
+        // Validación y guardado de la imagen
+        if (imagenArchivo != null && !imagenArchivo.isEmpty()) {
+            if (!imagenService.isFormatoValido(imagenArchivo)) {
+                result.rejectValue("imagen", "error.noticia", "Formato de imagen no permitido. Solo JPG y PNG.");
+                return mv;
+            }
+            if (!imagenService.isTamanoValido(imagenArchivo)) {
+                result.rejectValue("imagen", "error.noticia", "La imagen supera el tamaño máximo permitido de 2 MB.");
+                return mv;
+            }
+        }
+
+        // Guardar la noticia con permalink único
+        noticiaService.crearNoticia(noticia.getTitulo(), imagenArchivo, noticia.getTexto());
+        redirectAttributes.addFlashAttribute("mensaje", "La noticia ha sido creada exitosamente.");
+        mv.setViewName("redirect:/");
+
+
+
+
+    } catch (Exception e) {
+        logger.error("Error al guardar la noticia: ", e);
+        result.rejectValue("imagen", "error.noticia", "Error al guardar la imagen: " + e.getMessage());
     }
 
-    if (result.hasErrors()) {
-            logger.error("Errores en la validación de la noticia: " + result.getAllErrors());
-            ModelAndView mv = new ModelAndView("crearNoticia");
-            mv.addObject("noticia", noticia);
+
+    return mv;
+    }
+
+    // Muestra una noticia específica
+    @GetMapping("/{id}")
+    public ModelAndView mostrarNoticia(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
+        ModelAndView mv = new ModelAndView();
+        Noticia noticia = noticiaService.obtenerNoticiaPorId(id);
+
+        if (noticia == null) {
+            redirectAttributes.addFlashAttribute("error", "La noticia no existe.");
+            mv.setViewName("redirect:/");
             return mv;
         }
 
-    if (!imagen.isEmpty()) {
-        String imagenUrl = imagenService.guardarImagen(imagen);
-        noticia.setImagen(imagenUrl);
+        mv.setViewName("/detalle");
+        mv.addObject("noticia", noticia);
+        return mv;
     }
 
-    noticiaService.guardarNoticia(noticia);
-    redirectAttributes.addFlashAttribute("mensaje", "Noticia creada exitosamente.");
-    return new ModelAndView("redirect:/listado");
-    }
-
-
-    @GetMapping("/listado")
-            public ModelAndView listarNoticias() {
-            ModelAndView mv = new ModelAndView("listadoNoticias");
-            List<Noticia> noticias = noticiaService.obtenerNoticias();
-            mv.addObject("noticias", noticias);
-            return mv;
-    }
-            
-    @DeleteMapping("/eliminar")
-        public ModelAndView eliminarNoticia(@RequestParam("id") Integer id, RedirectAttributes redirectAttributes) {
-        noticiaService.eliminarNoticia(id);
-        redirectAttributes.addFlashAttribute("mensaje", "Noticia eliminada exitosamente.");
-        return new ModelAndView("redirect:/listado");
-    }
-        
-    // Opción para búsqueda de noticias
+    // Proceso de búsqueda de noticias por título o descripción
     @GetMapping("/buscar")
     public ModelAndView buscarNoticias(@RequestParam("query") String query) {
         ModelAndView mv = new ModelAndView("listadoNoticias");
-        List<Noticia> noticias = noticiaService.buscarNoticias(query);
-        mv.addObject("noticias", noticias);
+        List<Noticia> resultados = noticiaService.buscarNoticias(query);
+        mv.addObject("noticias", resultados);
+        mv.addObject("query", query);
         return mv;
     }
-    public ModelAndView verNoticia(@RequestParam("id") Integer id) {
-    Noticia noticia = noticiaService.obtenerNoticiaPorId(id);
-    if (noticia == null) {
-        // Manejar la situación donde no se encuentra la noticia, tal vez redirigir a una página de error
-        return new ModelAndView("error/noticiaNoEncontrada");
+
+
+    // Elimina una noticia específica
+    @PostMapping("/{id}/eliminar")
+    public ModelAndView eliminarNoticia(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
+        noticiaService.eliminarNoticia(id);
+        redirectAttributes.addFlashAttribute("mensaje", "La noticia ha sido eliminada correctamente.");
+        return new ModelAndView("redirect:/");
     }
-    ModelAndView mv = new ModelAndView("detalleNoticia");
-    mv.addObject("noticia", noticia);
-    return mv;
-}
+        
+
+
 
 
 }

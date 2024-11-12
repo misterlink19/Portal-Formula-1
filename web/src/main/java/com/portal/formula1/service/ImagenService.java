@@ -1,42 +1,64 @@
 package com.portal.formula1.service;
 
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.UUID;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class ImagenService {
 
-    @Value("${upload.dir}")
-    private String uploadDir;
+    // Ruta donde se almacenarán las imágenes (puedes cambiarla según sea necesario)
+    private final Path rootLocation = Paths.get("uploads");
 
-    public boolean isValidImage(MultipartFile file) {
-        String contentType = file.getContentType();
-        long size = file.getSize();
-        return (contentType.equals("image/jpeg") || contentType.equals("image/png")) && size <= 2 * 1024 * 1024;
-    }
+    // Tamaño máximo de la imagen en bytes (por ejemplo, 2 MB)
+    private final long MAX_IMAGE_SIZE = 2 * 1024 * 1024;
 
-    public String guardarImagen(MultipartFile file) {
+    // Tipos de imagen permitidos
+    private final String[] ALLOWED_TYPES = {"image/jpeg", "image/png"};
+
+    public ImagenService() {
         try {
-            String filename = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-            Path filepath = Paths.get(uploadDir, filename);
-            Files.createDirectories(filepath.getParent());
-            Files.write(filepath, file.getBytes());
-            // Devuelve solo el nombre del archivo para facilitar la integración con Thymeleaf
-            return filename;
+            Files.createDirectories(rootLocation);
         } catch (IOException e) {
-            throw new ImageStorageException("Error al guardar la imagen", e);
+            throw new RuntimeException("No se pudo crear el directorio de almacenamiento de imágenes", e);
         }
     }
-}
 
-class ImageStorageException extends RuntimeException {
-    public ImageStorageException(String message, Throwable cause) {
-        super(message, cause);
+    public boolean isFormatoValido(MultipartFile file) {
+        String contentType = file.getContentType();
+        for (String type : ALLOWED_TYPES) {
+            if (type.equals(contentType)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isTamanoValido(MultipartFile file) {
+        return file.getSize() <= MAX_IMAGE_SIZE;
+    }
+
+    public String guardarImagen(MultipartFile file) throws IOException {
+        if (file.isEmpty()) {
+            throw new IOException("La imagen está vacía");
+        }
+        if (!isFormatoValido(file)) {
+            throw new IOException("Formato de imagen no permitido. Sólo se permiten JPG y PNG.");
+        }
+        if (!isTamanoValido(file)) {
+            throw new IOException("La imagen supera el tamaño máximo permitido de 2 MB.");
+        }
+
+        // Generar un nombre de archivo único
+        String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+        Path destinationFile = this.rootLocation.resolve(Paths.get(fileName))
+                .normalize().toAbsolutePath();
+
+        Files.copy(file.getInputStream(), destinationFile);
+        return fileName; // Retorna el nombre de la imagen guardada
     }
 }

@@ -19,27 +19,26 @@ public class Noticia {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", unique = true, nullable = false)
     private Integer id;
-    
+
     @Column(name = "permalink", unique = true)
-    @NotBlank(message = "El permalink no puede estar vacío")
     @Size(max = 100, message = "El permalink no puede superar 100 caracteres")
     private String permalink;
-    
+
     @Basic(optional = false)
     @Column(name = "titulo")
     @NotBlank(message = "Tiene que haber un titulo")
     @Size(max = 100, message = "El titulo no puede superar 100 caracteres")
     private String titulo;
-    
+
     @Column(name = "imagen")
     private String imagen;
-    
+
     @Basic(optional = false)
     @Column(name = "texto")
     @NotBlank(message = "Tiene que haber una descripción")
     @Size(min = 500, max = 2000, message = "La descripción debe tener entre 500 y 2000 caracteres")
     private String texto;
-    
+
     // Relación con el usuario creador (comentada hasta definir la clase Usuario)
     /*
     @ManyToOne
@@ -48,7 +47,7 @@ public class Noticia {
     */
     @Column(name = "fecha_publicacion", nullable = false, updatable = false)
     private LocalDateTime fechaPublicacion;
-    
+
     /*
     El método PrePersist se ejecuta antes de que la entidad se guarde por primera vez en la base de datos,
     estableciendo automáticamente la fecha de publicación al momento actual.
@@ -57,17 +56,16 @@ public class Noticia {
     protected void onCreate() {
         this.fechaPublicacion = LocalDateTime.now();
     }
-    
+
     public Noticia() {
-    } 
-    
-    public Noticia(String permalink, String titulo, String imagen, String texto) {
-        this.permalink = permalink;
+    }
+
+    public Noticia(String titulo, String imagen, String texto) {
         this.titulo = titulo;
         this.imagen = imagen;
         this.texto = texto;
     }
-    
+
     public Integer getId() {
         return id;
     }
@@ -119,7 +117,7 @@ public class Noticia {
                 ", fechaPublicacion=" + fechaPublicacion +
                 '}';
     }
-    
+
     public LocalDateTime getFechaPublicacion() {
         return fechaPublicacion;
     }
