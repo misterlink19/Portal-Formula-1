@@ -64,8 +64,22 @@ public class EncuestaService {
     }
 
     public Encuesta obtenerUltimaEncuestaDisponible() {
-        return encuestaDAO.findFirstByFechaLimiteAfterOrderByFechaLimiteAsc(LocalDateTime.now())
+        return encuestaDAO.findFirstByOrderByFechaInicioDesc()
                 .orElseThrow(() -> new NoSuchElementException("No hay encuestas disponibles en este momento"));
+    }
+
+    public List<Object[]> getPilotosPorEncuesta(String permalink) {
+        if (entityManager == null) {
+            throw new IllegalStateException("EntityManager is null");
+        }
+        String sql = "SELECT p.Nombre, p.Apellidos, p.Siglas, p.Dorsal, p.RutaImagen, p.Pais " +
+                "FROM piloto p JOIN encuesta_piloto ep ON ep.piloto_id = p.dorsal where ep.encuesta_id = :permalink";
+
+        Query query = entityManager.createNativeQuery(sql);
+        query.setParameter("permalink", permalink);
+
+
+        return query.getResultList();
     }
 
 }

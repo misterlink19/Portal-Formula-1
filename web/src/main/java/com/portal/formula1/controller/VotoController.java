@@ -36,7 +36,7 @@ public class VotoController {
         ModelAndView mv = new ModelAndView("votos/votarEncuesta");
         try {
             Encuesta encuesta = encuestaService.obtenerEncuestaPorPermalink(permalink);
-            List<Object[]> pilotos = encuestaService.getTodosLosPilotos();
+            List<Object[]> pilotos = encuestaService.getPilotosPorEncuesta(permalink);
             mv.addObject("encuesta", encuesta);
             mv.addObject("pilotos", pilotos);
             mv.addObject("voto", new Voto()); // Añadir nuevo objeto Voto al modelo
@@ -60,7 +60,7 @@ public class VotoController {
             boolean yaHaVotado = votoService.haVotadoAntes(voto.getCorreoVotante(), encuesta);
             if (yaHaVotado) {
                 mv.addObject("encuesta", encuesta);
-                mv.addObject("pilotos", encuestaService.getTodosLosPilotos());
+                mv.addObject("pilotos", encuestaService.getPilotosPorEncuesta(permalink));
                 mv.addObject("voto", voto);
                 mv.addObject("mensajeError", "Ya has votado en esta encuesta con este correo electrónico.");
                 return mv;

@@ -18,5 +18,14 @@ import java.util.Optional;
 @Repository
 public interface EncuestaDAO extends JpaRepository<Encuesta, String>{
 
+    /**
+     * Encuentra la próxima encuesta basada en la fecha límite futura más cercana a now.
+     * */
     Optional<Encuesta> findFirstByFechaLimiteAfterOrderByFechaLimiteAsc(LocalDateTime now);
+
+    /**
+     *
+     * Encuentra la encuesta más recientemente creada en base a la fecha de inicio.
+     */
+    Optional<Encuesta> findFirstByOrderByFechaInicioDesc();
 }

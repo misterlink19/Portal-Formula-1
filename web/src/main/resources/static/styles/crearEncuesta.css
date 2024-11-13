@@ -1,6 +1,6 @@
-
 fieldset {
     margin-top: 20px;
+    padding: 20px;
 }
 
 .card-body {
@@ -14,15 +14,18 @@ fieldset {
     height: 300px;
     overflow-y: auto;
 }
+
 .image-container {
     position: relative;
     display: inline-block;
 }
+
 .card-img-top {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
+
 .flag-icon {
     position: absolute;
     top: 5px;
@@ -46,7 +49,7 @@ input, textarea {
 }
 
 .container {
-    max-width: 800px;
+    max-width: 1200px;
     margin: auto;
 }
 
@@ -62,3 +65,4 @@ input, textarea {
 .btn {
     margin: 5px;
 }
+.input-group { display: flex; flex-direction: column; align-items: flex-start; width: 100%; }
