@@ -136,9 +136,7 @@ public class EncuestaServiceTests {
     public void testObtenerUltimaEncuestaDisponibleNoEncontrada() {
         when(encuestaDAO.findFirstByOrderByFechaInicioDesc()).thenReturn(Optional.empty());
 
-        assertThrows(NoSuchElementException.class, () -> {
-            encuestaService.obtenerUltimaEncuestaDisponible();
-        });
+        assertThrows(NoSuchElementException.class, () -> encuestaService.obtenerUltimaEncuestaDisponible());
     }
 
 
