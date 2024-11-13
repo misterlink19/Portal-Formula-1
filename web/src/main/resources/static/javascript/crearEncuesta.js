@@ -1,7 +1,7 @@
 // Función para validar el formulario
 function validarFormulario() {
-    var checkboxes = document.querySelectorAll('input[name="pilotosSeleccionados"]:checked');
-    if (checkboxes.length < 5 || checkboxes.length > 10) {
+    var seleccionados = document.querySelectorAll('input[name="pilotosSeleccionados"]:checked');
+    if (seleccionados.length < 5 || seleccionados.length > 10) {
         alert("Por favor, selecciona entre 5 y 10 pilotos.");
         return false;
     }
@@ -10,9 +10,8 @@ function validarFormulario() {
     var fechaLimite = document.getElementById("fechaLimite").value;
     var fechaInicioDate = new Date(fechaInicio);
     var fechaLimiteDate = new Date(fechaLimite);
-    var fechaActual = new Date();
 
-    if (fechaInicioDate < fechaActual) {
+    if (fechaInicioDate < new Date()) {
         alert("La fecha de inicio debe ser mayor o igual a la fecha y hora actual.");
         return false;
     }
@@ -21,6 +20,8 @@ function validarFormulario() {
         alert("La fecha límite debe ser mayor o igual a la fecha de inicio.");
         return false;
     }
+
+
 
     return true;
 }
@@ -49,6 +50,7 @@ function actualizarContadorPilotos() {
 // Función para reiniciar el contador de pilotos seleccionados
 function reiniciarContadorPilotos() {
     document.getElementById("pilotosSeleccionadosCount").innerText = "Pilotos seleccionados: 0";
+    setInitialDateTime();
 }
 
 // Configurar Flatpickr para los campos de fecha y hora
@@ -58,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
         dateFormat: "Y-m-d\\TH:i",
         minDate: "today",
         time_24hr: true,
-        defaultDate: new Date(new Date().setHours(new Date().getHours() + 1)).toISOString().substring(0, 16)
+        defaultDate: new Date(new Date().setHours(new Date().getHours() + 1)).toISOString().substring(0, 16),
     });
 
     flatpickr("#fechaLimite", {
@@ -68,6 +70,11 @@ document.addEventListener('DOMContentLoaded', function() {
         time_24hr: true,
         defaultDate: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().substring(0, 16),
         defaultHour: 8,
-        defaultMinute: 0
+        defaultMinute: 0,
     });
+
+    // Evento al botón de reset para restablecer las fechas al valor por defecto
+    document.querySelector('input[type="reset"]')
+        .addEventListener('click', function()
+        { setTimeout(setInitialDateTime, 0); });
 });

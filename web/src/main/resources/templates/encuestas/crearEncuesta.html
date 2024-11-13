@@ -9,6 +9,7 @@
   <title>Crear Encuesta</title>
   <!-- Flatpickr CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link type="text/css" th:href="@{/styles/crearEncuesta.css}" rel="stylesheet">
 </head>
 
 <!-- Poner en su body o div donde quieren que su contenido se cargue,
@@ -31,7 +32,7 @@ que se ejcute el layout-->
         <textarea class="form-control" th:field="*{descripcion}" id="descripcion" maxlength="255" rows="4" required></textarea>
       </div>
     </div>
-    <div class="form-group row justify-content-center">
+    <div class="form-group row justify-content-center input-container">
       <div class="col-md-4">
         <label for="fechaInicio">Fecha de Inicio</label>
         <input type="text" class="form-control" th:field="*{fechaInicio}" id="fechaInicio" required>
@@ -63,7 +64,7 @@ que se ejcute el layout-->
     </div>
     <div class="form-group col-md-12 mt-3">
       <input type="submit" class="btn btn-primary" value="Crear Encuesta">
-      <input type="reset" class="btn btn-danger" value="Borrar los datos introducidos" onclick="reiniciarContadorPilotos()">
+      <input type="reset" class="btn btn-danger" value="Borrar los datos introducidos" onclick="reiniciarContadorPilotos(); setInitialDateTime();">
     </div>
   </fieldset>
 </form>

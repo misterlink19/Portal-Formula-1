@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Set;
 
 import com.portal.formula1.model.Encuesta;
-import com.portal.formula1.model.Voto;
 import com.portal.formula1.repository.VotoDAO;
 import com.portal.formula1.service.EncuestaService;
 import org.slf4j.Logger;
@@ -43,7 +42,7 @@ public class EncuestaController {
     @GetMapping({"/crearEncuestas", "/crearEncuesta"})
     public ModelAndView mostrarFormularioCreacion() {
         logger.debug("Entrando a mostrarFormularioCreacion");
-        ModelAndView mv = new ModelAndView("crearEncuesta");
+        ModelAndView mv = new ModelAndView("encuestas/crearEncuesta");
         mv.addObject("encuesta", new Encuesta());
         List<Object[]> pilotos = encuestaService.getTodosLosPilotos();
         mv.addObject("pilotos", pilotos);
@@ -61,31 +60,11 @@ public class EncuestaController {
     @GetMapping("/{permalink}")
     public ModelAndView mostrarEncuesta(@PathVariable String permalink) {
         logger.debug("Entrando a mostrarEncuesta con permalink: {}", permalink);
-        ModelAndView mv = new ModelAndView("verEncuesta");
+        ModelAndView mv = new ModelAndView("encuestas/verEncuesta");
         Encuesta encuesta = encuestaService.obtenerEncuestaPorPermalink(permalink);
+        List<Object[]> pilotos = encuestaService.getTodosLosPilotos();
         mv.addObject("encuesta", encuesta);
+        mv.addObject("pilotos", pilotos);
         return mv;
     }
-    //Este lo habilitare con la historia de votarEncuesta
-//    @GetMapping("/{permalink}")
-//    public ModelAndView mostrarEncuesta(@PathVariable String permalink) {
-//        logger.debug("Entrando a mostrarEncuesta con permalink: {}", permalink);
-//        ModelAndView mv = new ModelAndView("votarEncuesta");
-//        Encuesta encuesta = encuestaService.obtenerEncuestaPorPermalink(permalink);
-//        List<Object[]> pilotos = encuestaService.getTodosLosPilotos();
-//        mv.addObject("encuesta", encuesta);
-//        mv.addObject("pilotos", pilotos);
-//        return mv;
-//    }
-
-//    @PostMapping("/{permalink}/votos")
-//    public ModelAndView crearVoto(@PathVariable String permalink, @ModelAttribute Voto voto) {
-//        logger.debug("Entrando a crearVoto con permalink: {}", permalink);
-//        ModelAndView mv = new ModelAndView("votoConfirmado");
-//        Encuesta encuesta = encuestaService.obtenerEncuestaPorPermalink(permalink);
-//        voto.setEncuesta(encuesta);
-//        Voto nuevoVoto = votoDAO.save(voto);
-//        mv.addObject("voto", nuevoVoto);
-//        return mv;
-//    }
 }

@@ -11,6 +11,8 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +44,8 @@ public class EncuestaService {
     }
 
     public Encuesta obtenerEncuestaPorPermalink(String permalink) {
-        return encuestaDAO.findById(permalink).orElseThrow();
+        Optional<Encuesta> encuestaOptional = encuestaDAO.findById(permalink);
+        return encuestaOptional.orElseThrow(() -> new NoSuchElementException("Encuesta no encontrada con permalink: " + permalink));
     }
     
     public List<Object[]> getTodosLosPilotos() {
@@ -56,6 +59,25 @@ public class EncuestaService {
         if (query == null) {
             throw new IllegalStateException("Query is null");
         }
+
+        return query.getResultList();
+    }
+
+    public Encuesta obtenerUltimaEncuestaDisponible() {
+        return encuestaDAO.findFirstByOrderByFechaInicioDesc()
+                .orElseThrow(() -> new NoSuchElementException("No hay encuestas disponibles en este momento"));
+    }
+
+    public List<Object[]> getPilotosPorEncuesta(String permalink) {
+        if (entityManager == null) {
+            throw new IllegalStateException("EntityManager is null");
+        }
+        String sql = "SELECT p.Nombre, p.Apellidos, p.Siglas, p.Dorsal, p.RutaImagen, p.Pais " +
+                "FROM piloto p JOIN encuesta_piloto ep ON ep.piloto_id = p.dorsal where ep.encuesta_id = :permalink";
+
+        Query query = entityManager.createNativeQuery(sql);
+        query.setParameter("permalink", permalink);
+
 
         return query.getResultList();
     }
