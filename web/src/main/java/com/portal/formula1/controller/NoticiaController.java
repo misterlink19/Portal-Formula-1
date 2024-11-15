@@ -23,7 +23,7 @@ import org.springframework.stereotype.Controller;
 
 import javax.validation.Valid;
 @Controller
-@RequestMapping("/")
+@RequestMapping("/noticias")
 public class NoticiaController {
 
     @Autowired
@@ -41,9 +41,9 @@ public class NoticiaController {
     }
 
     // Muestra el listado de noticias en la página principal
-    @GetMapping
+    @GetMapping("/listar")
     public ModelAndView listarNoticias() {
-        ModelAndView mv = new ModelAndView("listadoNoticias");
+        ModelAndView mv = new ModelAndView("noticias/listadoNoticias");
         List<Noticia> noticias = noticiaService.obtenerNoticias();
         mv.addObject("noticias", noticias);
         return mv;
@@ -52,7 +52,7 @@ public class NoticiaController {
     // Muestra el formulario para crear una nueva noticia
     @GetMapping("/crear")
     public ModelAndView mostrarFormularioCreacion() {
-        ModelAndView mv = new ModelAndView("crearNoticia");
+        ModelAndView mv = new ModelAndView("noticias/crearNoticia");
         mv.addObject("noticia", new Noticia());
         return mv;
     }
@@ -63,7 +63,7 @@ public class NoticiaController {
                                      @RequestParam("imagenArchivo") MultipartFile imagenArchivo,
                                      RedirectAttributes redirectAttributes) {
 
-    ModelAndView mv = new ModelAndView("crearNoticia");
+    ModelAndView mv = new ModelAndView("noticias/crear");
     if (result.hasErrors()) {
         return mv;
     }
@@ -83,7 +83,7 @@ public class NoticiaController {
         // Guardar la noticia con permalink único
         noticiaService.crearNoticia(noticia.getTitulo(), imagenArchivo, noticia.getTexto());
         redirectAttributes.addFlashAttribute("mensaje", "La noticia ha sido creada exitosamente.");
-        mv.setViewName("redirect:/");
+        mv.setViewName("redirect:/noticias/listar");
 
 
 
@@ -105,11 +105,11 @@ public class NoticiaController {
 
         if (noticia == null) {
             redirectAttributes.addFlashAttribute("error", "La noticia no existe.");
-            mv.setViewName("redirect:/");
+            mv.setViewName("redirect:/noticias/listar");
             return mv;
         }
 
-        mv.setViewName("/detalle");
+        mv.setViewName("noticias/detalle");
         mv.addObject("noticia", noticia);
         return mv;
     }
@@ -117,7 +117,7 @@ public class NoticiaController {
     // Proceso de búsqueda de noticias por título o descripción
     @GetMapping("/buscar")
     public ModelAndView buscarNoticias(@RequestParam("query") String query) {
-        ModelAndView mv = new ModelAndView("listadoNoticias");
+        ModelAndView mv = new ModelAndView("noticias/listar");
         List<Noticia> resultados = noticiaService.buscarNoticias(query);
         mv.addObject("noticias", resultados);
         mv.addObject("query", query);
@@ -130,7 +130,7 @@ public class NoticiaController {
     public ModelAndView eliminarNoticia(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
         noticiaService.eliminarNoticia(id);
         redirectAttributes.addFlashAttribute("mensaje", "La noticia ha sido eliminada correctamente.");
-        return new ModelAndView("redirect:/");
+        return new ModelAndView("redirect:/noticias/listar");
     }
         
 
