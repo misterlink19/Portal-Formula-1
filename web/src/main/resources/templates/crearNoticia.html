@@ -1,0 +1,128 @@
+<!DOCTYPE HTML>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Crear Noticia</title>
+    <!-- Tu CSS desde la carpeta estática -->
+    <link type="text/css" th:href="@{/mis-estilos/crear.css}" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .form-container {
+            background-color: #fff;
+            max-width: 500px;
+            width: 90%;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            margin: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        label {
+            font-weight: bold;
+            color: #555;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input[type="text"],
+        textarea,
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus,
+        input[type="file"]:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+            outline: none;
+        }
+
+        textarea {
+            height: 120px;
+            resize: vertical;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 12px;
+            margin-top: -10px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            font-weight: bold;
+            border: none;
+            border-radius: 4px;
+            padding: 12px;
+            width: 100%;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .message {
+            text-align: center;
+            color: #28a745;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h1>Crear Noticia</h1>
+
+        <!-- Formulario para crear una noticia -->
+        <form th:action="@{/crear}" th:object="${noticia}" method="post" enctype="multipart/form-data">
+
+            <div>
+                <label for="titulo">Título:</label>
+                <input type="text" id="titulo" th:field="*{titulo}" maxlength="100" required />
+                <div th:if="${#fields.hasErrors('titulo')}" th:errors="*{titulo}"></div>
+            </div>
+            <div>
+                <label for="texto">Descripción:</label>
+                <textarea id="texto" th:field="*{texto}" minlength="500" maxlength="2000" required></textarea>
+                <div th:if="${#fields.hasErrors('texto')}" th:errors="*{texto}"></div>
+            </div>
+            <div>
+                <label for="imagenArchivo">Imagen (opcional):</label>
+                <input type="file" id="imagenArchivo" name="imagenArchivo" accept="image/jpeg,image/png" />
+                <div th:if="${#fields.hasErrors('imagen')}"></div>
+            </div>
+
+            <button type="submit">Publicar Noticia</button>
+        </form>
+        <div th:if="${mensaje}">
+            <p th:text="${mensaje}"></p>
+        </div>
+    </div>
+</body>
+</html>
