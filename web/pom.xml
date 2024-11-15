@@ -70,7 +70,6 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-core</artifactId>
         </dependency>
-
        <!-- Dependencia del Layout -->
        <dependency>
            <groupId>nz.net.ultraq.thymeleaf</groupId>
