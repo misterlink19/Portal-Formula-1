@@ -9,6 +9,11 @@ package com.portal.formula1.controller;
 import com.portal.formula1.model.Noticia;
 import com.portal.formula1.service.ImagenService;
 import com.portal.formula1.service.NoticiaService;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,6 +83,13 @@ public class NoticiaController {
                 result.rejectValue("imagen", "error.noticia", "La imagen supera el tamaño máximo permitido de 2 MB.");
                 return mv;
             }
+            // Guardar la imagen en resources/static/uploads
+            String nombreArchivo = System.currentTimeMillis() + "_" + imagenArchivo.getOriginalFilename();
+            Path rutaArchivo = Paths.get("src/main/resources/static/uploads").resolve(nombreArchivo).toAbsolutePath();
+            Files.copy(imagenArchivo.getInputStream(), rutaArchivo, StandardCopyOption.REPLACE_EXISTING);
+
+            // Establecer el nombre del archivo en el objeto noticia
+            noticia.setImagen(nombreArchivo);
         }
 
         // Guardar la noticia con permalink único
@@ -117,7 +129,7 @@ public class NoticiaController {
     // Proceso de búsqueda de noticias por título o descripción
     @GetMapping("/buscar")
     public ModelAndView buscarNoticias(@RequestParam("query") String query) {
-        ModelAndView mv = new ModelAndView("noticias/listar");
+        ModelAndView mv = new ModelAndView("noticias/listadoNoticias");
         List<Noticia> resultados = noticiaService.buscarNoticias(query);
         mv.addObject("noticias", resultados);
         mv.addObject("query", query);
