@@ -6,6 +6,7 @@ package com.portal.formula1.controller;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import com.portal.formula1.model.Encuesta;
@@ -17,8 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+
 /**
- *
  * @author Misterlink
  */
 @Controller
@@ -43,28 +44,48 @@ public class EncuestaController {
     public ModelAndView mostrarFormularioCreacion() {
         logger.debug("Entrando a mostrarFormularioCreacion");
         ModelAndView mv = new ModelAndView("encuestas/crearEncuesta");
-        mv.addObject("encuesta", new Encuesta());
-        List<Object[]> pilotos = encuestaService.getTodosLosPilotos();
-        mv.addObject("pilotos", pilotos);
+        try {
+            mv.addObject("encuesta", new Encuesta());
+            List<Object[]> pilotos = encuestaService.getTodosLosPilotos();
+            mv.addObject("pilotos", pilotos);
+        } catch (Exception e) {
+            logger.error("Error al cargar el formulario de creación: ", e);
+            mv.setViewName("error");
+            mv.addObject("mensajeError", "Error al cargar el formulario de creación.");
+        }
         return mv;
     }
 
     @PostMapping
     public ModelAndView crearEncuesta(@ModelAttribute Encuesta encuesta, @RequestParam Set<String> pilotosSeleccionados) {
         logger.debug("Entrando a crearEncuesta");
-        Set<String> pilotoSet = new HashSet<>(pilotosSeleccionados);
-        Encuesta nuevaEncuesta = encuestaService.crearEncuesta(encuesta,pilotoSet);
-        return new ModelAndView("redirect:/encuestas/" + nuevaEncuesta.getPermalink());
+        ModelAndView mv = new ModelAndView();
+        try {
+            Set<String> pilotoSet = new HashSet<>(pilotosSeleccionados);
+            Encuesta nuevaEncuesta = encuestaService.crearEncuesta(encuesta, pilotoSet);
+            mv.setViewName("redirect:/encuestas/" + nuevaEncuesta.getPermalink());
+        } catch (Exception e) {
+            logger.error("Error al crear la encuesta: ", e);
+            mv.setViewName("error");
+            mv.addObject("mensajeError", "Error al crear la encuesta.");
+        }
+        return mv;
     }
 
     @GetMapping("/{permalink}")
     public ModelAndView mostrarEncuesta(@PathVariable String permalink) {
         logger.debug("Entrando a mostrarEncuesta con permalink: {}", permalink);
         ModelAndView mv = new ModelAndView("encuestas/verEncuesta");
-        Encuesta encuesta = encuestaService.obtenerEncuestaPorPermalink(permalink);
-        List<Object[]> pilotos = encuestaService.getTodosLosPilotos();
-        mv.addObject("encuesta", encuesta);
-        mv.addObject("pilotos", pilotos);
+        try {
+            Encuesta encuesta = encuestaService.obtenerEncuestaPorPermalink(permalink);
+            List<Object[]> pilotos = encuestaService.getTodosLosPilotos();
+            mv.addObject("encuesta", encuesta);
+            mv.addObject("pilotos", pilotos);
+        }catch (NoSuchElementException e) {
+            logger.error("Encuesta no encontrada con permalink: {}", permalink);
+            mv.setViewName("error");
+            mv.addObject("mensajeError", "Encuesta no encontrada.");
+        }
         return mv;
     }
 }

@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}" >
 <head>
     <title>Detalle de Noticia</title>
 </head>
-<body>
+<body layout:fragment="body">
 <h1 th:text="${noticia.titulo}">Título de la Noticia</h1>
 
 <div>

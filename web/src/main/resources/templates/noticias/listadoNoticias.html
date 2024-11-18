@@ -1,5 +1,7 @@
 <!DOCTYPE HTML>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}" >
 <head>
     <title>Listado de Noticias</title>
     <!-- Tu CSS desde la carpeta estática -->
@@ -9,7 +11,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 
 </head>
-<body>
+<body layout:fragment="body">
 <div class="container-fluid">
     <h1 class="text-center mb-4">Noticias</h1>
 
