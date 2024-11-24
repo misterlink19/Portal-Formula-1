@@ -4,6 +4,7 @@
  */
 package com.portal.formula1.interceptors;
 
+import com.portal.formula1.model.Rol;
 import com.portal.formula1.model.UsuarioRegistrado;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,11 +22,10 @@ import org.springframework.web.servlet.ModelAndView;
 public class SessionInterceptor  implements HandlerInterceptor {
     
     public SessionInterceptor(){
-
-        routeRoles.put("/admin","ADMIN" );
+        routeRoles.put("/admin",Rol.ADMIN);
     }
 
-    private final Map<String, String> routeRoles = new HashMap<>();
+    private final Map<String, Rol> routeRoles = new HashMap<>();
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
@@ -34,10 +34,10 @@ public class SessionInterceptor  implements HandlerInterceptor {
             response.sendRedirect("/");
             return false;
         }
-        String userRole = user.getRol();
-        for (Map.Entry<String, String> entry : routeRoles.entrySet()) {
+        Rol userRole = user.getRol();
+        for (Map.Entry<String, Rol> entry : routeRoles.entrySet()) {
             String path = entry.getKey();
-            String requiredRole = entry.getValue();
+            Rol requiredRole = entry.getValue();
         
             if (request.getRequestURI().startsWith(path) && !requiredRole.equals(userRole)) {
                 response.sendRedirect("/accesoDenegado.jsp");

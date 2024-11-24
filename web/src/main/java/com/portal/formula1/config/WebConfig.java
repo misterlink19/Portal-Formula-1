@@ -26,7 +26,8 @@ public class WebConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/javascript/**")
                 .excludePathPatterns("/images/**")
                 .excludePathPatterns("/favicon.ico")
-                .excludePathPatterns("/votos/**");
+                .excludePathPatterns("/votos/**")
+                .excludePathPatterns("/registro/**");
     }
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {

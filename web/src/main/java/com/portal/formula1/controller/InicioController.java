@@ -71,4 +71,6 @@ public class InicioController {
         session.invalidate(); // Finaliza la sesión
         return "redirect:/";
     }
+
+
 }
