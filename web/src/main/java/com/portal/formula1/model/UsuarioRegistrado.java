@@ -50,6 +50,12 @@ public class UsuarioRegistrado implements Serializable {
     @Column(name = "validacion", nullable = false)
     private Boolean validacion = false;
 
+    @Getter
+    @Setter
+    @ManyToOne
+    @JoinColumn(name = "equipo_id")
+    private Equipo equipo;
+
     public UsuarioRegistrado() {
         this.validacion = false;
     }

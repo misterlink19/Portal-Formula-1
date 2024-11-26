@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ver Equipo</title>
+</head>
+<body layout:fragment="body">
+<main role="main" class="container">
+  <h1 th:text="'Detalles del Equipo: ' + ${equipo.nombre}">Detalles del Equipo</h1>
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title" th:text="${equipo.nombre}">Nombre del Equipo</h5>
+      <p class="card-text"><strong>Logo:</strong><img th:src="${equipo.logo}" alt="Logo del Equipo" class="img-fluid"></p>
+      <p class="card-text"><strong>Twitter:</strong><a th:href="'https://twitter.com/' + ${equipo.twitter}" th:text="${equipo.twitter}">@Twitter</a></p>
+      <h5 class="card-title">Responsables del Equipo</h5>
+      <ul>
+        <li th:each="responsable : ${equipo.responsables}">
+          <span th:text="${responsable.nombre}">Responsable</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <a th:href="@{/equipos}" class="btn btn-secondary mt-3">Volver a Equipos</a>
+</main>
+</body>
+</html>

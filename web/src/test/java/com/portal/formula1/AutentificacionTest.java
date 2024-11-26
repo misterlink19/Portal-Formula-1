@@ -13,6 +13,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static com.portal.formula1.model.Rol.ADMIN;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -40,7 +41,7 @@ public class AutentificacionTest {
         usuario = new UsuarioRegistrado();
         usuario.setUsuario("adminUser");
         usuario.setContrasena("$2a$10$Mk6Be3FX0HHjODkn69FWIeCh15NoI/CoVHaV1mPeJI2JkNfseihrW");
-        usuario.setRol("ADMIN");
+        usuario.setRol(ADMIN);
         usuario.setNombre("administrador Juan");
         usuario.setEmail("administrador@gmail.com");
 

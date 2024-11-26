@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}" >
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Crear Equipo</title>
+    <link type="text/css" th:href="@{/styles/crearEquipo.css}" rel="stylesheet">
+</head>
+<body>
+<div layout:fragment="body">
+    <h1 class="text-center">Crear Nuevo Equipo</h1>
+    <form th:action="@{/equipos}" th:object="${equipo}" method="post" class="mt-4">
+        <fieldset class="border p-4 text-center">
+            <div class="form-group row justify-content-center">
+                <div class="col-md-8">
+                    <label for="nombre">Nombre del Equipo</label>
+                    <input type="text" class="form-control" th:field="${nombre}" id="nombre" maxlength="255" required>
+                </div>
+            </div>
+            <div class="form-group row justify-content-center">
+                <div class="col-md-8">
+                    <label for="logo">Logo del Equipo</label>
+                    <input type="text" class="form-control" th:field="${logo}" id="logo" maxlength="255" required>
+                </div>
+            </div>
+            <div class="form-group row justify-content-center">
+                <div class="col-md-8">
+                    <label for="twitter">Twitter del Equipo</label>
+                    <input type="text" class="form-control" th:field="${twitter}" id="twitter" maxlength="255">
+                </div>
+            </div>
+            <div class="form-group col-md-12 mt-3">
+                <input type="submit" class="btn btn-primary" value="Crear Equipo">
+                <input type="reset" class="btn btn-danger" value="Borrar los datos introducidos">
+            </div>
+        </fieldset>
+    </form>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="/javascript/crearEquipo.js"></script>
+</div>
+
+</body>
+</html>
