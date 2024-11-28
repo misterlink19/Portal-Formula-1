@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Setter
@@ -24,5 +25,5 @@ public class Equipo {
     private String twitter;
 
     @OneToMany(mappedBy = "equipo", cascade = CascadeType.ALL)
-    private List<UsuarioRegistrado> responsables;
+    private List<UsuarioRegistrado> responsables = new ArrayList<>();
 }

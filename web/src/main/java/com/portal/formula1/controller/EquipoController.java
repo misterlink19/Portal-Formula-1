@@ -70,7 +70,7 @@ public class EquipoController {
     @GetMapping("/{id}")
     public ModelAndView mostrarEquipo(@PathVariable Long id) {
         logger.debug("Entrando a mostrarEquipo con id: {}", id);
-        ModelAndView mv = new ModelAndView("verEquipo");
+        ModelAndView mv = new ModelAndView("equipos/verEquipo");  // Asegúrate de que la ruta sea correcta
         try {
             Equipo equipo = equipoService.obtenerEquipoPorId(id)
                     .orElseThrow(() -> new NoSuchElementException("Equipo no encontrado"));
@@ -86,4 +86,5 @@ public class EquipoController {
         }
         return mv;
     }
+
 }
