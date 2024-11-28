@@ -3,13 +3,17 @@ package com.portal.formula1;
 import com.portal.formula1.controller.EquipoController;
 import com.portal.formula1.model.Equipo;
 import com.portal.formula1.service.EquipoService;
+import com.portal.formula1.service.ImagenService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
 
@@ -19,7 +23,6 @@ import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 public class EquipoControllerTests {
@@ -28,6 +31,9 @@ public class EquipoControllerTests {
 
     @InjectMocks
     private EquipoController equipoController;
+
+    @Mock
+    private ImagenService imagenService;
 
     private MockMvc mockMvc;
 
@@ -67,10 +73,20 @@ public class EquipoControllerTests {
     public void testCrearEquipo() throws Exception {
         Equipo equipo = new Equipo();
         equipo.setId(1L);
-        when(equipoService.crearEquipo(any(Equipo.class))).thenReturn(equipo);
+        equipo.setNombre("Nuevo Equipo");
+        equipo.setTwitter("twitterHandle");
 
-        mockMvc.perform(post("/equipos")
-                        .flashAttr("equipo", new Equipo()))
+        when(equipoService.crearEquipo(any(Equipo.class))).thenReturn(equipo);
+        when(imagenService.isFormatoValido(any(MultipartFile.class))).thenReturn(true);
+        when(imagenService.isTamanoValido(any(MultipartFile.class))).thenReturn(true);
+
+        MockMultipartFile mockFile = new MockMultipartFile("logoArchivo", "logo.png", "image/png", "test content".getBytes());
+
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/equipos/crear")
+                        .file(mockFile)
+                        .param("nombre", "Nuevo Equipo")
+                        .param("twitter", "twitterHandle")
+                        .flashAttr("equipo", equipo))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/equipos/1"));
     }
@@ -86,7 +102,7 @@ public class EquipoControllerTests {
 
         mockMvc.perform(get("/equipos/1"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("verEquipo"))
+                .andExpect(view().name("equipos/verEquipo"))
                 .andExpect(model().attributeExists("equipo"))
                 .andExpect(model().attribute("equipo", equipo));
     }
