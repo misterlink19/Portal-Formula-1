@@ -4,37 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Crear Equipo</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <link type="text/css" th:href="@{/styles/crearEquipo.css}" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/styles/crearEquipo.css}">
 </head>
 <body layout:fragment="body">
-<h1 class="text-center">Crear Nuevo Equipo</h1>
-<form th:action="@{/equipos}" th:object="${equipo}" method="post" class="mt-4">
-    <fieldset class="border p-4 text-center">
-        <div class="form-group row justify-content-center">
-            <div class="col-md-8">
-                <label for="nombre">Nombre del Equipo</label>
-                <input type="text" class="form-control" th:field="*{nombre}" id="nombre" maxlength="255" required>
+<div class="container">
+    <h1 class="text-center">Crear Nuevo Equipo</h1>
+    <form th:action="@{/equipos/crear}" th:object="${equipo}" method="post" enctype="multipart/form-data" class="mt-4">
+        <fieldset class="border p-4 text-center">
+            <div class="form-group row justify-content-center">
+                <div class="col-md-8">
+                    <label for="nombre">Nombre del Equipo</label>
+                    <input type="text" class="form-control" th:field="*{nombre}" id="nombre" maxlength="255" required>
+                    <div class="text-danger" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></div>
+                </div>
             </div>
-        </div>
-        <div class="form-group row justify-content-center">
-            <div class="col-md-8">
-                <label for="logo">Logo del Equipo</label>
-                <input type="text" class="form-control" th:field="*{logo}" id="logo" maxlength="255" required>
+            <div class="form-group row justify-content-center">
+                <div class="col-md-8">
+                    <label for="logo">Logo del Equipo</label>
+                    <input type="file" class="form-control" name="logoArchivo" id="logoArchivo" accept="image/jpeg, image/png" required>
+                    <div class="text-danger" th:if="${#fields.hasErrors('logo')}" th:errors="*{logo}"></div>
+                </div>
             </div>
-        </div>
-        <div class="form-group row justify-content-center">
-            <div class="col-md-8">
-                <label for="twitter">Twitter del Equipo</label>
-                <input type="text" class="form-control" th:field="*{twitter}" id="twitter" maxlength="255">
+            <div class="form-group row justify-content-center">
+                <div class="col-md-8">
+                    <label for="twitter">Twitter del Equipo</label>
+                    <input type="text" class="form-control" th:field="*{twitter}" id="twitter" maxlength="255" required>
+                    <div class="text-danger" th:if="${#fields.hasErrors('twitter')}" th:errors="*{twitter}"></div>
+                </div>
             </div>
-        </div>
-        <div class="form-group col-md-12 mt-3">
-            <input type="submit" class="btn btn-primary" value="Crear Equipo">
-            <input type="reset" class="btn btn-danger" value="Borrar los datos introducidos">
-        </div>
-    </fieldset>
-</form>
+            <div class="form-group col-md-12 mt-3">
+                <input type="submit" class="btn btn-primary" value="Crear Equipo">
+                <input type="button" class="btn btn-danger" value="Borrar los datos introducidos" onclick="resetFormFields()">
+            </div>
+        </fieldset>
+    </form>
+</div>
 <script src="/javascript/crearEquipo.js"></script>
 </body>
 </html>

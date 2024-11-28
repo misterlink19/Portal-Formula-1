@@ -31,6 +31,8 @@ public class EquipoService {
         return equipoDAO.findAll();
     }
 
+    public boolean existePorNombre(String nombre) { return equipoDAO.existsByNombre(nombre); }
+
     public Equipo addResponsableToEquipo(Long equipoId, String usuario) {
         Equipo equipo = equipoDAO.findById(equipoId).orElse(null);
         UsuarioRegistrado responsable = usuarioRegistradoDAO.findById(usuario).orElse(null);

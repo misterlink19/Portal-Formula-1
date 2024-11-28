@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface EquipoDAO extends JpaRepository<Equipo, Long> {
 
+    boolean existsByNombre(String nombre);
 }

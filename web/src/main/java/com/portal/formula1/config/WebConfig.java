@@ -28,12 +28,14 @@ public class WebConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/favicon.ico")
                 .excludePathPatterns("/votos/**")
                 .excludePathPatterns("/equipos/**")
-                .excludePathPatterns("/registro/**");
+                .excludePathPatterns("/registro/**")
+                .excludePathPatterns("/uploads/**");
     }
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/uploads/**")
-                .addResourceLocations("file:uploads/");
+                .addResourceLocations("file:uploads/")
+                .addResourceLocations("file:src/main/resources/static/uploads/"); // Con esto carga las imagenes que estan en uploads dentro de static;
     }
 
 }

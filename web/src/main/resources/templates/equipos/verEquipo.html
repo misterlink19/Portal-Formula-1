@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ver Equipo</title>
+  <link rel="stylesheet" th:href="@{/styles/verEquipo.css}">
 </head>
 <body layout:fragment="body">
 <main role="main" class="container">
@@ -11,7 +12,7 @@
   <div class="card">
     <div class="card-body">
       <h5 class="card-title" th:text="${equipo.nombre}">Nombre del Equipo</h5>
-      <p class="card-text"><strong>Logo:</strong><img th:src="${equipo.logo}" alt="Logo del Equipo" class="img-fluid"></p>
+      <p class="card-text logo-container"><strong>Logo:</strong><img th:src="@{'/uploads/' + ${equipo.logo}}" alt="Logo del Equipo" class="img-fluid"></p>
       <p class="card-text"><strong>Twitter:</strong><a th:href="'https://twitter.com/' + ${equipo.twitter}" th:text="${equipo.twitter}">@Twitter</a></p>
       <h5 class="card-title">Responsables del Equipo</h5>
       <ul>
