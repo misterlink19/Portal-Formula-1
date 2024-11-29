@@ -11,8 +11,9 @@
 </head>
 <body layout:fragment="body">
 <div class="container mt-5">
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
   <h1 class="text-center mb-4">Registro de Usuario</h1>
-  <form th:action="@{/registro}" th:object="${usuarioRegistrado}" method="post" class="needs-validation" novalidate>
+  <form th:action="@{/registro}" th:object="${usuarioRegistrado}" method="post" class="needs-validation" novalidate onsubmit="return validateForm()">
     <div class="mb-3">
       <label for="usuario" class="form-label">Usuario</label>
       <input type="text" id="usuario" name="usuario" class="form-control" th:field="*{usuario}" placeholder="Ingrese su nombre de usuario" required>
@@ -43,6 +44,7 @@
       </select>
       <div class="invalid-feedback">El campo rol es obligatorio.</div>
     </div>
+    <div class="g-recaptcha" th:data-sitekey="${@environment.getProperty('recaptcha.key')}"></div>
     <div class="d-grid">
       <button type="submit" class="btn btn-primary">Registrar</button>
     </div>
@@ -66,6 +68,18 @@
       }, false)
     })
   })()
+
+  function validateForm() {
+    if (grecaptcha.getResponse()) {
+
+      return true;
+    }else {
+      alert("Por favor, verifica que no eres un robot.");
+        return false;
+    }
+  }
+
+
 </script>
 </body>
 </html>
