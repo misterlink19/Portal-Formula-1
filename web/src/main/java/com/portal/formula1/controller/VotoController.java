@@ -67,7 +67,7 @@ public class VotoController {
             }
 
             Voto nuevoVoto = votoService.crearVoto(voto);
-            mv.setViewName("votoConfirmado");
+            mv.setViewName("votos/votoConfirmado");
             mv.addObject("voto", nuevoVoto);
         } catch (NoSuchElementException e) {
             logger.error("Encuesta no encontrada con permalink: {}", permalink);

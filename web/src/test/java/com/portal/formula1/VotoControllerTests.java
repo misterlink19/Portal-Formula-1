@@ -104,7 +104,7 @@ public class VotoControllerTests {
                         .param("correoVotante", "test@example.com")
                         .param("opcionSeleccionada", "1"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("votoConfirmado"))
+                .andExpect(view().name("votos/votoConfirmado"))
                 .andExpect(model().attributeExists("voto"));
     }
 }

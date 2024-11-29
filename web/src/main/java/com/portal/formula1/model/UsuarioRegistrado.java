@@ -5,8 +5,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
+import java.lang.annotation.Annotation;
 
 @Entity
 @Table(name = "usuarios_registrados")
@@ -49,6 +51,12 @@ public class UsuarioRegistrado implements Serializable {
     @Setter
     @Column(name = "validacion", nullable = false)
     private Boolean validacion = false;
+
+    @Getter
+    @Setter
+    @ManyToOne
+    @JoinColumn(name = "equipo_id")
+    private Equipo equipo;
 
     public UsuarioRegistrado() {
         this.validacion = false;
