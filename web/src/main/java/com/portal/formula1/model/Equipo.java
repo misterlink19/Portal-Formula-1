@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +14,10 @@ import jakarta.validation.constraints.Size;
 @Setter
 @Getter
 @Entity
-public class Equipo {
+public class Equipo implements Serializable {
+    // serialVersionUID es utilizado para la compatibilidad de la serialización cuando se inicia sesion
+    private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

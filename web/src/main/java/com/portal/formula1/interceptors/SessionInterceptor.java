@@ -40,7 +40,7 @@ public class SessionInterceptor  implements HandlerInterceptor {
             Rol requiredRole = entry.getValue();
         
             if (request.getRequestURI().startsWith(path) && !requiredRole.equals(userRole)) {
-                response.sendRedirect("/accesoDenegado.jsp");
+                response.sendRedirect("/accesoDenegado.html");
                 return false;
             }
         }

@@ -21,6 +21,12 @@ public class UsuarioService {
     }
 
     @Transactional
+    public void actualizarUsuario(UsuarioRegistrado usuario) {
+        usuarioRegistradoDAO.save(usuario);
+    }
+
+
+    @Transactional
     public void validarUsuarios(List<String> usuariosIds) {
         usuariosIds.forEach(id -> {
             UsuarioRegistrado usuario = usuarioRegistradoDAO.findById(id).orElse(null);

@@ -27,7 +27,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/images/**")
                 .excludePathPatterns("/favicon.ico")
                 .excludePathPatterns("/votos/**")
-                .excludePathPatterns("/equipos/**")
+//                .excludePathPatterns("/equipos/**") removi exclusión de /equipos/** para asegurar que pase por el interceptor
                 .excludePathPatterns("/registro/**")
                 .excludePathPatterns("/uploads/**");
     }

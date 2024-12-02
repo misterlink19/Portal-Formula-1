@@ -21,14 +21,44 @@
     <div class="collapse navbar-collapse" id="navbarCollapse">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item active"><a class="nav-link" th:href="@{/}">Inicio</a></li>
-            <li class="nav-item"><a class="nav-link" th:href="@{/encuestas}">Encuestas</a></li>
-            <li class="nav-item"><a class="nav-link" th:href="@{/votos/votar}">Votar</a></li>
-            <li class="nav-item"><a class="nav-link" th:href="@{/noticias/listar}">Noticias</a></li>
+
+            <!-- Mostrar solo si el usuario NO es Admin -->
+            <li class="nav-item" th:if="${session.usuario != null} and ${session.usuario.rol != T(com.portal.formula1.model.Rol).ADMIN}">
+                <a class="nav-link" th:href="@{/encuestas/listar}">Encuestas</a>
+            </li>
+            <li class="nav-item" th:if="${session.usuario != null} and ${session.usuario.rol != T(com.portal.formula1.model.Rol).ADMIN}">
+                <a class="nav-link" th:href="@{/votos/votar}">Votar</a>
+            </li>
+            <li class="nav-item" th:if="${session.usuario != null} and ${session.usuario.rol != T(com.portal.formula1.model.Rol).ADMIN}">
+                <a class="nav-link" th:href="@{/noticias/listar}">Noticias</a>
+            </li>
+
+            <!-- Solo para Administradores -->
+            <li class="nav-item" th:if="${session.usuario != null} and ${session.usuario.rol == T(com.portal.formula1.model.Rol).ADMIN}">
+                <a class="nav-link" th:href="@{/encuestas}">Gestionar Encuestas</a>
+            </li>
+            <li class="nav-item" th:if="${session.usuario != null} and ${session.usuario.rol == T(com.portal.formula1.model.Rol).ADMIN}">
+                <a class="nav-link" th:href="@{/votos}">Gestionar Votos</a>
+            </li>
+            <li class="nav-item" th:if="${session.usuario != null} and ${session.usuario.rol == T(com.portal.formula1.model.Rol).ADMIN}">
+                <a class="nav-link" th:href="@{/noticias/gestion}">Gestionar Noticias</a>
+            </li>
+            <li class="nav-item" th:if="${session.usuario != null} and ${session.usuario.rol == T(com.portal.formula1.model.Rol).ADMIN}">
+                <a class="nav-link" th:href="@{/equipos}">Gestionar Equipos</a>
+            </li>
+            <li class="nav-item" th:if="${session.usuario != null} and ${session.usuario.rol == T(com.portal.formula1.model.Rol).ADMIN}">
+                <a class="nav-link" th:href="@{/usuarios}">Gestionar Usuarios</a>
+            </li>
+
+            <!-- Solo para Responsables de Equipo -->
+            <li class="nav-item" th:if="${session.usuario != null} and ${session.usuario.rol == T(com.portal.formula1.model.Rol).JEFE_DE_EQUIPO}">
+                <a class="nav-link" th:href="@{/equipos}">Gestionar Equipos</a>
+            </li>
         </ul>
     </div>
 </nav>
 <body layout:fragment="body" class="container pt-5 mt-5">
- <!-- Contenido Principal -->
+<!-- Contenido Principal -->
 </body>
 <div>
     <!-- Footer -->
