@@ -54,7 +54,7 @@ public class UsuarioRegistrado implements Serializable {
 
     @Getter
     @Setter
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "equipo_id")
     private Equipo equipo;
 

@@ -1,9 +1,15 @@
 package com.portal.formula1.controller;
 
 import com.portal.formula1.model.Equipo;
+import com.portal.formula1.model.Rol;
+import com.portal.formula1.model.UsuarioRegistrado;
+import com.portal.formula1.service.AutentificacionService;
 import com.portal.formula1.service.EquipoService;
 import com.portal.formula1.service.ImagenService;
+import com.portal.formula1.service.UsuarioService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -32,14 +38,30 @@ public class EquipoController {
 
     @Autowired
     private ImagenService imagenService;
+    @Autowired
+    private UsuarioService usuarioService;
+
+    @Autowired
+    private AutentificacionService autentificacionService;
 
     @GetMapping
-    public ModelAndView mostrarMenuEquipos() {
+    public ModelAndView mostrarMenuEquipos(HttpServletRequest request) {
         logger.debug("Entrando a mostrarMenuEquipos");
         ModelAndView mv = new ModelAndView("equipos/equipo");
+        UsuarioRegistrado user = (UsuarioRegistrado) request.getSession().getAttribute("usuario");
         try {
-            List<Equipo> equipos = equipoService.obtenerTodosLosEquipos();
-            mv.addObject("equipos", equipos);
+            user = autentificacionService.checkUser(user.getUsuario());
+            // Con esto me aseguro que solo los admins y los responsables de equipo pueden entrar
+            // a la gestion de equipos.
+            if (user.getRol() != Rol.ADMIN && user.getRol() != Rol.JEFE_DE_EQUIPO) {
+                mv.setViewName("error");
+                mv.addObject("mensajeError", "No tienes permiso para acceder a esta sección.");
+                return mv;
+            }
+
+            logger.debug("Usuario recuperado con equipo: {}", user.getEquipo()); // Agregar log de depuración
+            mv.addObject("usuario", user);
+
         } catch (Exception e) {
             logger.error("Error al cargar el menú de equipos: ", e);
             mv.setViewName("error");
@@ -50,11 +72,21 @@ public class EquipoController {
 
 
     @GetMapping("/crear")
-    public ModelAndView mostrarFormularioCreacion() {
+    public ModelAndView mostrarFormularioCreacion(HttpServletRequest request) {
         logger.debug("Entrando a mostrarFormularioCreacion");
         ModelAndView mv = new ModelAndView("equipos/crearEquipo");
+        UsuarioRegistrado user = (UsuarioRegistrado) request.getSession().getAttribute("usuario");
+
         try {
-            mv.addObject("equipo", new Equipo());
+            // Con esto revisamos si el responsable de equipo ya tiene un equipo, antes de que le permita crear uno.
+            user = autentificacionService.checkUser(user.getUsuario());
+
+            if (user.getRol() == Rol.JEFE_DE_EQUIPO && user.getEquipo() != null) {
+                mv.setViewName("error");
+                mv.addObject("mensajeError", "Lo sentimos, ya tienes un equipo asignado.");
+            } else {
+                mv.addObject("equipo", new Equipo());
+            }
         } catch (Exception e) {
             logger.error("Error al cargar el formulario de creación: ", e);
             mv.setViewName("error");
@@ -68,9 +100,11 @@ public class EquipoController {
     public ModelAndView crearEquipo(@Valid @ModelAttribute("equipo") Equipo equipo,
                                     BindingResult result,
                                     @RequestParam("logoArchivo") MultipartFile logoArchivo,
-                                    RedirectAttributes redirectAttributes) {
+                                    RedirectAttributes redirectAttributes,
+                                    HttpServletRequest request) { //Con httpservletRequest es que se obtiene la session para verificar que usario es.
         logger.debug("Entrando a crearEquipo");
         ModelAndView mv = new ModelAndView("equipos/crearEquipo");
+        UsuarioRegistrado user = (UsuarioRegistrado) request.getSession().getAttribute("usuario");
 
         // Validación del lado del servidor
         if (result.hasErrors()) {
@@ -101,7 +135,13 @@ public class EquipoController {
                 mv.addObject("equipo", equipo);
                 return mv;
             }
-
+            // Revisa por si acaso de alguna manera entro responsable de equipo con equipo asignado
+            user = autentificacionService.checkUser(user.getUsuario());
+            if (user.getRol() == Rol.JEFE_DE_EQUIPO && user.getEquipo() != null) {
+                mv.addObject("mensajeError", "Lo sentimos, ya tienes un equipo asignado.");
+                mv.addObject("equipo", equipo);
+                return mv;
+            }
             // Guardar la imagen en resources/static/uploads
             String nombreArchivo = System.currentTimeMillis() + "_" + logoArchivo.getOriginalFilename();
             Path rutaArchivo = Paths.get("src/main/resources/static/uploads").resolve(nombreArchivo).toAbsolutePath();
@@ -112,6 +152,13 @@ public class EquipoController {
 
             // Guardar el equipo
             Equipo nuevoEquipo = equipoService.crearEquipo(equipo);
+
+            // Asigna el equipo al responsable de equipo que lo crea
+            if (user.getRol() == Rol.JEFE_DE_EQUIPO) {
+                user.setEquipo(nuevoEquipo);
+                usuarioService.actualizarUsuario(user);
+            }
+
             redirectAttributes.addFlashAttribute("mensaje", "El equipo ha sido creado exitosamente.");
             mv.setViewName("redirect:/equipos/" + nuevoEquipo.getId());
         } catch (Exception e) {
@@ -123,19 +170,34 @@ public class EquipoController {
     }
 
 
-
     @GetMapping("/{id}")
-    public ModelAndView mostrarEquipo(@PathVariable Long id) {
+    public ModelAndView mostrarEquipo(@PathVariable Long id, HttpServletRequest request) {
         logger.debug("Entrando a mostrarEquipo con id: {}", id);
         ModelAndView mv = new ModelAndView("equipos/verEquipo");
         try {
+            UsuarioRegistrado user = (UsuarioRegistrado) request.getSession().getAttribute("usuario");
+            if (user == null) {
+                throw new AccessDeniedException("Usuario no autenticado.");
+            }
+
             Equipo equipo = equipoService.obtenerEquipoPorId(id)
                     .orElseThrow(() -> new NoSuchElementException("Equipo no encontrado"));
+
+            boolean esResponsable = equipo.getResponsables().stream()
+                    .anyMatch(responsable -> responsable.getUsuario().equals(user.getUsuario()));
+            if (!esResponsable && user.getRol() != Rol.ADMIN) {
+                throw new AccessDeniedException("No tienes permisos para ver este equipo.");
+            }
+
             mv.addObject("equipo", equipo);
         } catch (NoSuchElementException e) {
             logger.error("Equipo no encontrado con id: {}", id);
             mv.setViewName("error");
             mv.addObject("mensajeError", "Equipo no encontrado.");
+        } catch (AccessDeniedException e) {
+            logger.error("Acceso denegado para el usuario: {}", request.getSession().getAttribute("usuario"));
+            mv.setViewName("error");
+            mv.addObject("mensajeError", "No tienes permisos para ver este equipo.");
         } catch (Exception e) {
             logger.error("Error al mostrar el equipo con id: {}", id, e);
             mv.setViewName("error");
@@ -143,8 +205,6 @@ public class EquipoController {
         }
         return mv;
     }
-
-
 
 
 }

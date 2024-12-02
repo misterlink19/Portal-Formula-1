@@ -10,8 +10,12 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 import com.portal.formula1.model.Encuesta;
+import com.portal.formula1.model.Rol;
+import com.portal.formula1.model.UsuarioRegistrado;
 import com.portal.formula1.repository.VotoDAO;
 import com.portal.formula1.service.EncuestaService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,14 +39,26 @@ public class EncuestaController {
     private VotoDAO votoDAO;
 
     @GetMapping
-    public ModelAndView mostrarMenuEncuestas() {
+    public ModelAndView mostrarMenuEncuestas(HttpSession session) {
         logger.debug("Entrando a mostrarMenuEncuestas");
+        UsuarioRegistrado usuario = (UsuarioRegistrado) session.getAttribute("usuario");
+        // Verificar si el usuario es ADMIN
+        if (usuario == null || usuario.getRol() != Rol.ADMIN) {
+            return new ModelAndView("error").addObject("mensajeError", "Acceso denegado.");
+        }
         return new ModelAndView("encuesta");
     }
 
     @GetMapping({"/crearEncuestas", "/crearEncuesta"})
-    public ModelAndView mostrarFormularioCreacion() {
+    public ModelAndView mostrarFormularioCreacion(HttpSession session) {
         logger.debug("Entrando a mostrarFormularioCreacion");
+        UsuarioRegistrado usuario = (UsuarioRegistrado) session.getAttribute("usuario");
+
+        // Verificar si el usuario es ADMIN
+        if (usuario == null || usuario.getRol() != Rol.ADMIN) {
+            return new ModelAndView("error").addObject("mensajeError", "Acceso denegado.");
+        }
+
         ModelAndView mv = new ModelAndView("encuestas/crearEncuesta");
         try {
             mv.addObject("encuesta", new Encuesta());
@@ -57,8 +73,15 @@ public class EncuestaController {
     }
 
     @PostMapping
-    public ModelAndView crearEncuesta(@ModelAttribute Encuesta encuesta, @RequestParam Set<String> pilotosSeleccionados) {
+    public ModelAndView crearEncuesta(@ModelAttribute Encuesta encuesta, @RequestParam Set<String> pilotosSeleccionados, HttpSession session) {
         logger.debug("Entrando a crearEncuesta");
+        UsuarioRegistrado usuario = (UsuarioRegistrado) session.getAttribute("usuario");
+
+        // Verificar si el usuario es ADMIN
+        if (usuario == null || usuario.getRol() != Rol.ADMIN) {
+            return new ModelAndView("error").addObject("mensajeError", "Acceso denegado.");
+        }
+
         ModelAndView mv = new ModelAndView();
         try {
             Set<String> pilotoSet = new HashSet<>(pilotosSeleccionados);
@@ -73,8 +96,15 @@ public class EncuestaController {
     }
 
     @GetMapping("/{permalink}")
-    public ModelAndView mostrarEncuesta(@PathVariable String permalink) {
+    public ModelAndView mostrarEncuesta(@PathVariable String permalink, HttpSession session) {
         logger.debug("Entrando a mostrarEncuesta con permalink: {}", permalink);
+        UsuarioRegistrado usuario = (UsuarioRegistrado) session.getAttribute("usuario");
+
+        // Verificar si el usuario es ADMIN
+        if (usuario == null || usuario.getRol() != Rol.ADMIN) {
+            return new ModelAndView("error").addObject("mensajeError", "Acceso denegado.");
+        }
+
         ModelAndView mv = new ModelAndView("encuestas/verEncuesta");
         try {
             Encuesta encuesta = encuestaService.obtenerEncuestaPorPermalink(permalink);

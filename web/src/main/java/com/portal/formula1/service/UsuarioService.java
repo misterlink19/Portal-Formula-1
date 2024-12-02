@@ -17,4 +17,10 @@ public class UsuarioService {
     public void registrarUsuario(UsuarioRegistrado usuario) {
         usuarioRegistradoDAO.save(usuario);
     }
+
+    @Transactional
+    public void actualizarUsuario(UsuarioRegistrado usuario) {
+        usuarioRegistradoDAO.save(usuario);
+    }
+
 }
