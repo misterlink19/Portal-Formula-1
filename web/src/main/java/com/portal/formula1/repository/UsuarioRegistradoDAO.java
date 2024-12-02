@@ -8,11 +8,19 @@ import com.portal.formula1.model.UsuarioRegistrado;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  *
  * @author fjavi
  */
 @Repository
 public interface UsuarioRegistradoDAO extends JpaRepository<UsuarioRegistrado,String> {
+    List<UsuarioRegistrado> findByRol(String rol);
+    List<UsuarioRegistrado> findByNombreContainingIgnoreCase(String nombre);
+    List<UsuarioRegistrado> findAllByOrderByFechaRegistroDesc();
+    List<UsuarioRegistrado> findByValidacionFalse();
+    UsuarioRegistrado findByEmail(String email);
+    List<UsuarioRegistrado> findByRolAndNombreContainingIgnoreCase(String rol, String nombre);
 
 }

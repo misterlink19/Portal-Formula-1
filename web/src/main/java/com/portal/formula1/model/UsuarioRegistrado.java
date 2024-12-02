@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "usuarios_registrados")
@@ -49,6 +50,13 @@ public class UsuarioRegistrado implements Serializable {
 
     @Getter
     @Setter
+    @Column(name = "fecha_registro", nullable = false, updatable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime fechaRegistro;
+
+
+    @Getter
+    @Setter
     @Column(name = "validacion", nullable = false)
     private Boolean validacion = false;
 
@@ -60,5 +68,10 @@ public class UsuarioRegistrado implements Serializable {
 
     public UsuarioRegistrado() {
         this.validacion = false;
+        this.fechaRegistro = LocalDateTime.now();
+    }
+
+    public boolean isValidacion() {
+        return this.validacion;
     }
 }

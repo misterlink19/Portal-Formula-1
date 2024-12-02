@@ -17,13 +17,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 public class UsuarioController {
@@ -94,5 +95,53 @@ public class UsuarioController {
 
         return response.isSuccess();
 
+    }
+
+    @GetMapping("/admin/usuarios")
+    public String listarUsuarios(@RequestParam(required = false) String rol,
+                                 @RequestParam(required = false) String nombre,
+                                 @RequestParam(required = false) String validacion,
+                                 @RequestParam(required = false) String orden,
+                                 Model model) {
+        List<UsuarioRegistrado> usuarios;
+
+        if (rol != null && !rol.isEmpty() && nombre != null && !nombre.isEmpty()) {
+            usuarios = usuarioService.filtrarPorRolYNombre(rol, nombre);
+        } else if (rol != null && !rol.isEmpty()) {
+            usuarios = usuarioService.filtrarPorRol(rol);
+        } else if (nombre != null && !nombre.isEmpty()) {
+            usuarios = usuarioService.buscarPorNombre(nombre);
+        } else {
+            usuarios = usuarioService.obtenerTodosLosUsuarios();
+        }
+
+        if (validacion != null && !validacion.isEmpty()) {
+            boolean isValidacion = Boolean.parseBoolean(validacion);
+            usuarios = usuarios.stream()
+                    .filter(usuario -> usuario.isValidacion() == isValidacion)
+                    .collect(Collectors.toList());
+        }
+
+        if ("fecha".equals(orden)) {
+            usuarios.sort(Comparator.comparing(UsuarioRegistrado::getFechaRegistro));
+        } else if ("nombre".equals(orden)) {
+            usuarios.sort(Comparator.comparing(UsuarioRegistrado::getNombre));
+        }
+
+        model.addAttribute("usuarios", usuarios);
+        return "admin/listaUsuarios";
+    }
+
+    @GetMapping("/admin/usuarios/{usuario}")
+    public String verDetallesUsuario(@PathVariable String usuario, Model model) {
+        UsuarioRegistrado usuarioRegistrado = usuarioService.obtenerUsuarioPorUsuario(usuario);
+        model.addAttribute("usuario", usuarioRegistrado);
+        return "admin/detalleUsuario";
+    }
+
+    @PostMapping("/admin/usuarios/validar")
+    public String validarUsuarios(@RequestParam List<String> usuariosIds) {
+        usuarioService.validarUsuarios(usuariosIds);
+        return "redirect:/admin/usuarios?validacion=success";
     }
 }

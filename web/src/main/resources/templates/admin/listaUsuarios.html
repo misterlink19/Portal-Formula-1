@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Usuarios</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Lista de Usuarios</h1>
+
+    <!-- Filtros -->
+    <form class="mb-4" th:action="@{/admin/usuarios}" method="get">
+        <div class="row">
+            <div class="col-md-4">
+                <input type="text" name="nombre" class="form-control" placeholder="Buscar por nombre" th:value="${param.nombre}" />
+            </div>
+            <div class="col-md-3">
+                <select name="rol" class="form-select">
+                    <option value="">Todos los roles</option>
+                    <option value="ADMIN" th:selected="${param.rol == 'ADMIN'}">Administrador</option>
+                    <option value="JEFE_DE_EQUIPO" th:selected="${param.rol == 'JEFE_DE_EQUIPO'}">Jefe de equipo</option>
+                    <option value="USUARIO_BASICO" th:selected="${param.rol == 'USUARIO_BASICO'}">Usuario Básico</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="validacion" class="form-select">
+                    <option value="">Todos</option>
+                    <option value="true" th:selected="${param.validacion == 'true'}">Verificado</option>
+                    <option value="false" th:selected="${param.validacion == 'false'}">No Verificado</option>
+                </select>
+            </div>
+
+            <!-- Nueva opción de ordenación -->
+            <div class="col-md-2">
+                <select name="orden" class="form-select">
+                    <option value="">Ordenar por</option>
+                    <option value="fecha" th:selected="${param.orden == 'fecha'}">Fecha de Registro</option>
+                    <option value="nombre" th:selected="${param.orden == 'nombre'}">Nombre</option>
+                </select>
+            </div>
+
+
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Tabla de usuarios -->
+    <form th:action="@{/admin/usuarios/validar}" method="post">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>
+                    <input type="checkbox" id="selectAll" onclick="toggleSelection()" />
+                </th>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Rol</th>
+                <th>Verificación</th>
+                <th>Acciones</th>
+                <th>Fecha de Registro</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="usuario : ${usuarios}">
+                <td>
+                    <input type="checkbox" name="usuariosIds" th:value="${usuario.usuario}" />
+                </td>
+                <td th:text="${usuario.nombre}"></td>
+                <td th:text="${usuario.email}"></td>
+                <td th:text="${usuario.rol}"></td>
+                <td>
+                    <span th:if="${usuario.validacion}" class="badge bg-success">Verificado</span>
+                    <span th:if="${!usuario.validacion}" class="badge bg-danger">No Verificado</span>
+                </td>
+                <td>
+                    <a th:href="@{/admin/usuarios/{usuario}(usuario=${usuario.usuario})}" class="btn btn-info btn-sm">Ver Detalles</a>
+                </td>
+                <td th:text="${usuario.fechaRegistro}"></td>
+            </tr>
+            </tbody>
+        </table>
+
+
+        <!-- Botón de validación -->
+        <div class="d-flex justify-content-end">
+            <button type="submit" class="btn btn-success">Validar seleccionados</button>
+        </div>
+        <!-- volver a la página principal-->
+        <div class="d-flex justify-content-start">
+            <a th:href="@{/}" class="btn btn-secondary mt-3">Volver al menú principal</a>
+        </div>
+
+    </form>
+
+    <!-- Mensaje si no hay usuarios -->
+    <p th:if="${usuarios.isEmpty()}" class="text-center text-muted">No hay usuarios registrados.</p>
+
+    <!-- Paginación -->
+    <nav aria-label="Page navigation" th:if="${totalPaginas > 1}">
+        <ul class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${paginaActual == 1} ? 'disabled'">
+                <a class="page-link" th:href="@{/admin/usuarios(page=${paginaActual - 1}, nombre=${param.nombre}, rol=${param.rol}, validacion=${param.validacion})}">Anterior</a>
+            </li>
+            <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPaginas)}" th:classappend="${i == paginaActual} ? 'active'">
+                <a class="page-link" th:href="@{/admin/usuarios(page=${i}, nombre=${param.nombre}, rol=${param.rol}, validacion=${param.validacion})}" th:text="${i}"></a>
+            </li>
+            <li class="page-item" th:classappend="${paginaActual == totalPaginas} ? 'disabled'">
+                <a class="page-link" th:href="@{/admin/usuarios(page=${paginaActual + 1}, nombre=${param.nombre}, rol=${param.rol}, validacion=${param.validacion})}">Siguiente</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function toggleSelection() {
+        const checkboxes = document.querySelectorAll('input[name="usuariosIds"]');
+        const selectAll = document.getElementById('selectAll');
+        checkboxes.forEach(checkbox => checkbox.checked = selectAll.checked);
+    }
+</script>
+</body>
+</html>
+
