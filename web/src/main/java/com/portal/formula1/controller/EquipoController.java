@@ -8,6 +8,7 @@ import com.portal.formula1.service.EquipoService;
 import com.portal.formula1.service.ImagenService;
 import com.portal.formula1.service.UsuarioService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
@@ -26,6 +27,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/equipos")
@@ -206,5 +208,28 @@ public class EquipoController {
         return mv;
     }
 
+    @GetMapping("listar")
+    public ModelAndView listarEquipos(HttpSession session) {
+        logger.debug("Entrando a Listado de Equipos");
+        UsuarioRegistrado usuario = (UsuarioRegistrado) session.getAttribute("usuario");
 
+        // Verificar si el usuario es ADMIN o JEFE DE EQUIPO
+        if (usuario == null || (usuario.getRol() != Rol.ADMIN && usuario.getRol() != Rol.JEFE_DE_EQUIPO )) {
+            return new ModelAndView("error").addObject("mensajeError", "Acceso denegado.");
+        }
+        ModelAndView mv = new ModelAndView("equipos/listadoEquipos");
+        if(usuario.getRol() == Rol.ADMIN) {
+            List<Equipo> equipos = equipoService.obtenerTodosLosEquipos();
+            mv.addObject("equipos", equipos);
+        }else if(usuario.getRol() == Rol.JEFE_DE_EQUIPO) {
+            Optional<Equipo> equipo = equipoService.obtenerEquipoPorId(usuario.getEquipo().getId());
+            if(equipo.isPresent()) {
+                mv.addObject("equipos", equipo);
+            }else{
+                mv.addObject("equipos", null);
+            }
+        }
+        mv.addObject("usuario", usuario);
+        return mv;
+    }
 }

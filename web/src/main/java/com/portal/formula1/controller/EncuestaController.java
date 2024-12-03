@@ -118,4 +118,23 @@ public class EncuestaController {
         }
         return mv;
     }
+
+    @GetMapping("/listar")
+    public ModelAndView mostrarListaEncuestas(HttpSession session) {
+        logger.debug("Entrando a mostrarListaEncuestas");
+        UsuarioRegistrado usuario = (UsuarioRegistrado) session.getAttribute("usuario");
+        ModelAndView mv = new ModelAndView();
+        if (usuario == null || usuario.getRol() != Rol.ADMIN) {
+            logger.error("El listado de Encuesta no esta disponible para estos roles");
+            mv.setViewName("error");
+            mv.addObject("mensajeError", "Lista de Encuestas no Disponible.");
+        } else {
+            List<Encuesta> encuestas = encuestaService.getAllEncuestas();
+            mv.setViewName("encuestas/listadoEncuestas");
+            mv.addObject("encuestas", encuestas);
+        }
+        return mv;
+    }
+
+
 }

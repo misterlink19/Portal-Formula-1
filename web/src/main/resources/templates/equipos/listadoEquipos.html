@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}" >
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listado de Encuestas</title>
+    <link type="text/css" th:href="@{/styles/listadoEquipos.css}" rel="stylesheet">
+</head>
+<body>
+<div layout:fragment="body">
+    <main role="main" class="">
+        <h1>Lista de Equipos</h1>
+        <div class="grid">
+            <div th:each="equipo : ${equipos}" class="card">
+                <div class="card-content">
+                    <div class="team-info">
+                        <img th:src="@{${equipo.logo}}"
+                             th:alt="'Logo de ' + ${equipo.nombre}"
+                             class="team-logo">
+                        <div>
+                            <h2 class="team-name" th:text="${equipo.nombre}"></h2>
+                            <p class="team-twitter" th:text="${equipo.twitter}"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <span class="badge" th:text="${#lists.size(equipo.responsables)}  + ' Responsables'"></span>
+                    <a th:href="@{/equipos/{id}(id=${equipo.id})}" class="details-link">Ver detalles</a>
+                </div>
+            </div>
+        </div>
+        <a th:href="@{/equipos}" class="btn btn-secondary mt-3">Volver a Equipos</a>
+    </main>
+</div>
+</body>
+</html>

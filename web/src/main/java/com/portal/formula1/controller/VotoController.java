@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -77,7 +79,7 @@ public class VotoController {
         return mv;
     }
 
-
+    /* AGREGUE LA FUNCIONALIDAD ABAJO
     @GetMapping("/{permalink}/resultados")
     public ModelAndView mostrarResultados(@PathVariable String permalink) {
         logger.debug("Entrando a mostrarResultados con permalink: {}", permalink);
@@ -93,7 +95,7 @@ public class VotoController {
             mv.addObject("mensajeError", "Encuesta no encontrada.");
         }
         return mv;
-    }
+    }*/
 
     @GetMapping("/votar")
     public ModelAndView redirigirAVotar() {
@@ -104,6 +106,23 @@ public class VotoController {
         } catch (NoSuchElementException e) {
             mv.setViewName("error");
             mv.addObject("mensajeError", "No hay encuestas disponibles en este momento.");
+        }
+        return mv;
+    }
+
+    @GetMapping("/{permalink}/resultados")
+    public ModelAndView mostrarResultados(@PathVariable String permalink) {
+        logger.debug("Entrando a mostrarResultados con permalink: {}", permalink);
+        ModelAndView mv = new ModelAndView("votos/resultadosEncuesta");
+        try {
+            Encuesta encuesta = encuestaService.obtenerEncuestaPorPermalink(permalink);
+            List<Object> ranking = votoService.getRankingVotacion(permalink); // Corrección aquí
+            mv.addObject("encuesta", encuesta);
+            mv.addObject("ranking", ranking);
+        } catch (NoSuchElementException e) {
+            logger.error("Encuesta no encontrada con permalink: {}", permalink);
+            mv.setViewName("error");
+            mv.addObject("mensajeError", "Encuesta no encontrada.");
         }
         return mv;
     }

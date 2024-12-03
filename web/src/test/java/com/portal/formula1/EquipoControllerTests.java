@@ -2,6 +2,8 @@ package com.portal.formula1;
 
 import com.portal.formula1.controller.EquipoController;
 import com.portal.formula1.model.Equipo;
+import com.portal.formula1.model.Rol;
+import com.portal.formula1.model.UsuarioRegistrado;
 import com.portal.formula1.service.EquipoService;
 import com.portal.formula1.service.ImagenService;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +21,7 @@ import java.util.Arrays;
 
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -119,4 +122,40 @@ public class EquipoControllerTests {
                 .andExpect(view().name("error"))
                 .andExpect(model().attributeExists("mensajeError"));
     }
+
+    /**
+     * Verifica que se maneja correctamente el caso en el que no se permite acceder al listado de Equipos.
+     **/
+    @Test
+    public void testListarEquipos_AccesoDenegado() throws Exception {
+        mockMvc.perform(get("/listar")
+                        .sessionAttr("usuario", null))
+                .andExpect(status().isOk())
+                .andExpect(view().name("error"))
+                .andExpect(model().attributeExists("mensajeError"))
+                .andExpect(model().attribute("mensajeError", "Acceso denegado."));
+    }
+
+    /**
+     * Verifica que se maneja correctamente el caso en el que el administrador accede.
+     **/
+    @Test
+    public void testListarEquipos_Admin() throws Exception {
+        UsuarioRegistrado usuario = new UsuarioRegistrado();
+        usuario.setRol(Rol.ADMIN);
+
+        List<Equipo> equipos = Arrays.asList(new Equipo(), new Equipo());
+
+
+        when(equipoService.obtenerTodosLosEquipos()).thenReturn(equipos);
+
+        mockMvc.perform(get("/listar")
+                        .sessionAttr("usuario", usuario))
+                .andExpect(status().isOk())
+                .andExpect(view().name("equipos/listadoEquipos"))
+                .andExpect(model().attributeExists("equipos"))
+                .andExpect(model().attribute("equipos", equipos))
+                .andExpect(model().attribute("usuario", usuario));
+    }
+
 }

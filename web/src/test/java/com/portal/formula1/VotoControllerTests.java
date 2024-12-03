@@ -17,7 +17,10 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -106,5 +109,51 @@ public class VotoControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(view().name("votos/votoConfirmado"))
                 .andExpect(model().attributeExists("voto"));
+    }
+
+
+    /**
+     *
+     * Prueba que se muestra correctamente los resultados de una encuesta.
+     */
+    @Test
+    public void testMostrarResultados_EncuestaEncontrada() throws Exception {
+        // Mock para una encuesta encontrada
+        Encuesta encuesta = new Encuesta();
+        encuesta.setTitulo("Test Encuesta");
+        encuesta.setDescripcion("Descripción de prueba");
+
+        // Mock para el ranking de votación
+        List<Object> ranking = Arrays.asList("Piloto A", "Piloto B");
+
+        // Configuración de los mocks
+        when(encuestaService.obtenerEncuestaPorPermalink("test-permalink")).thenReturn(encuesta);
+        when(votoService.getRankingVotacion("test-permalink")).thenReturn(ranking);
+
+        // Ejecución del test
+        mockMvc.perform(get("/votos/test-permalink/resultados"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("votos/resultadosEncuesta"))
+                .andExpect(model().attributeExists("encuesta"))
+                .andExpect(model().attribute("encuesta", encuesta))
+                .andExpect(model().attributeExists("ranking"))
+                .andExpect(model().attribute("ranking", ranking));
+    }
+
+    /**
+     *
+     * Prueba como se maneja cuando no se encuentra la encuesta de la que se busca el resultado.
+     */
+    @Test
+    public void testMostrarResultados_EncuestaNoEncontrada() throws Exception {
+        // Mock para una encuesta no encontrada
+        when(encuestaService.obtenerEncuestaPorPermalink("test-permalink")).thenThrow(new NoSuchElementException());
+
+        // Ejecución del test
+        mockMvc.perform(get("/votos/test-permalink/resultados"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("error"))
+                .andExpect(model().attributeExists("mensajeError"))
+                .andExpect(model().attribute("mensajeError", "Encuesta no encontrada."));
     }
 }
