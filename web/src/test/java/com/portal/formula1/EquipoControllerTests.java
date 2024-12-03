@@ -4,6 +4,7 @@ import com.portal.formula1.controller.EquipoController;
 import com.portal.formula1.model.Equipo;
 import com.portal.formula1.model.Rol;
 import com.portal.formula1.model.UsuarioRegistrado;
+import com.portal.formula1.service.AutentificacionService;
 import com.portal.formula1.service.EquipoService;
 import com.portal.formula1.service.ImagenService;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -38,12 +40,24 @@ public class EquipoControllerTests {
     @Mock
     private ImagenService imagenService;
 
+    @Mock
+    private AutentificacionService autentificacionService;
+
     private MockMvc mockMvc;
+    private MockHttpSession session;
+
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
         mockMvc = MockMvcBuilders.standaloneSetup(equipoController).build();
+
+        // Configurar usuario administrador en la sesión
+        UsuarioRegistrado adminUser = new UsuarioRegistrado();
+        adminUser.setUsuario("admin");
+        adminUser.setRol(Rol.ADMIN);
+        session = new MockHttpSession();
+        session.setAttribute("usuario", adminUser);
     }
 
     /**
@@ -51,19 +65,31 @@ public class EquipoControllerTests {
      */
     @Test
     public void testMostrarMenuEquipos() throws Exception {
+        // Simular la obtención de equipos
         when(equipoService.obtenerTodosLosEquipos()).thenReturn(Arrays.asList(new Equipo(), new Equipo()));
-        mockMvc.perform(get("/equipos"))
+
+        // Simular la verificación del usuario
+        when(autentificacionService.checkUser(any(String.class))).thenReturn((UsuarioRegistrado) session.getAttribute("usuario"));
+
+        mockMvc.perform(get("/equipos")
+                        .session(session)) // Incluir la sesión con el usuario autenticado
                 .andExpect(status().isOk())
                 .andExpect(view().name("equipos/equipo"))
-                .andExpect(model().attributeExists("equipos"));
+                .andExpect(model().attributeExists("usuario"));
     }
+
+
 
     /**
      * Verifica que el formulario de creación de equipos se muestra correctamente.
      **/
     @Test
     public void testMostrarFormularioCreacion() throws Exception {
-        mockMvc.perform(get("/equipos/crear"))
+        // Simular la verificación del usuario
+        when(autentificacionService.checkUser(any(String.class))).thenReturn((UsuarioRegistrado) session.getAttribute("usuario"));
+
+        mockMvc.perform(get("/equipos/crear")
+                        .session(session)) // Incluir la sesión con el usuario autenticado
                 .andExpect(status().isOk())
                 .andExpect(view().name("equipos/crearEquipo"))
                 .andExpect(model().attributeExists("equipo"));
@@ -79,6 +105,9 @@ public class EquipoControllerTests {
         equipo.setNombre("Nuevo Equipo");
         equipo.setTwitter("twitterHandle");
 
+        // Simular la verificación del usuario
+        when(autentificacionService.checkUser(any(String.class))).thenReturn((UsuarioRegistrado) session.getAttribute("usuario"));
+
         when(equipoService.crearEquipo(any(Equipo.class))).thenReturn(equipo);
         when(imagenService.isFormatoValido(any(MultipartFile.class))).thenReturn(true);
         when(imagenService.isTamanoValido(any(MultipartFile.class))).thenReturn(true);
@@ -87,6 +116,7 @@ public class EquipoControllerTests {
 
         mockMvc.perform(MockMvcRequestBuilders.multipart("/equipos/crear")
                         .file(mockFile)
+                        .session(session) // Incluir la sesión con el usuario autenticado
                         .param("nombre", "Nuevo Equipo")
                         .param("twitter", "twitterHandle")
                         .flashAttr("equipo", equipo))
@@ -103,7 +133,11 @@ public class EquipoControllerTests {
         equipo.setId(1L);
         when(equipoService.obtenerEquipoPorId(1L)).thenReturn(Optional.of(equipo));
 
-        mockMvc.perform(get("/equipos/1"))
+        // Simular la verificación del usuario
+        when(autentificacionService.checkUser(any(String.class))).thenReturn((UsuarioRegistrado) session.getAttribute("usuario"));
+
+        mockMvc.perform(get("/equipos/1")
+                        .session(session)) // Incluir la sesión con el usuario autenticado
                 .andExpect(status().isOk())
                 .andExpect(view().name("equipos/verEquipo"))
                 .andExpect(model().attributeExists("equipo"))
@@ -117,7 +151,11 @@ public class EquipoControllerTests {
     public void testMostrarEquipoNoEncontrado() throws Exception {
         when(equipoService.obtenerEquipoPorId(1L)).thenReturn(Optional.empty());
 
-        mockMvc.perform(get("/equipos/1"))
+        // Simular la verificación del usuario
+        when(autentificacionService.checkUser(any(String.class))).thenReturn((UsuarioRegistrado) session.getAttribute("usuario"));
+
+        mockMvc.perform(get("/equipos/1")
+                        .session(session)) // Incluir la sesión con el usuario autenticado
                 .andExpect(status().isOk())
                 .andExpect(view().name("error"))
                 .andExpect(model().attributeExists("mensajeError"));
@@ -128,8 +166,7 @@ public class EquipoControllerTests {
      **/
     @Test
     public void testListarEquipos_AccesoDenegado() throws Exception {
-        mockMvc.perform(get("/listar")
-                        .sessionAttr("usuario", null))
+        mockMvc.perform(get("/equipos/listar"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("error"))
                 .andExpect(model().attributeExists("mensajeError"))
@@ -141,21 +178,19 @@ public class EquipoControllerTests {
      **/
     @Test
     public void testListarEquipos_Admin() throws Exception {
-        UsuarioRegistrado usuario = new UsuarioRegistrado();
-        usuario.setRol(Rol.ADMIN);
-
         List<Equipo> equipos = Arrays.asList(new Equipo(), new Equipo());
 
+        // Simular la verificación del usuario
+        when(autentificacionService.checkUser(any(String.class))).thenReturn((UsuarioRegistrado) session.getAttribute("usuario"));
 
         when(equipoService.obtenerTodosLosEquipos()).thenReturn(equipos);
 
-        mockMvc.perform(get("/listar")
-                        .sessionAttr("usuario", usuario))
+        mockMvc.perform(get("/equipos/listar")
+                        .session(session)) // Incluir la sesión con el usuario autenticado
                 .andExpect(status().isOk())
                 .andExpect(view().name("equipos/listadoEquipos"))
                 .andExpect(model().attributeExists("equipos"))
-                .andExpect(model().attribute("equipos", equipos))
-                .andExpect(model().attribute("usuario", usuario));
+                .andExpect(model().attribute("equipos", equipos));
     }
 
 }

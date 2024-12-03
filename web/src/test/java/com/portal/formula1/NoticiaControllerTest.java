@@ -46,49 +46,53 @@ public class NoticiaControllerTest {
         List<Noticia> noticias = Arrays.asList(new Noticia("Título de prueba", "imagen.jpg", "Texto de prueba"));
         when(noticiaService.obtenerNoticias()).thenReturn(noticias);
 
-        mockMvc.perform(get("/"))
+        mockMvc.perform(get("/noticias/listar")) // Ruta correcta para listar noticias
                 .andExpect(status().isOk())
-                .andExpect(view().name("listadoNoticias"))
+                .andExpect(view().name("noticias/listadoNoticias"))
                 .andExpect(model().attribute("noticias", noticias));
 
         verify(noticiaService, times(1)).obtenerNoticias();
         verifyNoMoreInteractions(noticiaService);
     }
 
+
     @Test
     public void testMostrarFormularioCreacion() throws Exception {
-        mockMvc.perform(get("/crear"))
+        mockMvc.perform(get("/noticias/crear")) // Ruta correcta para el formulario de creación
                 .andExpect(status().isOk())
-                .andExpect(view().name("crearNoticia"))
+                .andExpect(view().name("noticias/crearNoticia"))
                 .andExpect(model().attributeExists("noticia"));
     }
+
 
     @Test
     public void testMostrarNoticia() throws Exception {
         Noticia noticia = new Noticia("Título de prueba", "imagen.jpg", "Texto de prueba");
         when(noticiaService.obtenerNoticiaPorId(1)).thenReturn(noticia);
 
-        mockMvc.perform(get("/1"))
+        mockMvc.perform(get("/noticias/1")) // Ruta correcta para mostrar noticia
                 .andExpect(status().isOk())
-                .andExpect(view().name("/detalle"))
+                .andExpect(view().name("noticias/detalle"))
                 .andExpect(model().attribute("noticia", noticia));
 
         verify(noticiaService, times(1)).obtenerNoticiaPorId(1);
         verifyNoMoreInteractions(noticiaService);
     }
 
+
     @Test
     public void testBuscarNoticias() throws Exception {
         List<Noticia> resultados = Arrays.asList(new Noticia("Título de prueba", "imagen.jpg", "Texto de prueba"));
         when(noticiaService.buscarNoticias("prueba")).thenReturn(resultados);
 
-        mockMvc.perform(get("/buscar").param("query", "prueba"))
+        mockMvc.perform(get("/noticias/buscar").param("query", "prueba")) // Ruta correcta para buscar noticias
                 .andExpect(status().isOk())
-                .andExpect(view().name("listadoNoticias"))
+                .andExpect(view().name("noticias/listadoNoticias"))
                 .andExpect(model().attribute("noticias", resultados))
                 .andExpect(model().attribute("query", "prueba"));
 
         verify(noticiaService, times(1)).buscarNoticias("prueba");
         verifyNoMoreInteractions(noticiaService);
     }
+
 }

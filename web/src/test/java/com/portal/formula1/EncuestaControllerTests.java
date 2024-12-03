@@ -23,6 +23,7 @@ import org.mockito.Mock;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -48,10 +49,20 @@ public class EncuestaControllerTests {
     @InjectMocks
     private EncuestaController encuestaController;
 
+    private MockHttpSession session;
+
+
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
         mockMvc = MockMvcBuilders.standaloneSetup(encuestaController).build();
+
+        // Configurar usuario administrador en la sesión
+        UsuarioRegistrado adminUser = new UsuarioRegistrado();
+        adminUser.setUsuario("admin");
+        adminUser.setRol(Rol.ADMIN);
+        session = new MockHttpSession();
+        session.setAttribute("usuario", adminUser);
     }
 
     /**
@@ -64,7 +75,8 @@ public class EncuestaControllerTests {
         pilotos.add(new Object[]{"Lewis", "Hamilton", "HAM", 44, "/img/hamilton.jpg", "Reino Unido", "@LewisHamilton"});
         when(encuestaService.getTodosLosPilotos()).thenReturn(pilotos);
 
-        mockMvc.perform(get("/encuestas/crearEncuestas"))
+        mockMvc.perform(get("/encuestas/crearEncuestas")
+                        .session(session)) // Incluir la sesión con el usuario autenticado
                 .andExpect(status().isOk())
                 .andExpect(view().name("encuestas/crearEncuesta"))
                 .andExpect(model().attributeExists("pilotos"));
@@ -81,9 +93,12 @@ public class EncuestaControllerTests {
         encuesta.setTitulo("Título de prueba");
         encuesta.setDescripcion("Descripción de prueba");
         encuesta.setFechaLimite(LocalDateTime.parse("2024-12-31T23:59:59"));
+        encuesta.setPermalink("titulo-de-prueba");
+
         when(encuestaService.crearEncuesta(any(Encuesta.class), any(Set.class))).thenReturn(encuesta);
 
         mockMvc.perform(post("/encuestas")
+                        .session(session) // Incluir la sesión con el usuario autenticado
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .param("titulo", "Título de prueba")
                         .param("descripcion", "Descripción de prueba")
@@ -101,12 +116,15 @@ public class EncuestaControllerTests {
     @Test
     public void testMostrarEncuesta() throws Exception {
         Encuesta encuesta = new Encuesta("Título de prueba", "Descripción de prueba", LocalDateTime.now(), LocalDateTime.now().plusDays(1));
+        encuesta.setPermalink("test-permalink");
         List<Object[]> pilotos = new ArrayList<>();
         pilotos.add(new Object[]{"Lewis", "Hamilton", "HAM", 44, "/img/hamilton.jpg", "Reino Unido", "@LewisHamilton"});
+
         when(encuestaService.obtenerEncuestaPorPermalink("test-permalink")).thenReturn(encuesta);
         when(encuestaService.getTodosLosPilotos()).thenReturn(pilotos);
 
-        mockMvc.perform(get("/encuestas/test-permalink"))
+        mockMvc.perform(get("/encuestas/test-permalink")
+                        .session(session)) // Incluir la sesión con el usuario autenticado
                 .andExpect(status().isOk())
                 .andExpect(view().name("encuestas/verEncuesta"))
                 .andExpect(model().attributeExists("encuesta"))
