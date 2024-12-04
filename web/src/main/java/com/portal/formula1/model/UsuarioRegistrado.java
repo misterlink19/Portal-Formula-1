@@ -50,6 +50,12 @@ public class UsuarioRegistrado implements Serializable {
 
     @Getter
     @Setter
+    @Enumerated(EnumType.STRING)
+    @Column(name = "rol_solicitado", nullable = true)
+    private Rol rolSolicitado;
+
+    @Getter
+    @Setter
     @Column(name = "fecha_registro", nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime fechaRegistro;

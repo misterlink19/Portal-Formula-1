@@ -1,12 +1,14 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista de Usuarios</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
+<body layout:fragment="body">
 <div class="container mt-5">
     <h1 class="text-center mb-4">Lista de Usuarios</h1>
 
@@ -49,7 +51,7 @@
     </form>
 
     <!-- Tabla de usuarios -->
-    <form th:action="@{/admin/usuarios/validar}" method="post">
+    <form id="miFormulario" th:action="@{/admin/usuarios/validar}" method="post">
         <table class="table table-striped">
             <thead>
             <tr>
@@ -59,6 +61,7 @@
                 <th>Nombre</th>
                 <th>Email</th>
                 <th>Rol</th>
+                <th>Rol Solicitado</th>
                 <th>Verificación</th>
                 <th>Acciones</th>
                 <th>Fecha de Registro</th>
@@ -72,6 +75,7 @@
                 <td th:text="${usuario.nombre}"></td>
                 <td th:text="${usuario.email}"></td>
                 <td th:text="${usuario.rol}"></td>
+                <td th:text="${usuario.rolSolicitado != null ? usuario.rolSolicitado : '-'}"></td>
                 <td>
                     <span th:if="${usuario.validacion}" class="badge bg-success">Verificado</span>
                     <span th:if="${!usuario.validacion}" class="badge bg-danger">No Verificado</span>
@@ -87,7 +91,11 @@
 
         <!-- Botón de validación -->
         <div class="d-flex justify-content-end">
-            <button type="submit" class="btn btn-success">Validar seleccionados</button>
+            <button id="botonValidarUsuarios" type="submit" class="btn btn-success">Validar seleccionados</button>
+        </div>
+        <!-- Botón de validación de roles-->
+        <div class="d-flex justify-content-end">
+            <button id="botonValidarRoles" type="submit" class="btn btn-success mt-5">Validar Roles seleccionados</button>
         </div>
         <!-- volver a la página principal-->
         <div class="d-flex justify-content-start">
@@ -122,6 +130,22 @@
         const selectAll = document.getElementById('selectAll');
         checkboxes.forEach(checkbox => checkbox.checked = selectAll.checked);
     }
+    document.getElementById('botonValidarUsuarios').addEventListener('click', function(event) {
+        event.preventDefault();
+
+        const formulario = document.getElementById('miFormulario');
+        formulario.action = '/admin/usuarios/validar';
+
+        formulario.submit();
+    });
+    document.getElementById('botonValidarRoles').addEventListener('click', function(event) {
+        event.preventDefault();
+
+        const formulario = document.getElementById('miFormulario');
+        formulario.action = '/admin/usuarios/validarRol';
+
+        formulario.submit();
+    });
 </script>
 </body>
 </html>

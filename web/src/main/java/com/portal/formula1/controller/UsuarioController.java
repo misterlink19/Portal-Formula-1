@@ -115,12 +115,12 @@ public class UsuarioController {
             usuarios = usuarioService.obtenerTodosLosUsuarios();
         }
 
-        if (validacion != null && !validacion.isEmpty()) {
+        /*if (validacion != null && !validacion.isEmpty()) {
             boolean isValidacion = Boolean.parseBoolean(validacion);
             usuarios = usuarios.stream()
                     .filter(usuario -> usuario.isValidacion() == isValidacion)
                     .collect(Collectors.toList());
-        }
+        }*/
 
         if ("fecha".equals(orden)) {
             usuarios.sort(Comparator.comparing(UsuarioRegistrado::getFechaRegistro));
@@ -142,6 +142,13 @@ public class UsuarioController {
     @PostMapping("/admin/usuarios/validar")
     public String validarUsuarios(@RequestParam List<String> usuariosIds) {
         usuarioService.validarUsuarios(usuariosIds);
+        return "redirect:/admin/usuarios?validacion=success";
+    }
+
+
+    @PostMapping("/admin/usuarios/validarRol")
+    public String validarUsuariosRol(@RequestParam List<String> usuariosIds) {
+        usuarioService.validarUsuariosRol(usuariosIds);
         return "redirect:/admin/usuarios?validacion=success";
     }
 }

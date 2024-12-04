@@ -6,6 +6,7 @@ package com.portal.formula1.controller;
 
 import com.portal.formula1.model.UsuarioRegistrado;
 import com.portal.formula1.service.AutentificacionService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -67,10 +68,11 @@ public class InicioController {
         return mv;
     }
     @PostMapping("/logout")
-    public String logout(HttpSession session) {
-        session.invalidate(); // Finaliza la sesión
+    public String logout(HttpServletRequest request) {
+        request.getSession().invalidate();
         return "redirect:/";
     }
+
 
 
 }

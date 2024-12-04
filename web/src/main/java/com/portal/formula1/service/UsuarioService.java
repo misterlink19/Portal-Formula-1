@@ -37,6 +37,18 @@ public class UsuarioService {
         });
     }
 
+    @Transactional
+    public void validarUsuariosRol(List<String> usuariosIds) {
+        usuariosIds.forEach(id -> {
+            UsuarioRegistrado usuario = usuarioRegistradoDAO.findById(id).orElse(null);
+            if (usuario != null && usuario.getRolSolicitado() != null) {
+                usuario.setRol(usuario.getRolSolicitado());
+                usuario.setRolSolicitado(null);
+                usuarioRegistradoDAO.save(usuario);
+            }
+        });
+    }
+
     public List<UsuarioRegistrado> obtenerTodosLosUsuarios() {
         return usuarioRegistradoDAO.findAll();
     }
