@@ -16,7 +16,7 @@
             <div th:each="equipo : ${equipos}" class="card">
                 <div class="card-content">
                     <div class="team-info">
-                        <img th:src="@{${equipo.logo}}"
+                        <img th:src="@{/uploads/{logo}(logo=${equipo.logo})}"
                              th:alt="'Logo de ' + ${equipo.nombre}"
                              class="team-logo">
                         <div>
