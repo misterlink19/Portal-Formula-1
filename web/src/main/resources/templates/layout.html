@@ -46,7 +46,7 @@
                 <a class="nav-link" th:href="@{/votos}">Gestionar Votos</a>
             </li>
             <li class="nav-item" th:if="${session.usuario != null} and ${session.usuario.rol == T(com.portal.formula1.model.Rol).ADMIN}">
-                <a class="nav-link" th:href="@{/noticias/gestion}">Gestionar Noticias</a>
+                <a class="nav-link" th:href="@{/noticias/listar}">Gestionar Noticias</a>
             </li>
             <li class="nav-item" th:if="${session.usuario != null} and ${session.usuario.rol == T(com.portal.formula1.model.Rol).ADMIN}">
                 <a class="nav-link" th:href="@{/equipos}">Gestionar Equipos</a>
