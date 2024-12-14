@@ -1,5 +1,6 @@
 package com.portal.formula1.service;
 
+import com.portal.formula1.model.Rol;
 import com.portal.formula1.model.UsuarioRegistrado;
 import com.portal.formula1.repository.UsuarioRegistradoDAO;
 import com.portal.formula1.repository.UsuarioRegistradoDAO;
@@ -17,6 +18,10 @@ public class UsuarioService {
 
     @Transactional
     public void registrarUsuario(UsuarioRegistrado usuario) {
+        if(!usuario.getRol().equals(Rol.USUARIO_BASICO)){
+            usuario.setRolSolicitado(usuario.getRol());
+            usuario.setRol(Rol.USUARIO_BASICO);
+        }
         usuarioRegistradoDAO.save(usuario);
     }
 
