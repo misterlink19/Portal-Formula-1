@@ -20,27 +20,23 @@ function validarFormulario() {
         alert("La fecha límite debe ser mayor o igual a la fecha de inicio.");
         return false;
     }
-
-
-
     return true;
 }
 
 // Función para establecer las fechas iniciales
 function setInitialDateTime() {
-    var fechaActual = new Date();
-    fechaActual.setHours(fechaActual.getHours() + 1);
+    const now = new Date();
+    now.setHours(now.getHours() + 2); // Adelantar la hora actual en una hora
 
-    var fechaManana = new Date(fechaActual);
-    fechaManana.setDate(fechaActual.getDate() + 1);
+    const future = new Date();
+    future.setDate(future.getDate() + 1); // Fecha límite adelantada en un dia
 
-    var isoDateTimeActual = fechaActual.toISOString().substring(0, 16); // Recorta para mantener el formato yyyy-MM-ddTH:mm
-    var isoDateTimeManana = fechaManana.toISOString().substring(0, 16); // Recorta para mantener el formato yyyy-MM-ddTH:mm
+    const initialDateTime = now.toISOString().slice(0, 16); // Recorta para mantener el formato yyyy-MM-ddTH:mm
+    const futureDateTime = future.toISOString().slice(0, 16); // Recorta para mantener el formato yyyy-MM-ddTH:mm
 
-    document.getElementById("fechaInicio").value = isoDateTimeActual;
-    document.getElementById("fechaLimite").value = isoDateTimeManana;
+    document.getElementById("fechaInicio").value = initialDateTime;
+    document.getElementById("fechaLimite").value = futureDateTime;
 }
-
 // Función para actualizar el contador de pilotos seleccionados
 function actualizarContadorPilotos() {
     var checkboxes = document.querySelectorAll('input[name="pilotosSeleccionados"]:checked');
@@ -52,15 +48,15 @@ function reiniciarContadorPilotos() {
     document.getElementById("pilotosSeleccionadosCount").innerText = "Pilotos seleccionados: 0";
     setInitialDateTime();
 }
+document.addEventListener("DOMContentLoaded", function () {
+    setInitialDateTime(); // Llamar a la función para establecer la fecha y hora iniciales
 
-// Configurar Flatpickr para los campos de fecha y hora
-document.addEventListener('DOMContentLoaded', function() {
     flatpickr("#fechaInicio", {
         enableTime: true,
         dateFormat: "Y-m-d\\TH:i",
         minDate: "today",
         time_24hr: true,
-        defaultDate: new Date(new Date().setHours(new Date().getHours() + 1)).toISOString().substring(0, 16),
+        defaultDate: document.getElementById("fechaInicio").value,
     });
 
     flatpickr("#fechaLimite", {
@@ -68,13 +64,17 @@ document.addEventListener('DOMContentLoaded', function() {
         dateFormat: "Y-m-d\\TH:i",
         minDate: "today",
         time_24hr: true,
-        defaultDate: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().substring(0, 16),
-        defaultHour: 8,
-        defaultMinute: 0,
+        defaultDate: document.getElementById("fechaLimite").value,
     });
 
-    // Evento al botón de reset para restablecer las fechas al valor por defecto
-    document.querySelector('input[type="reset"]')
-        .addEventListener('click', function()
-        { setTimeout(setInitialDateTime, 0); });
+    document.querySelector('input[type="reset"]').addEventListener("click", function () {
+        setTimeout(() => {
+            document.getElementById("pilotosSeleccionadosCount").innerText = "Pilotos seleccionados: 0";
+            setInitialDateTime();
+        }, 0);
+    });
 });
+
+
+
+

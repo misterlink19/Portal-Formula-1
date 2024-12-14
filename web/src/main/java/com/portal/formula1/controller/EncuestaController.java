@@ -14,7 +14,6 @@ import com.portal.formula1.model.Rol;
 import com.portal.formula1.model.UsuarioRegistrado;
 import com.portal.formula1.repository.VotoDAO;
 import com.portal.formula1.service.EncuestaService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +45,7 @@ public class EncuestaController {
         if (usuario == null || usuario.getRol() != Rol.ADMIN) {
             return new ModelAndView("error").addObject("mensajeError", "Acceso denegado.");
         }
-        return new ModelAndView("encuesta");
+        return new ModelAndView("encuestas/encuesta");
     }
 
     @GetMapping({"/crearEncuestas", "/crearEncuesta"})

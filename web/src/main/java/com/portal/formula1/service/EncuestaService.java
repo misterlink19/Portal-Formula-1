@@ -68,6 +68,9 @@ public class EncuestaService {
                 .orElseThrow(() -> new NoSuchElementException("No hay encuestas disponibles en este momento"));
     }
 
+
+
+
     public List<Object[]> getPilotosPorEncuesta(String permalink) {
         if (entityManager == null) {
             throw new IllegalStateException("EntityManager is null");

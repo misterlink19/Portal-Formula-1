@@ -78,25 +78,7 @@ public class VotoController {
         }
         return mv;
     }
-
-    /* AGREGUE LA FUNCIONALIDAD ABAJO
-    @GetMapping("/{permalink}/resultados")
-    public ModelAndView mostrarResultados(@PathVariable String permalink) {
-        logger.debug("Entrando a mostrarResultados con permalink: {}", permalink);
-        ModelAndView mv = new ModelAndView("votos/resultadosEncuesta");
-        try {
-            Encuesta encuesta = encuestaService.obtenerEncuestaPorPermalink(permalink);
-            List<Voto> votos = votoService.obtenerVotosPorEncuesta(encuesta);
-            mv.addObject("encuesta", encuesta);
-            mv.addObject("votos", votos);
-        } catch (NoSuchElementException e) {
-            logger.error("Encuesta no encontrada con permalink: {}", permalink);
-            mv.setViewName("error");
-            mv.addObject("mensajeError", "Encuesta no encontrada.");
-        }
-        return mv;
-    }*/
-
+    
     @GetMapping("/votar")
     public ModelAndView redirigirAVotar() {
         ModelAndView mv = new ModelAndView();

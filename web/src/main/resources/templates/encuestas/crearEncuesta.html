@@ -1,25 +1,16 @@
 <!DOCTYPE html>
-<!-- Para que funcione el layout hay que poner estas etiquetas para que funcione el layout-->
-<html xmlns:th="http://www.thymeleaf.org" lang="en"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout}" >
+<html xmlns:th="http://www.thymeleaf.org" lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Crear Encuesta</title>
-  <!-- Flatpickr CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <link type="text/css" th:href="@{/styles/crearEncuesta.css}" rel="stylesheet">
 </head>
-
-<!-- Poner en su body o div donde quieren que su contenido se cargue,
- si van a cargar scripts, incluyanlo dentro del div o body donde hayan declarado
-que se ejcute el layout-->
 <body onload="setInitialDateTime()" layout:fragment="body">
 <h1 class="text-center">Crear Nueva Encuesta</h1>
 <form th:action="@{/encuestas}" th:object="${encuesta}" method="post" class="mt-4" onsubmit="return validarFormulario()">
   <fieldset class="border p-4 text-center">
-
     <div class="form-group row justify-content-center">
       <div class="col-md-8">
         <label for="titulo">Título</label>
@@ -45,12 +36,12 @@ que se ejcute el layout-->
     <div class="form-group col-md-12">
       <h2>Selecciona Pilotos</h2>
       <p id="pilotosSeleccionadosCount">Pilotos seleccionados: 0</p>
-      <div class="scrollable-container" style="height: 300px; overflow-y: auto;">
+      <div class="scrollable-container" style="height:300px;overflow-y:auto">
         <div class="row row-cols-1 row-cols-md-5 g-4">
           <div class="col" th:each="piloto : ${pilotos}">
             <div class="card h-100">
               <div class="image-container">
-                <img th:src="@{${piloto[4]}}" alt="Piloto" class="card-img-top img-thumbnail" style="object-fit: cover; height: 150px;">
+                <img th:src="@{${piloto[4]}}" alt="Piloto" class="card-img-top img-thumbnail" style="object-fit:cover;height:150px">
                 <img th:src="@{'/images/pilotos/bandera/' + ${piloto[5]} + '.png'}" alt="Bandera" class="flag-icon">
               </div>
               <div class="card-body text-center">
@@ -64,14 +55,11 @@ que se ejcute el layout-->
     </div>
     <div class="form-group col-md-12 mt-3">
       <input type="submit" class="btn btn-primary" value="Crear Encuesta">
-      <input type="reset" class="btn btn-danger" value="Borrar los datos introducidos" onclick="reiniciarContadorPilotos(); setInitialDateTime();">
+      <input type="reset" class="btn btn-danger" value="Borrar los datos introducidos" onclick="reiniciarContadorPilotos(), setInitialDateTime()">
     </div>
   </fieldset>
 </form>
-
-<!-- Flatpickr JS -->
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<!-- Tu JS personalizado -->
-<script src="/javascript/crearEncuesta.js"></script>
+<script layout:fragment="scripts" src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script layout:fragment="scripts" src="/javascript/crearEncuesta.js"></script>
 </body>
 </html>

@@ -28,4 +28,6 @@ public interface EncuestaDAO extends JpaRepository<Encuesta, String>{
      * Encuentra la encuesta más recientemente creada en base a la fecha de inicio.
      */
     Optional<Encuesta> findFirstByOrderByFechaInicioDesc();
+
+
 }
