@@ -36,5 +36,9 @@ public class Equipo implements Serializable {
 
     @OneToMany(mappedBy = "equipo", cascade = CascadeType.ALL)
     private List<UsuarioRegistrado> responsables = new ArrayList<>();
+
+    @OneToMany(mappedBy = "equipo", cascade = CascadeType.ALL)
+    private List<Piloto> pilotos = new ArrayList<>();
+
 }
 
