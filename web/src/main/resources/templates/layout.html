@@ -59,6 +59,9 @@
             <li class="nav-item" th:if="${session.usuario != null} and ${session.usuario.rol == T(com.portal.formula1.model.Rol).JEFE_DE_EQUIPO}">
                 <a class="nav-link" th:href="@{/equipos}">Gestionar Equipos</a>
             </li>
+            <li class="nav-item" th:if="${session.usuario != null} and ${session.usuario.rol == T(com.portal.formula1.model.Rol).JEFE_DE_EQUIPO}">
+                <a class="nav-link" th:href="@{/pilotos}">Gestionar Pilotos</a>
+            </li>
             <li class="nav-item">
                 <form th:action="@{/logout}" method="post" style="display: inline;">
                     <button type="submit" class="btn btn-danger">Cerrar sesión</button>

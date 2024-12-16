@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Crear Encuesta</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <link type="text/css" th:href="@{/styles/crearEncuesta.css}" rel="stylesheet">
@@ -41,12 +41,13 @@
           <div class="col" th:each="piloto : ${pilotos}">
             <div class="card h-100">
               <div class="image-container">
-                <img th:src="@{${piloto[4]}}" alt="Piloto" class="card-img-top img-thumbnail" style="object-fit:cover;height:150px">
-                <img th:src="@{'/images/pilotos/bandera/' + ${piloto[5]} + '.png'}" alt="Bandera" class="flag-icon">
+                <img th:src="@{'/uploads/' + ${piloto.rutaImagen}}" alt="Piloto" class="card-img-top img-thumbnail" style="object-fit:cover;height:150px">
+                <img th:src="@{'/images/pilotos/bandera/' + ${piloto.pais} + '.png'}" alt="Bandera" class="flag-icon">
               </div>
               <div class="card-body text-center">
-                <h5 class="card-title" th:text="${piloto[0]} + ' ' + ${piloto[1]}"></h5>
-                <input type="checkbox" th:name="pilotosSeleccionados" th:value="${piloto[3]}" onchange="actualizarContadorPilotos()">
+                <h5 class="card-title" th:text="${piloto.nombre} + ' ' + ${piloto.apellidos}"></h5>
+                <p class="card-text" th:text="'Equipo: ' + ${piloto.equipo.nombre}"></p>
+                <input type="checkbox" th:name="pilotosSeleccionados" th:value="${piloto.dorsal}" onchange="actualizarContadorPilotos()">
               </div>
             </div>
           </div>

@@ -2,6 +2,7 @@ package com.portal.formula1;
 
 import com.portal.formula1.controller.VotoController;
 import com.portal.formula1.model.Encuesta;
+import com.portal.formula1.model.Piloto;
 import com.portal.formula1.model.Voto;
 import com.portal.formula1.service.EncuestaService;
 import com.portal.formula1.service.VotoService;
@@ -17,10 +18,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -61,16 +59,29 @@ public class VotoControllerTests {
         Encuesta encuesta = new Encuesta();
         encuesta.setTitulo("Test Encuesta");
         encuesta.setDescripcion("Descripción de prueba");
+
+        Piloto piloto1 = new Piloto();
+        piloto1.setDorsal(44);
+        piloto1.setNombre("Lewis");
+        piloto1.setApellidos("Hamilton");
+        piloto1.setSiglas("HAM");
+        piloto1.setRutaImagen("/img/hamilton.jpg");
+        piloto1.setPais("Reino Unido");
+        piloto1.setTwitter("@LewisHamilton");
+
+        encuesta.getPilotos().add(piloto1);
+
         when(encuestaService.obtenerEncuestaPorPermalink(anyString())).thenReturn(encuesta);
-        when(encuestaService.getTodosLosPilotos()).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/votos/test-permalink/votar"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("votos/votarEncuesta"))
                 .andExpect(model().attributeExists("encuesta"))
                 .andExpect(model().attributeExists("pilotos"))
+                .andExpect(model().attribute("pilotos", new ArrayList<>(encuesta.getPilotos())))
                 .andExpect(model().attributeExists("voto"));
     }
+
 
     /**
      *
@@ -124,7 +135,9 @@ public class VotoControllerTests {
         encuesta.setDescripcion("Descripción de prueba");
 
         // Mock para el ranking de votación
-        List<Object> ranking = Arrays.asList("Piloto A", "Piloto B");
+        List<Object[]> ranking = new ArrayList<>();
+        ranking.add(new Object[]{"Lewis", "Hamilton", "HAM", 44, "/img/hamilton.jpg", "Reino Unido", "@LewisHamilton", 10L, "Mercedes"});
+        ranking.add(new Object[]{"Max", "Verstappen", "VER", 33, "/img/verstappen.jpg", "Países Bajos", "@Max33Verstappen", 8L, "Red Bull Racing"});
 
         // Configuración de los mocks
         when(encuestaService.obtenerEncuestaPorPermalink("test-permalink")).thenReturn(encuesta);
@@ -139,6 +152,9 @@ public class VotoControllerTests {
                 .andExpect(model().attributeExists("ranking"))
                 .andExpect(model().attribute("ranking", ranking));
     }
+
+
+
 
     /**
      *

@@ -4,14 +4,13 @@
  */
 package com.portal.formula1.controller;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 
 import com.portal.formula1.model.Encuesta;
+import com.portal.formula1.model.Piloto;
 import com.portal.formula1.model.Rol;
 import com.portal.formula1.model.UsuarioRegistrado;
+import com.portal.formula1.repository.PilotoDAO;
 import com.portal.formula1.repository.VotoDAO;
 import com.portal.formula1.service.EncuestaService;
 import jakarta.servlet.http.HttpSession;
@@ -37,6 +36,9 @@ public class EncuestaController {
     @Autowired
     private VotoDAO votoDAO;
 
+    @Autowired
+    private PilotoDAO pilotoDAO;
+
     @GetMapping
     public ModelAndView mostrarMenuEncuestas(HttpSession session) {
         logger.debug("Entrando a mostrarMenuEncuestas");
@@ -61,7 +63,7 @@ public class EncuestaController {
         ModelAndView mv = new ModelAndView("encuestas/crearEncuesta");
         try {
             mv.addObject("encuesta", new Encuesta());
-            List<Object[]> pilotos = encuestaService.getTodosLosPilotos();
+            List<Piloto> pilotos = pilotoDAO.findAll();
             mv.addObject("pilotos", pilotos);
         } catch (Exception e) {
             logger.error("Error al cargar el formulario de creación: ", e);
@@ -72,7 +74,7 @@ public class EncuestaController {
     }
 
     @PostMapping
-    public ModelAndView crearEncuesta(@ModelAttribute Encuesta encuesta, @RequestParam Set<String> pilotosSeleccionados, HttpSession session) {
+    public ModelAndView crearEncuesta(@ModelAttribute Encuesta encuesta, @RequestParam Set<Integer> pilotosSeleccionados, HttpSession session) {
         logger.debug("Entrando a crearEncuesta");
         UsuarioRegistrado usuario = (UsuarioRegistrado) session.getAttribute("usuario");
 
@@ -83,7 +85,7 @@ public class EncuestaController {
 
         ModelAndView mv = new ModelAndView();
         try {
-            Set<String> pilotoSet = new HashSet<>(pilotosSeleccionados);
+            Set<Integer> pilotoSet = new HashSet<>(pilotosSeleccionados);
             Encuesta nuevaEncuesta = encuestaService.crearEncuesta(encuesta, pilotoSet);
             mv.setViewName("redirect:/encuestas/" + nuevaEncuesta.getPermalink());
         } catch (Exception e) {
@@ -107,7 +109,7 @@ public class EncuestaController {
         ModelAndView mv = new ModelAndView("encuestas/verEncuesta");
         try {
             Encuesta encuesta = encuestaService.obtenerEncuestaPorPermalink(permalink);
-            List<Object[]> pilotos = encuestaService.getTodosLosPilotos();
+            List<Piloto> pilotos = new ArrayList<>(encuesta.getPilotos());
             mv.addObject("encuesta", encuesta);
             mv.addObject("pilotos", pilotos);
         }catch (NoSuchElementException e) {
