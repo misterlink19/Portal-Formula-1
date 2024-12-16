@@ -155,7 +155,7 @@ public class PilotoController {
             piloto.setEquipo(user.getEquipo());
 
             Piloto nuevoPiloto = pilotoService.guardarPiloto(piloto);
-            redirectAttributes.addFlashAttribute("mensaje", "El piloto ha sido creado exitosamente.");
+            redirectAttributes.addFlashAttribute("successMessage", "El piloto ha sido creado exitosamente.");
             mv.setViewName("redirect:/pilotos/" + nuevoPiloto.getDorsal());
         } catch (Exception e) {
             logger.error("Error al crear el piloto: ", e);
@@ -165,6 +165,7 @@ public class PilotoController {
 
         return mv;
     }
+
 
     @GetMapping("/{dorsal}")
     public ModelAndView mostrarPiloto(@PathVariable Integer dorsal, HttpServletRequest request) {

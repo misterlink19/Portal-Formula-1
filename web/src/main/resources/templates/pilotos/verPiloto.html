@@ -10,6 +10,13 @@
 <body layout:fragment="body">
 <main role="main" class="container mt-5">
   <h1 class="text-center mb-4" th:text="'Detalles del Piloto: ' + ${piloto.nombre}">Detalles del Piloto</h1>
+
+  <!-- Mensaje de éxito -->
+  <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+    <strong>Piloto creado exitosamente!</strong> <span th:text="${successMessage}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+
   <div class="card mb-4 shadow-sm">
     <div class="row g-0">
       <div class="col-md-4 d-flex justify-content-center align-items-center p-3">
