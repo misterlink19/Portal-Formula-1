@@ -32,8 +32,4 @@ public class PilotoService {
     public boolean existeDorsal(Integer dorsal) {
         return pilotoDAO.existsByDorsal(dorsal);
     }
-
-    public boolean existeSiglas(String siglas) {
-        return pilotoDAO.existsBySiglas(siglas);
-    }
 }

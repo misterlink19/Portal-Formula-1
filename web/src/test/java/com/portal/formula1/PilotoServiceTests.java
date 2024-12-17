@@ -102,17 +102,4 @@ public class PilotoServiceTests {
         verify(pilotoDAO, times(1)).existsByDorsal(1);
     }
 
-    /**
-     * Verifica que se puede comprobar si unas siglas existen y
-     * que se llama al método existsBySiglas del PilotoDAO
-     **/
-    @Test
-    public void testExisteSiglas() {
-        when(pilotoDAO.existsBySiglas("JD")).thenReturn(true);
-
-        boolean exists = pilotoService.existeSiglas("JD");
-
-        assertTrue(exists);
-        verify(pilotoDAO, times(1)).existsBySiglas("JD");
-    }
 }

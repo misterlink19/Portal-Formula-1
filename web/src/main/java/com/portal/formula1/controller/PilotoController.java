@@ -125,12 +125,6 @@ public class PilotoController {
             return mv;
         }
 
-        if (pilotoService.existeSiglas(piloto.getSiglas())) {
-            result.rejectValue("siglas", "error.piloto", "Ya existe un piloto con estas siglas.");
-            mv.addObject("piloto", piloto);
-            return mv;
-        }
-
         try {
             if (fotoArchivo == null || fotoArchivo.isEmpty()) {
                 result.rejectValue("rutaImagen", "error.piloto", "La foto del piloto es obligatoria.");

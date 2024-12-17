@@ -279,6 +279,10 @@ public class PilotoControllerTests {
                 .andExpect(model().attributeExists("piloto"))
                 .andExpect(model().attributeHasFieldErrors("piloto", "dorsal"));
     }
+
+    /**
+     * Verifica que no permite crear pilotos a usuarios sin permisos de responsables de equipo
+     * */
     @Test
     public void testMostrarPilotoSinPermisos() throws Exception {
         UsuarioRegistrado usuarioSinPermisos = new UsuarioRegistrado();
@@ -294,32 +298,6 @@ public class PilotoControllerTests {
                 .andExpect(view().name("error"))
                 .andExpect(model().attributeExists("mensajeError"));
     }
-
-    @Test
-    public void testCrearPilotoSiglasExistentes() throws Exception {
-        UsuarioRegistrado jefeDeEquipoUser = new UsuarioRegistrado();
-        jefeDeEquipoUser.setUsuario("jefe");
-        jefeDeEquipoUser.setRol(Rol.JEFE_DE_EQUIPO);
-        jefeDeEquipoUser.setEquipo(new com.portal.formula1.model.Equipo());
-        session.setAttribute("usuario", jefeDeEquipoUser);
-
-        when(autentificacionService.checkUser(any(String.class))).thenReturn(jefeDeEquipoUser);
-        when(pilotoService.existeSiglas(anyString())).thenReturn(true);
-
-        MockMultipartFile mockFile = new MockMultipartFile("fotoArchivo", "foto.png", "image/png", "test content".getBytes());
-
-        mockMvc.perform(MockMvcRequestBuilders.multipart("/pilotos/crear")
-                        .file(mockFile)
-                        .session(session)
-                        .param("dorsal", "1")
-                        .param("nombre", "Nuevo Piloto")
-                        .param("siglas", "NP"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("pilotos/crearPiloto"))
-                .andExpect(model().attributeExists("piloto"))
-                .andExpect(model().attributeHasFieldErrors("piloto", "siglas"));
-    }
-
 }
 
 
