@@ -6,13 +6,16 @@ package com.portal.formula1;
 
 import com.portal.formula1.controller.EncuestaController;
 import com.portal.formula1.model.Encuesta;
+import com.portal.formula1.model.Piloto;
 import com.portal.formula1.model.Rol;
 import com.portal.formula1.model.UsuarioRegistrado;
+import com.portal.formula1.repository.PilotoDAO;
 import com.portal.formula1.repository.VotoDAO;
 import com.portal.formula1.service.EncuestaService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -46,6 +49,9 @@ public class EncuestaControllerTests {
     @Mock
     private VotoDAO votoDAO;
 
+    @Mock
+    private PilotoDAO  pilotoDAO;
+
     @InjectMocks
     private EncuestaController encuestaController;
 
@@ -71,9 +77,18 @@ public class EncuestaControllerTests {
      */
     @Test
     public void testMostrarFormularioCreacion() throws Exception {
-        List<Object[]> pilotos = new ArrayList<>();
-        pilotos.add(new Object[]{"Lewis", "Hamilton", "HAM", 44, "/img/hamilton.jpg", "Reino Unido", "@LewisHamilton"});
-        when(encuestaService.getTodosLosPilotos()).thenReturn(pilotos);
+        List<Piloto> pilotos = new ArrayList<>();
+        Piloto piloto1 = new Piloto();
+        piloto1.setDorsal(44);
+        piloto1.setNombre("Lewis");
+        piloto1.setApellidos("Hamilton");
+        piloto1.setSiglas("HAM");
+        piloto1.setRutaImagen("/img/hamilton.jpg");
+        piloto1.setPais("Reino Unido");
+        piloto1.setTwitter("@LewisHamilton");
+
+        pilotos.add(piloto1);
+        when(pilotoDAO.findAll()).thenReturn(pilotos);
 
         mockMvc.perform(get("/encuestas/crearEncuestas")
                         .session(session)) // Incluir la sesión con el usuario autenticado
@@ -81,6 +96,8 @@ public class EncuestaControllerTests {
                 .andExpect(view().name("encuestas/crearEncuesta"))
                 .andExpect(model().attributeExists("pilotos"));
     }
+
+
 
 
     /**
@@ -95,6 +112,9 @@ public class EncuestaControllerTests {
         encuesta.setFechaLimite(LocalDateTime.parse("2024-12-31T23:59:59"));
         encuesta.setPermalink("titulo-de-prueba");
 
+        Piloto piloto1 = new Piloto();
+        piloto1.setDorsal(44);
+        when(pilotoDAO.findById(44)).thenReturn(Optional.of(piloto1));
         when(encuestaService.crearEncuesta(any(Encuesta.class), any(Set.class))).thenReturn(encuesta);
 
         mockMvc.perform(post("/encuestas")
@@ -103,10 +123,12 @@ public class EncuestaControllerTests {
                         .param("titulo", "Título de prueba")
                         .param("descripcion", "Descripción de prueba")
                         .param("fechaLimite", "2024-12-31T23:59:59")
-                        .param("pilotosSeleccionados", "HAM"))
+                        .param("pilotosSeleccionados", "44"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/encuestas/" + encuesta.getPermalink()));
     }
+
+
 
 
     /**
@@ -117,19 +139,29 @@ public class EncuestaControllerTests {
     public void testMostrarEncuesta() throws Exception {
         Encuesta encuesta = new Encuesta("Título de prueba", "Descripción de prueba", LocalDateTime.now(), LocalDateTime.now().plusDays(1));
         encuesta.setPermalink("test-permalink");
-        List<Object[]> pilotos = new ArrayList<>();
-        pilotos.add(new Object[]{"Lewis", "Hamilton", "HAM", 44, "/img/hamilton.jpg", "Reino Unido", "@LewisHamilton"});
+
+        Piloto piloto1 = new Piloto();
+        piloto1.setDorsal(44);
+        piloto1.setNombre("Lewis");
+        piloto1.setApellidos("Hamilton");
+        piloto1.setSiglas("HAM");
+        piloto1.setRutaImagen("/img/hamilton.jpg");
+        piloto1.setPais("Reino Unido");
+        piloto1.setTwitter("@LewisHamilton");
+
+        encuesta.getPilotos().add(piloto1);
 
         when(encuestaService.obtenerEncuestaPorPermalink("test-permalink")).thenReturn(encuesta);
-        when(encuestaService.getTodosLosPilotos()).thenReturn(pilotos);
 
         mockMvc.perform(get("/encuestas/test-permalink")
                         .session(session)) // Incluir la sesión con el usuario autenticado
                 .andExpect(status().isOk())
                 .andExpect(view().name("encuestas/verEncuesta"))
                 .andExpect(model().attributeExists("encuesta"))
-                .andExpect(model().attributeExists("pilotos"));
+                .andExpect(model().attributeExists("pilotos"))
+                .andExpect(model().attribute("pilotos", new ArrayList<>(encuesta.getPilotos())));
     }
+
 
 
     /**

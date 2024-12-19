@@ -44,7 +44,9 @@
   <div class="row row-cols-1 row-cols-md-3 g-4">
     <div class="col" th:each="piloto : ${equipo.pilotos}">
       <div class="card h-100 shadow-sm">
-        <img th:src="@{${piloto.rutaImagen}}" class="card-img-top img-fluid" alt="Imagen de Piloto">
+        <div class="card-img-top d-flex justify-content-center align-items-center p-3">
+          <img th:src="@{'/uploads/' + ${piloto.rutaImagen}}" class="img-thumbnail" alt="Imagen de Piloto" style="width: 150px; height: 150px;">
+        </div>
         <div class="card-body">
           <h5 class="card-title text-center" th:text="${piloto.nombre} + ' ' + ${piloto.apellidos}">Nombre del Piloto</h5>
           <p class="card-text text-center">

@@ -5,15 +5,14 @@
 package com.portal.formula1.service;
 
 import com.portal.formula1.model.Encuesta;
+import com.portal.formula1.model.Piloto;
 import com.portal.formula1.repository.EncuestaDAO;
+import com.portal.formula1.repository.PilotoDAO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,16 +27,21 @@ public class EncuestaService {
     @Autowired
     private EncuestaDAO encuestaDAO;
 
-    @PersistenceContext //Para manejar pilotos directamente de la base de datos
-    private EntityManager entityManager;
+    @Autowired
+    private PilotoDAO pilotoDAO;
 
     public List<Encuesta> getAllEncuestas() {
         return encuestaDAO.findAll();
     }
 
-    public Encuesta crearEncuesta(Encuesta encuesta, Set<String> pilotos) {
+    public Encuesta crearEncuesta(Encuesta encuesta, Set<Integer> pilotoIds) {
         if (encuesta.getFechaInicio() == null) {
             encuesta.setFechaInicio(LocalDateTime.now());
+        }
+        Set<Piloto> pilotos = new HashSet<>();
+        for (Integer pilotoId : pilotoIds) {
+            Piloto piloto = pilotoDAO.findById(pilotoId).orElseThrow(() -> new NoSuchElementException("Piloto no encontrado con id: " + pilotoId));
+            pilotos.add(piloto);
         }
         encuesta.getPilotos().addAll(pilotos);
         return encuestaDAO.save(encuesta);
@@ -47,42 +51,9 @@ public class EncuestaService {
         Optional<Encuesta> encuestaOptional = encuestaDAO.findById(permalink);
         return encuestaOptional.orElseThrow(() -> new NoSuchElementException("Encuesta no encontrada con permalink: " + permalink));
     }
-    
-    public List<Object[]> getTodosLosPilotos() {
-        if (entityManager == null) {
-            throw new IllegalStateException("EntityManager is null");
-        }
-
-        String sql = "SELECT Nombre, Apellidos, Siglas, Dorsal, RutaImagen, Pais, Twitter FROM Piloto";
-        Query query = entityManager.createNativeQuery(sql);
-
-        if (query == null) {
-            throw new IllegalStateException("Query is null");
-        }
-
-        return query.getResultList();
-    }
 
     public Encuesta obtenerUltimaEncuestaDisponible() {
         return encuestaDAO.findFirstByOrderByFechaInicioDesc()
                 .orElseThrow(() -> new NoSuchElementException("No hay encuestas disponibles en este momento"));
     }
-
-
-
-
-    public List<Object[]> getPilotosPorEncuesta(String permalink) {
-        if (entityManager == null) {
-            throw new IllegalStateException("EntityManager is null");
-        }
-        String sql = "SELECT p.Nombre, p.Apellidos, p.Siglas, p.Dorsal, p.RutaImagen, p.Pais " +
-                "FROM piloto p JOIN encuesta_piloto ep ON ep.piloto_id = p.dorsal where ep.encuesta_id = :permalink";
-
-        Query query = entityManager.createNativeQuery(sql);
-        query.setParameter("permalink", permalink);
-
-
-        return query.getResultList();
-    }
-
 }

@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout}">
+<html xmlns:th="http://www.thymeleaf.org" lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,13 +18,14 @@
                     <div class="col" th:each="piloto : ${pilotos}">
                         <div class="card h-100">
                             <div class="image-container">
-                                <img th:src="@{${piloto[4]}}" alt="Piloto" class="card-img-top">
-                                <img th:src="@{'/images/pilotos/bandera/' + ${piloto[5]} + '.png'}" alt="Bandera" class="flag-icon">
+                                <img th:src="@{'/uploads/' + ${piloto.rutaImagen}}" alt="Piloto" class="card-img-top">
+                                <img th:src="@{'/images/pilotos/bandera/' + ${piloto.pais} + '.png'}" alt="Bandera" class="flag-icon">
                             </div>
                             <div class="card-body text-center">
-                                <h5 class="card-title" th:text="${piloto[0] + ' ' + piloto[1]}"></h5>
+                                <h5 class="card-title" th:text="${piloto.nombre} + ' ' + ${piloto.apellidos}"></h5>
+                                <p class="card-text" th:text="'Equipo: ' + ${piloto.equipo.nombre}"></p>
                                 <div>
-                                    <input type="radio" th:field="*{opcionSeleccionada}" th:value="${piloto[3]}">
+                                    <input type="radio" th:field="*{opcionSeleccionada}" th:value="${piloto.dorsal}">
                                 </div>
                             </div>
                         </div>

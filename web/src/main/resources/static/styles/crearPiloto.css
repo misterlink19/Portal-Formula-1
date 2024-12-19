@@ -1,0 +1,98 @@
+/* Contenedor principal */
+.container {
+    text-align: center;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Tarjeta del formulario */
+.card {
+    margin: auto;
+    max-width: 600px;
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+/* Título del formulario */
+h1 {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Etiquetas del formulario */
+label {
+    font-weight: bold;
+    color: #555;
+}
+
+/* Entradas de formulario */
+.form-control {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 10px;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+/* Botones del formulario */
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: #fff;
+    font-weight: bold;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: #fff;
+    font-weight: bold;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Botones en estado hover */
+.btn-primary:hover,
+.btn-danger:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+    color: #fff;
+}
+
+/* Mensajes de error */
+.text-danger {
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+/* Contenedor del logo */
+.logo-container {
+    margin: auto;
+}
+
+.logo-container img {
+    width: 150px;
+    height: auto;
+    max-height: 150px;
+    object-fit: contain;
+}
+
+/* Estilos adicionales */
+fieldset {
+    border: none;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}

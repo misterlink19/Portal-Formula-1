@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout}" >
+<html xmlns:th="http://www.thymeleaf.org" lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,26 +7,49 @@
 </head>
 <body>
 <div layout:fragment="body">
-<main role="main" class="container">
-    <h1 th:text="'Detalles de la Encuesta: ' + ${encuesta.titulo}">Detalles de la Encuesta</h1>
-    <div class="card">
-        <div class="card-body">
-            <h5 class="card-title" th:text="${encuesta.titulo}">Título de la Encuesta</h5>
-            <p class="card-text" th:text="${encuesta.descripcion}">Descripción de la Encuesta</p>
-            <p class="card-text">
-                <strong>Fecha Límite:</strong> <span th:text="${encuesta.fechaLimite}">Fecha Límite de la Encuesta</span>
-            </p>
-            <h5 class="card-title">Pilotos Seleccionados</h5>
-            <ul>
-                <li th:each="piloto : ${encuesta.pilotos}">
-                    <span th:text="${piloto}">Piloto</span>
-                </li>
-            </ul>
+    <main role="main" class="container">
+        <h1 th:text="'Detalles de la Encuesta: ' + ${encuesta.titulo}">Detalles de la Encuesta</h1>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title" th:text="${encuesta.titulo}">Título de la Encuesta</h5>
+                <p class="card-text" th:text="${encuesta.descripcion}">Descripción de la Encuesta</p>
+                <p class="card-text">
+                    <strong>Fecha Límite:</strong> <span th:text="${encuesta.fechaLimite}">Fecha Límite de la Encuesta</span>
+                </p>
+                <h5 class="card-title">Pilotos Seleccionados</h5>
+                <div class="row row-cols-1 row-cols-md-3 g-4">
+                    <div class="col" th:each="piloto : ${encuesta.pilotos}">
+                        <div class="card h-100">
+                            <div class="row g-0">
+                                <div class="col-md-4 d-flex justify-content-center align-items-center p-3">
+                                    <img th:src="@{'/uploads/' + ${piloto.rutaImagen}}" class="mr-3 img-thumbnail" alt="Imagen de Piloto" style="width: 64px; height: 64px;">
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <h5 class="mt-0" th:text="${piloto.dorsal} + ' - ' + ${piloto.nombre} + ' ' + ${piloto.apellidos}"></h5>
+                                        <p class="mb-0">
+                                            <strong>Equipo:</strong> <span th:text="${piloto.equipo.nombre}">Nombre del Equipo</span>
+                                        </p>
+                                        <p class="mb-0">
+                                            <strong>País:</strong>
+                                            <img th:src="@{'/images/pilotos/bandera/' + ${piloto.pais} + '.png'}" alt="Bandera" class="me-2" style="width: 24px;">
+                                            <span th:text="${piloto.pais}"></span>
+                                        </p>
+                                        <p class="mb-0">
+                                            <strong>Twitter:</strong>
+                                            <a th:href="'https://twitter.com/' + ${piloto.twitter}" class="text-primary" th:text="${piloto.twitter}">@Twitter</a>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
 
-    <a th:href="@{/templates/encuestas}" class="btn btn-secondary mt-3">Volver a Encuestas</a>
-</main>
+        <a th:href="@{/templates/encuestas}" class="btn btn-secondary mt-3">Volver a Encuestas</a>
+    </main>
 </div>
 </body>
 </html>

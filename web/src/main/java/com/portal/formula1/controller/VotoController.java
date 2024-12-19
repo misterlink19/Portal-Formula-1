@@ -1,6 +1,7 @@
 package com.portal.formula1.controller;
 
 import com.portal.formula1.model.Encuesta;
+import com.portal.formula1.model.Piloto;
 import com.portal.formula1.model.Voto;
 import com.portal.formula1.service.EncuestaService;
 import com.portal.formula1.service.VotoService;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -38,7 +40,7 @@ public class VotoController {
         ModelAndView mv = new ModelAndView("votos/votarEncuesta");
         try {
             Encuesta encuesta = encuestaService.obtenerEncuestaPorPermalink(permalink);
-            List<Object[]> pilotos = encuestaService.getPilotosPorEncuesta(permalink);
+            List<Piloto> pilotos = new ArrayList<>(encuesta.getPilotos());
             mv.addObject("encuesta", encuesta);
             mv.addObject("pilotos", pilotos);
             mv.addObject("voto", new Voto()); // Añadir nuevo objeto Voto al modelo
@@ -62,7 +64,7 @@ public class VotoController {
             boolean yaHaVotado = votoService.haVotadoAntes(voto.getCorreoVotante(), encuesta);
             if (yaHaVotado) {
                 mv.addObject("encuesta", encuesta);
-                mv.addObject("pilotos", encuestaService.getPilotosPorEncuesta(permalink));
+                mv.addObject("pilotos", new ArrayList<>(encuesta.getPilotos()));
                 mv.addObject("voto", voto);
                 mv.addObject("mensajeError", "Ya has votado en esta encuesta con este correo electrónico.");
                 return mv;
@@ -78,7 +80,7 @@ public class VotoController {
         }
         return mv;
     }
-    
+
     @GetMapping("/votar")
     public ModelAndView redirigirAVotar() {
         ModelAndView mv = new ModelAndView();
@@ -98,7 +100,7 @@ public class VotoController {
         ModelAndView mv = new ModelAndView("votos/resultadosEncuesta");
         try {
             Encuesta encuesta = encuestaService.obtenerEncuestaPorPermalink(permalink);
-            List<Object> ranking = votoService.getRankingVotacion(permalink); // Corrección aquí
+            List<Object[]> ranking = votoService.getRankingVotacion(permalink); // Corrección aquí
             mv.addObject("encuesta", encuesta);
             mv.addObject("ranking", ranking);
         } catch (NoSuchElementException e) {
@@ -108,5 +110,6 @@ public class VotoController {
         }
         return mv;
     }
+
 
 }

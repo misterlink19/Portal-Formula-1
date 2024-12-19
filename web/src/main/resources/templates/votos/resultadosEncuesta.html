@@ -1,11 +1,9 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout}" >
+<html xmlns:th="http://www.thymeleaf.org" lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Listado de Encuestas</title>
+    <title>Resultados de la Votación</title>
     <link type="text/css" th:href="@{/styles/resultadosEncuesta.css}" rel="stylesheet">
 </head>
 <body>
@@ -13,19 +11,21 @@
     <main>
         <div th:if="${encuesta}">
             <h1 th:text="'Resultados de la Votación: ' + ${encuesta.titulo}">Resultados de la Votación</h1>
-
         </div>
 
         <div class="resultados">
-            <div th:each="piloto, iterStat : ${ranking}"
+            <div th:each="entry, iterStat : ${ranking}"
                  th:classappend="${iterStat.index == 0} ? 'ganador' : ''"
                  class="piloto">
-                <img th:src="${piloto[4]}" th:alt="${piloto[0] + ' ' + piloto[1]}">
-                <h2 th:text="${piloto[0] + ' ' + piloto[1]}">Nombre del piloto</h2>
-                <p th:text="${piloto[2] + ' | #' + piloto[3]}">Siglas | #Dorsal</p>
-                <p th:text="${piloto[5]}">País</p>
-                <p th:text="${piloto[6]}">Red Social</p>
-                <p class="votos" th:text="${piloto[7] + ' votos'}">Cantidad de votos</p>
+                <img th:src="@{'/uploads/' + ${entry[4]}}" th:alt="${entry[0] + ' ' + entry[1]}" class="img-thumbnail">
+                <h2 th:text="${entry[0] + ' ' + entry[1]}">Nombre del piloto</h2>
+                <p th:text="${entry[2] + ' | #' + entry[3]}">Siglas | #Dorsal</p>
+                <p>
+                    <strong>Equipo:</strong> <span th:text="${entry[8]}">Nombre del Equipo</span>
+                </p>
+                <p th:text="${entry[5]}">País</p>
+                <p th:text="${entry[6]}">Red Social</p>
+                <p class="votos" th:text="${entry[7] + ' votos'}">Cantidad de votos</p>
             </div>
         </div>
         <a th:href="@{/encuestas}" class="btn btn-secondary mt-3">Volver a Encuestas</a>
