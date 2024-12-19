@@ -232,4 +232,5 @@ public class EquipoController {
         mv.addObject("usuario", usuario);
         return mv;
     }
+
 }

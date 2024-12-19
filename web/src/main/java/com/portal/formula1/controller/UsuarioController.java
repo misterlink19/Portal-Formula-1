@@ -1,9 +1,14 @@
 package com.portal.formula1.controller;
 
+import com.portal.formula1.model.Rol;
 import com.portal.formula1.model.UsuarioRegistrado;
+import com.portal.formula1.service.AutentificacionService;
 import com.portal.formula1.service.UsuarioService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -13,24 +18,30 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
 @Controller
+@Slf4j
 public class UsuarioController {
 
     @Autowired
     private UsuarioService usuarioService;
+
+    @Autowired
+    private AutentificacionService autentificacionService; // Si lo usas para verificar usuarios
 
     @Value("${recaptcha.secret}")
     private String recaptchaSecret;
@@ -150,5 +161,81 @@ public class UsuarioController {
     public String validarUsuariosRol(@RequestParam List<String> usuariosIds) {
         usuarioService.validarUsuariosRol(usuariosIds);
         return "redirect:/admin/usuarios?validacion=success";
+    }
+
+    @GetMapping("/equipos/responsables/crear")
+    public ModelAndView mostrarFormularioNuevoResponsable(HttpServletRequest request) {
+        log.debug("Entrando a mostrarFormularioNuevoResponsable");
+        ModelAndView mv = new ModelAndView("equipos/crearResponsable");
+
+        try {
+            UsuarioRegistrado usuarioActual = (UsuarioRegistrado) request.getSession().getAttribute("usuario");
+            // Verificar usuario actual
+            usuarioActual = autentificacionService.checkUser(usuarioActual.getUsuario());
+
+            if (usuarioActual == null || usuarioActual.getRol() != Rol.JEFE_DE_EQUIPO || usuarioActual.getEquipo() == null) {
+                mv.setViewName("error");
+                mv.addObject("mensajeError", "No tienes permisos para crear responsables de equipo.");
+                return mv;
+            }
+
+            mv.addObject("nuevoResponsable", new UsuarioRegistrado());
+            mv.addObject("usuario", usuarioActual); // Para usar en la vista si es necesario
+
+        } catch (Exception e) {
+            log.error("Error al mostrar formulario de nuevo responsable: ", e);
+            mv.setViewName("error");
+            mv.addObject("mensajeError", "Error al cargar el formulario.");
+        }
+
+        return mv;
+    }
+
+    @PostMapping("/equipos/responsables/crear")
+    public ModelAndView crearNuevoResponsable(
+            @ModelAttribute("nuevoResponsable") @Valid UsuarioRegistrado nuevoResponsable,
+            BindingResult result,
+            HttpServletRequest request,
+            RedirectAttributes redirectAttributes) {
+
+        log.debug("Iniciando creación de nuevo responsable");
+        ModelAndView mv = new ModelAndView("equipos/crearResponsable");
+
+        try {
+            UsuarioRegistrado creador = (UsuarioRegistrado) request.getSession().getAttribute("usuario");
+            creador = autentificacionService.checkUser(creador.getUsuario());
+
+            // Validación del usuario creador
+            if (creador == null || creador.getRol() != Rol.JEFE_DE_EQUIPO || creador.getEquipo() == null) {
+                mv.setViewName("error");
+                mv.addObject("mensajeError", "No tienes permisos para crear responsables de equipo.");
+                return mv;
+            }
+
+            // Si hay errores de validación
+            if (result.hasErrors()) {
+                mv.addObject("error", "Por favor, corrija los errores en el formulario.");
+                return mv;
+            }
+
+            // Crear el nuevo responsable
+            UsuarioRegistrado responsableCreado = usuarioService.crearResponsableEquipo(creador, nuevoResponsable);
+            log.info("Responsable creado exitosamente: {}", responsableCreado.getUsuario());
+
+            // Redireccionar con mensaje de éxito
+            redirectAttributes.addFlashAttribute("mensaje",
+                    "Responsable creado exitosamente. Contraseña temporal: " + responsableCreado.getContrasena());
+            return new ModelAndView("redirect:/equipos/" + creador.getEquipo().getId());
+
+        } catch (IllegalStateException e) {
+            log.error("Error al crear responsable: {}", e.getMessage());
+            mv.addObject("error", e.getMessage());
+            return mv;
+        } catch (Exception e) {
+            log.error("Error inesperado al crear responsable: ", e);
+            mv.setViewName("error");
+            mv.addObject("mensajeError", "Error inesperado al crear el responsable.");
+            return mv;
+        }
     }
 }

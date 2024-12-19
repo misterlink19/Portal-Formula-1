@@ -1,20 +1,28 @@
 package com.portal.formula1.service;
 
+
 import com.portal.formula1.model.Rol;
 import com.portal.formula1.model.UsuarioRegistrado;
 import com.portal.formula1.repository.UsuarioRegistradoDAO;
-import com.portal.formula1.repository.UsuarioRegistradoDAO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Random;
 
 @Service
 public class UsuarioService {
 
     @Autowired
     private UsuarioRegistradoDAO usuarioRegistradoDAO;
+
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder; // Declaración del passwordEncoder
+
+
 
     @Transactional
     public void registrarUsuario(UsuarioRegistrado usuario) {
@@ -82,7 +90,61 @@ public class UsuarioService {
         return usuarioRegistradoDAO.findByRolAndNombreContainingIgnoreCase(rol, nombre);
     }
 
+    // metodo generar contraseña
+    private String generarContrasenaTemporal() {
+        String caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+        StringBuilder contrasenaTemporal = new StringBuilder();
+        Random random = new Random();
 
+        for (int i = 0; i < 8; i++) {
+            contrasenaTemporal.append(caracteres.charAt(random.nextInt(caracteres.length())));
+        }
+
+        return contrasenaTemporal.toString();
+    }
+
+    //Servicio para que un JEFE_DE_EQUIPO pueda crear un nuevo usuario JEFE_DE_EQUIPO
+    @Transactional
+    public UsuarioRegistrado crearResponsableEquipo(UsuarioRegistrado creador, UsuarioRegistrado nuevoResponsable) {
+        // Validar que el creador sea JEFE_DE_EQUIPO y tenga un equipo asignado
+        if (creador.getRol() != Rol.JEFE_DE_EQUIPO || creador.getEquipo() == null) {
+            throw new IllegalStateException("Solo los jefes de equipo pueden crear otros responsables");
+        }
+
+        // Verificar si el usuario ya existe
+        if (usuarioRegistradoDAO.findById(nuevoResponsable.getUsuario()).isPresent()) {
+            throw new IllegalStateException("El nombre de usuario ya existe");
+        }
+
+        // Validar campos obligatorios del nuevo responsable
+        if (nuevoResponsable.getUsuario() == null || nuevoResponsable.getUsuario().trim().isEmpty() ||
+                nuevoResponsable.getNombre() == null || nuevoResponsable.getNombre().trim().isEmpty() ||
+                nuevoResponsable.getEmail() == null || nuevoResponsable.getEmail().trim().isEmpty()) {
+            throw new IllegalStateException("Todos los campos son obligatorios");
+        }
+
+        try {
+            // Generar contraseña temporal
+            String contrasenaTemporal = generarContrasenaTemporal();
+
+            // Configurar el nuevo responsable
+            nuevoResponsable.setRol(Rol.JEFE_DE_EQUIPO);
+            nuevoResponsable.setEquipo(creador.getEquipo());
+            nuevoResponsable.setContrasena(passwordEncoder.encode(contrasenaTemporal));
+            nuevoResponsable.setValidacion(true);
+            nuevoResponsable.setFechaRegistro(LocalDateTime.now());
+            nuevoResponsable.setRolSolicitado(null);
+
+            // Guardar el nuevo responsable
+            UsuarioRegistrado responsableGuardado = usuarioRegistradoDAO.save(nuevoResponsable);
+
+            // Establecer la contraseña temporal sin encriptar para mostrarla una única vez
+            responsableGuardado.setContrasena(contrasenaTemporal);
+            return responsableGuardado;
+        } catch (Exception e) {
+            throw new IllegalStateException("Error al crear el nuevo responsable: " + e.getMessage());
+        }
+    }
 
 
 }

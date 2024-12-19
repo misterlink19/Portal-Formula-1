@@ -26,6 +26,14 @@
        th:href="@{/equipos/{id}(id=${usuario.equipo.id})}"
        class="btn btn-info mr-4">Ver Equipo</a>
 
+    <!-- Agregar en verEquipo.html -->
+    <div th:if="${usuario.rol == T(com.portal.formula1.model.Rol).JEFE_DE_EQUIPO}">
+      <a th:href="@{/equipos/responsables/crear}" class="btn btn-primary">
+        Crear Nuevo Responsable
+      </a>
+    </div>
+
+
     <!-- Botón "Salir al Menú Anterior" -->
     <a onclick="history.back()" class="btn btn-danger">Salir al Menú Anterior</a>
   </div>
