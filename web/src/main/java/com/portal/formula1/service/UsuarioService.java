@@ -139,8 +139,9 @@ public class UsuarioService {
             UsuarioRegistrado responsableGuardado = usuarioRegistradoDAO.save(nuevoResponsable);
 
             // Establecer la contraseña temporal sin encriptar para mostrarla una única vez
-            responsableGuardado.setContrasena(contrasenaTemporal);
-            return responsableGuardado;
+            UsuarioRegistrado usuarioTemp = new UsuarioRegistrado();
+            usuarioTemp.setContrasena(contrasenaTemporal);
+            return usuarioTemp;
         } catch (Exception e) {
             throw new IllegalStateException("Error al crear el nuevo responsable: " + e.getMessage());
         }

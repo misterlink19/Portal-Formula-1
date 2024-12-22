@@ -173,7 +173,7 @@ public class EquipoController {
 
 
     @GetMapping("/{id}")
-    public ModelAndView mostrarEquipo(@PathVariable Long id, HttpServletRequest request) {
+    public ModelAndView mostrarEquipo(@PathVariable Long id, @ModelAttribute("mensaje") String mensaje, HttpServletRequest request) {
         logger.debug("Entrando a mostrarEquipo con id: {}", id);
         ModelAndView mv = new ModelAndView("equipos/verEquipo");
         try {
@@ -192,6 +192,12 @@ public class EquipoController {
             }
 
             mv.addObject("equipo", equipo);
+
+            // Añadir el mensaje al modelo si existe
+            if (mensaje != null && !mensaje.isEmpty()) {
+                mv.addObject("mensaje", mensaje);
+            }
+
         } catch (NoSuchElementException e) {
             logger.error("Equipo no encontrado con id: {}", id);
             mv.setViewName("error");

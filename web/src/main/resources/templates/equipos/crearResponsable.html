@@ -55,12 +55,18 @@
         Por favor ingrese un email válido.
       </div>
     </div>
-
+    <!-- Campo oculto para el rol -->
+    <input type="hidden" th:field="*{rol}" th:value="${T(com.portal.formula1.model.Rol).JEFE_DE_EQUIPO}">
+    <!-- Campo oculto para la contraseña -->
+    <input type="hidden" th:field="*{contrasena}" th:value="${''}">
+    <!-- Botones de acción -->
     <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
       <a th:href="@{/equipos}" class="btn btn-secondary me-md-2">Cancelar</a>
       <button type="submit" class="btn btn-primary">Agregar Responsable</button>
     </div>
   </form>
+
+
 </div>
 
 <!-- Scripts -->

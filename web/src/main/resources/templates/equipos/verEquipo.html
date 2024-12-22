@@ -9,25 +9,22 @@
 </head>
 <body layout:fragment="body">
 <main role="main" class="container mt-5">
-  <!-- Equipo Header -->
-  <h1 class="text-center mb-4" th:text="'Detalles del Equipo: ' + ${equipo.nombre}">Detalles del Equipo</h1>
+  <!-- Mostrar mensaje de éxito si existe -->
+  <div th:if="${mensaje}" class="alert alert-success alert-dismissible fade show" role="alert">
+    <span th:text="${mensaje}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
 
+  <h1 class="text-center mb-4" th:text="'Detalles del Equipo: ' + ${equipo.nombre}">Detalles del Equipo</h1>
   <div class="card mb-4 shadow-sm">
     <div class="row g-0">
-      <!-- Logo del Equipo -->
       <div class="col-md-4 d-flex justify-content-center align-items-center p-3">
         <img th:src="@{'/uploads/' + ${equipo.logo}}" alt="Logo del Equipo" class="img-fluid rounded">
       </div>
       <div class="col-md-8">
         <div class="card-body">
-          <!-- Nombre del Equipo -->
           <h3 class="card-title" th:text="${equipo.nombre}">Nombre del Equipo</h3>
-          <!-- Twitter -->
-          <p class="card-text">
-            <strong>Twitter:</strong>
-            <a th:href="'https://twitter.com/' + ${equipo.twitter}" class="text-primary" th:text="${equipo.twitter}">@Twitter</a>
-          </p>
-          <!-- Responsables -->
+          <p class="card-text"><strong>Twitter:</strong><a th:href="'https://twitter.com/' + ${equipo.twitter}" class="text-primary" th:text="${equipo.twitter}">@Twitter</a></p>
           <h5 class="card-title mt-3">Responsables del Equipo</h5>
           <ul class="list-group list-group-flush">
             <li class="list-group-item" th:each="responsable : ${equipo.responsables}">
@@ -38,39 +35,27 @@
       </div>
     </div>
   </div>
-
-  <!-- Listado de Pilotos -->
   <h2 class="mt-5">Pilotos</h2>
   <div class="row row-cols-1 row-cols-md-3 g-4">
     <div class="col" th:each="piloto : ${equipo.pilotos}">
       <div class="card h-100 shadow-sm">
         <div class="card-img-top d-flex justify-content-center align-items-center p-3">
-          <img th:src="@{'/uploads/' + ${piloto.rutaImagen}}" class="img-thumbnail" alt="Imagen de Piloto" style="width: 150px; height: 150px;">
+          <img th:src="@{'/uploads/' + ${piloto.rutaImagen}}" class="img-thumbnail" alt="Imagen de Piloto" style="width:150px;height:150px">
         </div>
         <div class="card-body">
           <h5 class="card-title text-center" th:text="${piloto.nombre} + ' ' + ${piloto.apellidos}">Nombre del Piloto</h5>
-          <p class="card-text text-center">
-            <strong>Dorsal:</strong> <span th:text="${piloto.dorsal}">00</span><br>
-            <strong>País:</strong>
-            <img th:src="@{'/images/pilotos/bandera/' + ${piloto.pais} + '.png'}" alt="Bandera" class="me-2" style="width: 24px;">
-            <span th:text="${piloto.pais}">País</span>
-          </p>
-          <p class="card-text text-center">
-            <strong>Twitter:</strong>
-            <a th:href="'https://twitter.com/' + ${piloto.twitter}" class="text-primary" th:text="${piloto.twitter}">@Twitter</a>
-          </p>
+          <p class="card-text text-center"><strong>Dorsal:</strong><span th:text="${piloto.dorsal}">00</span><br>
+            <strong>País:</strong><img th:src="@{'/images/pilotos/bandera/' + ${piloto.pais} + '.png'}" alt="Bandera" class="me-2" style="width:24px">
+            <span th:text="${piloto.pais}">País</span></p>
+          <p class="card-text text-center"><strong>Twitter:</strong><a th:href="'https://twitter.com/' + ${piloto.twitter}" class="text-primary" th:text="${piloto.twitter}">@Twitter</a></p>
         </div>
       </div>
     </div>
   </div>
-
-  <!-- Botón Volver -->
   <div class="text-center mt-5">
     <a th:href="@{/equipos}" class="btn btn-secondary">Volver a Equipos</a>
   </div>
 </main>
-
-<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

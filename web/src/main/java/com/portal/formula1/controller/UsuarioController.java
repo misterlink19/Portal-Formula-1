@@ -179,7 +179,12 @@ public class UsuarioController {
                 return mv;
             }
 
-            mv.addObject("nuevoResponsable", new UsuarioRegistrado());
+
+            UsuarioRegistrado nuevoResponsable = new UsuarioRegistrado();
+            nuevoResponsable.setContrasena("temporal123");
+            nuevoResponsable.setRol(Rol.JEFE_DE_EQUIPO); // Asigna un rol predeterminado
+
+            mv.addObject("nuevoResponsable", nuevoResponsable);
             mv.addObject("usuario", usuarioActual); // Para usar en la vista si es necesario
 
         } catch (Exception e) {
