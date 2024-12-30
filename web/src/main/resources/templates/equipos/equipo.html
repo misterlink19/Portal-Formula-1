@@ -33,6 +33,12 @@
       </a>
     </div>
 
+    <!-- Eliminar en verEquipo.html -->
+    <div th:if="${usuario.rol == T(com.portal.formula1.model.Rol).JEFE_DE_EQUIPO}">
+      <a th:href="@{/equipos/eliminar}" class="btn btn-primary">
+        Eliminar Responsable
+      </a>
+    </div>
 
     <!-- Botón "Salir al Menú Anterior" -->
     <a onclick="history.back()" class="btn btn-danger">Salir al Menú Anterior</a>

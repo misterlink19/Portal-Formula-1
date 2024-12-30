@@ -1,0 +1,113 @@
+.main{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 20px;
+}
+.card {
+    display: flex;
+    flex-direction: row;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background-color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    overflow: hidden;
+    padding: 20px;
+    gap: 20px;
+
+}
+
+.image-container {
+    flex: 0 0 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.image-container img {
+    width: 150px;
+    height: 150px;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+.details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.details h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0;
+    color: #333;
+}
+
+.team-name {
+    font-size: 18px;
+    color: #777;
+    margin-bottom: 15px;
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.label {
+    font-weight: bold;
+    color: #555;
+}
+
+.value {
+    font-size: 16px;
+    color: #333;
+}
+
+.flag {
+    width: 20px;
+    height: 14px;
+    object-fit: contain;
+    border-radius: 2px;
+    border: 1px solid #ddd;
+}
+
+.twitter {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.twitter:hover {
+    text-decoration: underline;
+}
+
+.button-content{
+    width: fit-content;
+    padding: 10px 10px;
+    border-radius: 10px;
+    background-color: #777e82;
+    color: #ffffff;
+    cursor: pointer;
+}
+
+.button-content a{
+    text-decoration: none;
+    color: #ffffff;
+}
+
+.button-content a:hover{
+    text-decoration: none;
+    color: #989494;
+}

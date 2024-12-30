@@ -164,7 +164,7 @@ public class PilotoController {
     @GetMapping("/{dorsal}")
     public ModelAndView mostrarPiloto(@PathVariable Integer dorsal, HttpServletRequest request) {
         logger.debug("Entrando a mostrarPiloto con dorsal:{}", dorsal);
-        ModelAndView mv = new ModelAndView("pilotos/verPiloto");
+        ModelAndView mv = new ModelAndView("pilotos/detallePiloto");
         try {
             UsuarioRegistrado user = (UsuarioRegistrado) request.getSession().getAttribute("usuario");
             if (user == null) {
@@ -186,6 +186,8 @@ public class PilotoController {
                 throw new AccessDeniedException("No tienes permisos para ver este piloto.");
             }
             mv.addObject("piloto", piloto);
+            mv.addObject("equipo", equipo.getNombre());
+            mv.addObject("equipoId", equipo.getId());
         } catch (NoSuchElementException e) {
             logger.error("Piloto no encontrado con dorsal:{}", dorsal);
             mv.setViewName("error");

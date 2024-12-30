@@ -48,6 +48,9 @@
             <strong>País:</strong><img th:src="@{'/images/pilotos/bandera/' + ${piloto.pais} + '.png'}" alt="Bandera" class="me-2" style="width:24px">
             <span th:text="${piloto.pais}">País</span></p>
           <p class="card-text text-center"><strong>Twitter:</strong><a th:href="'https://twitter.com/' + ${piloto.twitter}" class="text-primary" th:text="${piloto.twitter}">@Twitter</a></p>
+          <div class="card-text text-center">
+            <a th:href="@{/pilotos/{id}(id=${piloto.getDorsal()})}" class="btn btn-secondary">Ver Detalles</a>
+          </div>
         </div>
       </div>
     </div>

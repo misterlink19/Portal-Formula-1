@@ -10,6 +10,7 @@ import com.portal.formula1.service.UsuarioService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -171,7 +172,6 @@ public class EquipoController {
         return mv;
     }
 
-
     @GetMapping("/{id}")
     public ModelAndView mostrarEquipo(@PathVariable Long id, @ModelAttribute("mensaje") String mensaje, HttpServletRequest request) {
         logger.debug("Entrando a mostrarEquipo con id: {}", id);
@@ -238,5 +238,43 @@ public class EquipoController {
         mv.addObject("usuario", usuario);
         return mv;
     }
+
+    @GetMapping("/eliminar")
+    public ModelAndView mostrarFormEliminacion(HttpServletRequest request) {
+        logger.debug("Entrando a Eliminar Responsable");
+        ModelAndView mv = new ModelAndView("equipos/eliminarResponsable");
+        UsuarioRegistrado user = (UsuarioRegistrado) request.getSession().getAttribute("usuario");
+
+        try {
+            // Con esto revisamos si el responsable de equipo tiene un equipo
+            user = autentificacionService.checkUser(user.getUsuario());
+
+            if (user.getRol() == Rol.JEFE_DE_EQUIPO && user.getEquipo() != null) {
+                List<UsuarioRegistrado> responsablesEquipo = usuarioService.obtenerUsuarioPorIdEquipo(user.getEquipo().getId());
+                mv.addObject("responsablesEquipo", responsablesEquipo);
+                mv.addObject("user", user);
+            } else {
+                mv.setViewName("error");
+                mv.addObject("mensajeError", "Lo sentimos, usted no tiene un equipo asignado.");
+            }
+        } catch (Exception e) {
+            logger.error("Error al cargar el formulario de eliminacion: ", e);
+            mv.setViewName("error");
+            mv.addObject("mensajeError", "Error al cargar el formulario de eliminación.");
+        }
+        return mv;
+    }
+
+    @DeleteMapping("/eliminar/{usuario}")
+    public ResponseEntity<?> eliminarResponsable(@PathVariable("usuario") String usuarioEliminar, HttpServletRequest request) {
+        UsuarioRegistrado user = (UsuarioRegistrado) request.getSession().getAttribute("usuario");
+        if (user == null || (user.getRol() != Rol.ADMIN && user.getRol() != Rol.JEFE_DE_EQUIPO )) {
+            return ResponseEntity.badRequest().body("No puedes acceder.");
+        } else {
+            usuarioService.eliminarUsuarioRespondable(usuarioEliminar);
+            return ResponseEntity.ok("Responsable eliminado correctamente.");
+        }
+    }
+
 
 }

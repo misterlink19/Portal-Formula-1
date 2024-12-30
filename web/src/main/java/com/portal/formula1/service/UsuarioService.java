@@ -90,6 +90,14 @@ public class UsuarioService {
         return usuarioRegistradoDAO.findByRolAndNombreContainingIgnoreCase(rol, nombre);
     }
 
+    public List<UsuarioRegistrado> obtenerUsuarioPorIdEquipo(Long idEquipo) {
+        return usuarioRegistradoDAO.findByEquipo_Id(idEquipo);
+    }
+
+    public void eliminarUsuarioRespondable(String usuario){
+        usuarioRegistradoDAO.deleteUsuarioRegistradoByUsuario(usuario);
+    }
+
     // metodo generar contraseña
     private String generarContrasenaTemporal() {
         String caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
