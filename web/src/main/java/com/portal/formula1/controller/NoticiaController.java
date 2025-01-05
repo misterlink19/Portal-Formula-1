@@ -7,6 +7,8 @@ package com.portal.formula1.controller;
 
 
 import com.portal.formula1.model.Noticia;
+import com.portal.formula1.model.Rol;
+import com.portal.formula1.model.UsuarioRegistrado;
 import com.portal.formula1.service.ImagenService;
 import com.portal.formula1.service.NoticiaService;
 
@@ -16,7 +18,11 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -136,17 +142,10 @@ public class NoticiaController {
         return mv;
     }
 
-
-    // Elimina una noticia específica
     @PostMapping("/{id}/eliminar")
     public ModelAndView eliminarNoticia(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
         noticiaService.eliminarNoticia(id);
         redirectAttributes.addFlashAttribute("mensaje", "La noticia ha sido eliminada correctamente.");
         return new ModelAndView("redirect:/noticias/listar");
     }
-        
-
-
-
-
 }

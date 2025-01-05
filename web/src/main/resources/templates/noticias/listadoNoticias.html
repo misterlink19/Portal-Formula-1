@@ -21,6 +21,10 @@
         <button type="submit" class="btn btn-primary">Buscar</button>
     </form>
 
+    <div>
+        <a id="crearNoticia" th:if="${session.usuario != null} and ${session.usuario.rol == T(com.portal.formula1.model.Rol).ADMIN}" class="btn btn-primary" th:href="@{/noticias/crear}">Crear Noticia</a>
+    </div>
+
     <!-- Listado de noticias -->
     <div class="row">
         <div th:each="noticia : ${noticias}" class="col-6">
@@ -43,7 +47,7 @@
                                 <small class="text-muted" th:text="${noticia.fechaPublicacion}"></small>
                             </p>
                             <!-- Botón de eliminar -->
-                            <form th:action="@{/noticias/{id}/eliminar(id=${noticia.id})}" method="post" class="d-inline">
+                            <form th:if="${session.usuario != null} and ${session.usuario.rol == T(com.portal.formula1.model.Rol).ADMIN}" th:action="@{/noticias/{id}/eliminar(id=${noticia.id})}" method="post" class="d-inline">
                                 <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
                             </form>
                         </div>
