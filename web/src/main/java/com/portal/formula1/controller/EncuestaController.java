@@ -136,6 +136,34 @@ public class EncuestaController {
         }
         return mv;
     }
+    @DeleteMapping("/eliminar/{permalink}")
+    public ModelAndView eliminarEncuesta(@PathVariable String permalink, HttpSession session) {
+        logger.debug("Entrando a eliminarEncuesta con permalink: {}", permalink);
+        UsuarioRegistrado usuario = (UsuarioRegistrado) session.getAttribute("usuario");
+        ModelAndView mv = new ModelAndView("redirect:/encuestas/listar");
+        if (usuario == null || usuario.getRol() != Rol.ADMIN) {
+            mv.setViewName("error");
+            mv.addObject("mensajeError", "Acceso denegado.");
+            return mv;
+        }
+        try {
+            encuestaService.eliminarEncuesta(permalink);
+            mv.addObject("mensaje", "La encuesta ha sido eliminada exitosamente.");
+        } catch (NoSuchElementException e) {
+            logger.error("Encuesta no encontrada con permalink: {}", permalink);
+            mv.setViewName("error");
+            mv.addObject("mensajeError", "Encuesta no encontrada.");
+        } catch (Exception e) {
+            logger.error("Error al eliminar la encuesta con permalink: {}", permalink, e);
+            mv.setViewName("error");
+            mv.addObject("mensajeError", "Error al eliminar la encuesta.");
+        }
+        return mv;
+    }
+
+
+
+
 
 
 }

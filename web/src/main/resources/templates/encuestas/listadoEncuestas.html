@@ -10,7 +10,20 @@
 </head>
 <body>
 <div layout:fragment="body">
-    <main role="main" class="">
+    <main role="main" class="container mt-5">
+
+        <!-- Mostrar mensaje de éxito si existe -->
+        <div th:if="${mensaje}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <span th:text="${mensaje}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <!-- Mostrar mensaje de error si existe -->
+        <div th:if="${mensajeError}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${mensajeError}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
         <h2>Votaciones Disponibles</h2>
         <div class="filters">
             <input class="filters-input" type="text" id="busqueda" placeholder="Buscar por título o palabra clave">
@@ -23,9 +36,7 @@
         </div>
 
         <div id="votaciones" class="votaciones">
-
             <p id="no-coincidencias" class="no-coincidencias">No hay encuestas que coincidan con el filtro</p>
-
 
             <div th:each="encuesta : ${encuestas}" class="votacion" th:data-titulo="${encuesta.titulo}"
                  th:data-descripcion="${encuesta.descripcion}"
@@ -46,11 +57,18 @@
                             th:attr="onclick= 'location.href=\'/votos/' + ${encuesta.permalink} + '/votar'+ '\''">
                     </button>
 
-
                     <button th:unless="${encuesta.fechaLimite >= #temporals.createNow()}"
                             th:text="'Ver Resultados'"
                             th:attr="onclick= 'location.href=\'/votos/' + ${encuesta.permalink} + '/resultados'+ '\''">
                     </button>
+
+                    <!-- Botón de eliminación solo visible para administradores -->
+                    <form th:if="${session.usuario != null and session.usuario.rol == T(com.portal.formula1.model.Rol).ADMIN}"
+                          th:action="@{/encuestas/eliminar/{permalink}(permalink=${encuesta.permalink})}" method="post"
+                          onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta encuesta? Esta acción no se puede deshacer.');">
+                        <input type="hidden" name="_method" value="delete" />
+                        <button type="submit" class="btn btn-danger text-black text-bg-danger">Eliminar Encuesta</button>
+                    </form>
                 </div>
             </div>
         </div>

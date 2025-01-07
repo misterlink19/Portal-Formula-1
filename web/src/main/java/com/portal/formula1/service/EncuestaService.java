@@ -56,4 +56,9 @@ public class EncuestaService {
         return encuestaDAO.findFirstByOrderByFechaInicioDesc()
                 .orElseThrow(() -> new NoSuchElementException("No hay encuestas disponibles en este momento"));
     }
+    public void eliminarEncuesta(String permalink) {
+        Encuesta encuesta = encuestaDAO.findById(permalink).orElseThrow(() -> new NoSuchElementException("Encuesta no encontrada con permalink: " + permalink));
+        encuestaDAO.delete(encuesta);
+    }
+
 }
