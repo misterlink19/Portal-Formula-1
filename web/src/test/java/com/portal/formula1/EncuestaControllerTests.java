@@ -13,10 +13,7 @@ import com.portal.formula1.repository.PilotoDAO;
 import com.portal.formula1.repository.VotoDAO;
 import com.portal.formula1.service.EncuestaService;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,6 +29,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -214,5 +215,65 @@ public class EncuestaControllerTests {
                 .andExpect(view().name("error"))
                 .andExpect(model().attributeExists("mensajeError"))
                 .andExpect(model().attribute("mensajeError", "Lista de Encuestas no Disponible."));
+    }
+
+    /**
+     * Verifica que un administrador puede eliminar una encuesta exitosamente.
+     */
+    @Test
+    public void testEliminarEncuesta_AdminSuccess() throws Exception {
+        mockMvc.perform(delete("/encuestas/eliminar/test-permalink")
+                        .session(session))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/encuestas/listar"))
+                .andExpect(flash().attributeExists("mensaje"))
+                .andExpect(flash().attribute("mensaje", "La encuesta ha sido eliminada exitosamente."));
+    }
+
+    /**
+     * Verifica que se muestra el mensaje de éxito tras la eliminación.
+     */
+    @Test
+    public void testEliminarEncuesta_MensajeExito() throws Exception {
+        mockMvc.perform(delete("/encuestas/eliminar/test-permalink")
+                        .session(session))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/encuestas/listar"))
+                .andExpect(flash().attributeExists("mensaje"))
+                .andExpect(flash().attribute("mensaje", "La encuesta ha sido eliminada exitosamente."));
+    }
+
+    /**
+     * Verifica que un usuario no autorizado no puede eliminar una encuesta.
+     */
+    @Test
+    public void testEliminarEncuesta_UsuarioNoAutorizado() throws Exception {
+        UsuarioRegistrado usuarioNoAutorizado = new UsuarioRegistrado();
+        usuarioNoAutorizado.setRol(Rol.USUARIO_BASICO);
+        MockHttpSession sessionNoAutorizada = new MockHttpSession();
+        sessionNoAutorizada.setAttribute("usuario", usuarioNoAutorizado);
+
+        mockMvc.perform(delete("/encuestas/eliminar/test-permalink")
+                        .session(sessionNoAutorizada))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/encuestas/listar"))
+                .andExpect(flash().attributeExists("mensajeError"))
+                .andExpect(flash().attribute("mensajeError", "Acceso denegado."));
+    }
+
+
+    /**
+     * Verifica que se maneja el caso de intentar eliminar una encuesta que no existe.
+     */
+    @Test
+    public void testEliminarEncuesta_NoEncontrada() throws Exception {
+        doThrow(new NoSuchElementException("Encuesta no encontrada")).when(encuestaService).eliminarEncuesta(anyString());
+
+        mockMvc.perform(delete("/encuestas/eliminar/test-permalink")
+                        .session(session))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/encuestas/listar"))
+                .andExpect(flash().attributeExists("mensajeError"))
+                .andExpect(flash().attribute("mensajeError", "Encuesta no encontrada."));
     }
 }
