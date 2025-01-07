@@ -40,7 +40,7 @@ public class Encuesta {
     private List<Voto> votos;
 
 
-    @ManyToMany
+    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     @JoinTable(
             name = "encuesta_piloto",
             joinColumns = @JoinColumn(name = "encuesta_id"),

@@ -56,4 +56,17 @@ public class EncuestaService {
         return encuestaDAO.findFirstByOrderByFechaInicioDesc()
                 .orElseThrow(() -> new NoSuchElementException("No hay encuestas disponibles en este momento"));
     }
+
+    public boolean estaPilotoEnEncuestaActiva(Integer pilotoId) {
+        LocalDateTime fechaActual = LocalDateTime.now();
+        List<Encuesta> encuestasActivas = encuestaDAO.findByFechaLimiteAfter(fechaActual);
+
+        for (Encuesta encuesta : encuestasActivas) {
+            if (encuesta.getPilotos().stream().anyMatch(piloto -> piloto.getDorsal().equals(pilotoId))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

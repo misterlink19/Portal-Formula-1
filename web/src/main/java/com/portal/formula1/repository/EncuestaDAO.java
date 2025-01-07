@@ -9,8 +9,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Optional;
-
+import java.util.List;
 /**
  *
  * @author Misterlink
@@ -29,5 +30,8 @@ public interface EncuestaDAO extends JpaRepository<Encuesta, String>{
      */
     Optional<Encuesta> findFirstByOrderByFechaInicioDesc();
 
-
+    /**
+     * Encuentra todas las encuestas activas cuya fecha de finalización es posterior a la fecha actual.
+     */
+    List<Encuesta> findByFechaLimiteAfter(LocalDateTime fechaLimite);
 }

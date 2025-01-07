@@ -6,6 +6,7 @@ import com.portal.formula1.model.Piloto;
 import com.portal.formula1.model.Rol;
 import com.portal.formula1.model.UsuarioRegistrado;
 import com.portal.formula1.service.AutentificacionService;
+import com.portal.formula1.service.EncuestaService;
 import com.portal.formula1.service.ImagenService;
 import com.portal.formula1.service.PilotoService;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,6 +37,9 @@ public class PilotoControllerTests {
 
     @Mock
     private ImagenService imagenService;
+
+    @Mock
+    private EncuestaService encuestaService;
 
     @Mock
     private AutentificacionService autentificacionService;
@@ -298,6 +302,102 @@ public class PilotoControllerTests {
                 .andExpect(view().name("error"))
                 .andExpect(model().attributeExists("mensajeError"));
     }
+    /**
+     * Test para eliminar un piloto exitosamente por un usuario con rol ADMIN.
+     */
+    @Test
+    public void testEliminarPiloto() throws Exception {
+        Piloto piloto = new Piloto();
+        piloto.setDorsal(1);
+
+        UsuarioRegistrado adminUser = new UsuarioRegistrado();
+        adminUser.setUsuario("admin");
+        adminUser.setRol(Rol.ADMIN);
+        session.setAttribute("usuario", adminUser);
+
+        when(autentificacionService.checkUser(any(String.class))).thenReturn(adminUser);
+        when(pilotoService.obtenerPilotoPorDorsal(anyInt())).thenReturn(Optional.of(piloto));
+        when(encuestaService.estaPilotoEnEncuestaActiva(anyInt())).thenReturn(false);
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/pilotos/eliminar/1").session(session))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/equipos?successMessage=El+piloto+ha+sido+eliminado+exitosamente."));
+    }
+
+
+    /**
+     * Test para mostrar un piloto sin autenticación, esperando un error.
+     */
+    @Test
+    public void testMostrarPilotoSinAutenticacion() throws Exception {
+        mockMvc.perform(get("/pilotos/1").session(new MockHttpSession()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("error"))
+                .andExpect(model().attributeExists("mensajeError"));
+    }
+    /**
+     * Test para eliminar un piloto exitosamente por un usuario con rol JEFE_DE_EQUIPO.
+     */
+    @Test
+    public void testEliminarPilotoComoJefeDeEquipo() throws Exception {
+        Piloto piloto = new Piloto();
+        piloto.setDorsal(1);
+
+        UsuarioRegistrado jefeDeEquipoUser = new UsuarioRegistrado();
+        jefeDeEquipoUser.setUsuario("jefe");
+        jefeDeEquipoUser.setRol(Rol.JEFE_DE_EQUIPO);
+        session.setAttribute("usuario", jefeDeEquipoUser);
+
+        when(autentificacionService.checkUser(any(String.class))).thenReturn(jefeDeEquipoUser);
+        when(pilotoService.obtenerPilotoPorDorsal(anyInt())).thenReturn(Optional.of(piloto));
+        when(encuestaService.estaPilotoEnEncuestaActiva(anyInt())).thenReturn(false);
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/pilotos/eliminar/1").session(session))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/equipos?successMessage=El+piloto+ha+sido+eliminado+exitosamente."));
+    }
+    /**
+     * Test para intentar eliminar un piloto que está en una encuesta activa, esperando un error.
+     */
+    @Test
+    public void testEliminarPilotoEnEncuestaActiva() throws Exception {
+        Piloto piloto = new Piloto();
+        piloto.setDorsal(1);
+
+        UsuarioRegistrado adminUser = new UsuarioRegistrado();
+        adminUser.setUsuario("admin");
+        adminUser.setRol(Rol.ADMIN);
+        session.setAttribute("usuario", adminUser);
+
+        when(autentificacionService.checkUser(any(String.class))).thenReturn(adminUser);
+        when(pilotoService.obtenerPilotoPorDorsal(anyInt())).thenReturn(Optional.of(piloto));
+        when(encuestaService.estaPilotoEnEncuestaActiva(anyInt())).thenReturn(true);
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/pilotos/eliminar/1").session(session))
+                .andExpect(status().isOk())
+                .andExpect(view().name("error"))
+                .andExpect(model().attributeExists("mensajeError"));
+    }
+    /**
+     * Test para intentar eliminar un piloto por un usuario sin permisos adecuados, esperando un error.
+     */
+    @Test
+    public void testEliminarPilotoSinPermisos() throws Exception {
+        Piloto piloto = new Piloto();
+        piloto.setDorsal(1);
+
+        UsuarioRegistrado usuarioSinPermisos = new UsuarioRegistrado();
+        usuarioSinPermisos.setUsuario("usuario");
+        usuarioSinPermisos.setRol(Rol.USUARIO_BASICO);
+        session.setAttribute("usuario", usuarioSinPermisos);
+
+        when(autentificacionService.checkUser(any(String.class))).thenReturn(usuarioSinPermisos);
+        when(pilotoService.obtenerPilotoPorDorsal(anyInt())).thenReturn(Optional.of(piloto));
+        when(encuestaService.estaPilotoEnEncuestaActiva(anyInt())).thenReturn(false);
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/pilotos/eliminar/1").session(session))
+                .andExpect(status().isOk())
+                .andExpect(view().name("error"))
+                .andExpect(model().attributeExists("mensajeError"));
+    }
 }
-
-

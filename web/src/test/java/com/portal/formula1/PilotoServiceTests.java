@@ -10,6 +10,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -31,7 +32,7 @@ public class PilotoServiceTests {
 
     /**
      * Verifica que se puede guardar un piloto y
-     * que se llama al método save del PilotoDAO
+     * que se llama al mét0do save del PilotoDAO
      **/
     @Test
     public void testGuardarPiloto() {
@@ -46,7 +47,7 @@ public class PilotoServiceTests {
 
     /**
      * Verifica que se puede eliminar un piloto por su dorsal y
-     * que se llama al método deleteById del PilotoDAO
+     * que se llama al mét0do deleteById del PilotoDAO
      **/
     @Test
     public void testEliminarPiloto() {
@@ -58,7 +59,7 @@ public class PilotoServiceTests {
 
     /**
      * Verifica que se puede obtener un piloto por su dorsal y
-     * que se llama al método findById del PilotoDAO
+     * que se llama al mét0do findById del PilotoDAO
      **/
     @Test
     public void testObtenerPilotoPorDorsal() {
@@ -75,7 +76,7 @@ public class PilotoServiceTests {
 
     /**
      * Verifica que se puede listar pilotos por equipo y
-     * que se llama al método findByEquipo_Id del PilotoDAO
+     * que se llama al mét0do findByEquipo_Id del PilotoDAO
      **/
     @Test
     public void testListarPilotosPorEquipo() {
@@ -90,7 +91,7 @@ public class PilotoServiceTests {
 
     /**
      * Verifica que se puede comprobar si un dorsal existe y
-     * que se llama al método existsByDorsal del PilotoDAO
+     * que se llama al mét0do existsByDorsal del PilotoDAO
      **/
     @Test
     public void testExisteDorsal() {
@@ -101,5 +102,27 @@ public class PilotoServiceTests {
         assertTrue(exists);
         verify(pilotoDAO, times(1)).existsByDorsal(1);
     }
-
+    /**
+     * Verifica el comportamiento cuando se intenta obtener
+     * un piloto que no existe.
+     **/
+    @Test
+    public void testObtenerPilotoPorDorsalNoExistente() {
+        when(pilotoDAO.findById(1)).thenReturn(Optional.empty());
+        Optional<Piloto> result = pilotoService.obtenerPilotoPorDorsal(1);
+        assertFalse(result.isPresent());
+        verify(pilotoDAO, times(1)).findById(1);
+    }
+    /**
+     * Verifica el comportamiento cuando se intenta eliminar
+     * un piloto que no existe.
+     **/
+    @Test
+    public void testEliminarPilotoNoExistente() {
+        doThrow(new NoSuchElementException()).when(pilotoDAO).deleteById(1);
+        assertThrows(NoSuchElementException.class, () -> {
+            pilotoService.eliminarPiloto(1);
+        });
+        verify(pilotoDAO, times(1)).deleteById(1);
+    }
 }

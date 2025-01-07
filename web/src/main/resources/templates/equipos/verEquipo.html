@@ -50,6 +50,12 @@
           <p class="card-text text-center"><strong>Twitter:</strong><a th:href="'https://twitter.com/' + ${piloto.twitter}" class="text-primary" th:text="${piloto.twitter}">@Twitter</a></p>
           <div class="card-text text-center">
             <a th:href="@{/pilotos/{id}(id=${piloto.getDorsal()})}" class="btn btn-secondary">Ver Detalles</a>
+            <form th:action="@{/pilotos/eliminar/{dorsal}(dorsal=${piloto.dorsal})}" method="post" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este piloto? Esta acción no se puede deshacer.');">
+              <input type="hidden" name="_method" value="delete" />
+              <button type="submit" class="btn btn-danger">Eliminar</button>
+            </form>
+
+
           </div>
         </div>
       </div>

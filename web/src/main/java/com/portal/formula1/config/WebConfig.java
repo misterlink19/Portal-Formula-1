@@ -11,6 +11,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.filter.HiddenHttpMethodFilter;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
@@ -38,4 +40,9 @@ public class WebConfig implements WebMvcConfigurer {
                 .addResourceLocations("file:src/main/resources/static/uploads/"); // Con esto carga las imagenes que estan en uploads dentro de static;
     }
 
+    // Agrega este Bean para manejar métodos HTTP ocultos
+    @Bean
+    public HiddenHttpMethodFilter hiddenHttpMethodFilter() {
+        return new HiddenHttpMethodFilter();
+    }
 }
