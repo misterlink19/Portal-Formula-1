@@ -1,12 +1,7 @@
 package com.portal.formula1.controller;
 
-import com.portal.formula1.model.Equipo;
-import com.portal.formula1.model.Rol;
-import com.portal.formula1.model.UsuarioRegistrado;
-import com.portal.formula1.service.AutentificacionService;
-import com.portal.formula1.service.EquipoService;
-import com.portal.formula1.service.ImagenService;
-import com.portal.formula1.service.UsuarioService;
+import com.portal.formula1.model.*;
+import com.portal.formula1.service.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +33,8 @@ public class EquipoController {
 
     @Autowired
     private EquipoService equipoService;
-
+    @Autowired
+    private PilotoService pilotoService;
     @Autowired
     private ImagenService imagenService;
     @Autowired
@@ -210,6 +206,50 @@ public class EquipoController {
             logger.error("Error al mostrar el equipo con id: {}", id, e);
             mv.setViewName("error");
             mv.addObject("mensajeError", "Error al mostrar el equipo.");
+        }
+        return mv;
+    }
+
+    @PostMapping("eliminar/{id}")
+    public ModelAndView eliminarEquipo(@PathVariable Long id, @ModelAttribute("mensaje") String mensaje, HttpServletRequest request) {
+        logger.debug("Entrando a mostrarEquipo con id: {}", id);
+        ModelAndView mv = new ModelAndView("redirect:/equipos/listar");
+        try {
+            UsuarioRegistrado user = (UsuarioRegistrado) request.getSession().getAttribute("usuario");
+            if (user == null) {
+                throw new AccessDeniedException("Usuario no autenticado.");
+            }
+
+            Equipo equipo = equipoService.obtenerEquipoPorId(id)
+                    .orElseThrow(() -> new NoSuchElementException("Equipo no encontrado"));
+
+            boolean esResponsable = equipo.getResponsables().stream()
+                    .anyMatch(responsable -> responsable.getUsuario().equals(user.getUsuario()));
+            if (!esResponsable && user.getRol() != Rol.ADMIN) {
+                throw new AccessDeniedException("No tienes permisos para eliminar este equipo.");
+            }
+            try {
+                for (Piloto p : equipo.getPilotos()) {
+                    pilotoService.eliminarPiloto(p.getDorsal());
+                }
+            }catch(Exception e){
+                logger.error("Error al eliminar un piloto del equipo",e);
+                mv.setViewName("error");
+                mv.addObject("mensajeError", "Error al eliminar un piloto del equipo.");
+            }
+            equipoService.eliminarEquipo(id);
+        } catch (NoSuchElementException e) {
+            logger.error("Equipo no encontrado con id: {}", id);
+            mv.setViewName("error");
+            mv.addObject("mensajeError", "Equipo no encontrado.");
+        } catch (AccessDeniedException e) {
+            logger.error("Acceso denegado para el usuario: {}", request.getSession().getAttribute("usuario"));
+            mv.setViewName("error");
+            mv.addObject("mensajeError", "No tienes permisos para eliminar este equipo.");
+        } catch (Exception e) {
+            logger.error("Error al mostrar el equipo con id: {}", id, e);
+            mv.setViewName("error");
+            mv.addObject("mensajeError", "Error al eliminar el equipo.");
         }
         return mv;
     }
