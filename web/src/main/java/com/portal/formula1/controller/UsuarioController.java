@@ -30,7 +30,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Controller
@@ -243,4 +242,47 @@ public class UsuarioController {
             return mv;
         }
     }
+
+    @GetMapping("/cambiarContrasena")
+    public String mostrarFormularioCambioContrasena(Model model, HttpServletRequest request) {
+        UsuarioRegistrado usuarioActual = (UsuarioRegistrado) request.getSession().getAttribute("usuario");
+        if (usuarioActual == null) {
+            return "redirect:/login"; // Redirigir al login si el usuario no está autenticado
+        }
+        model.addAttribute("usuario", usuarioActual);
+        return "cambiarContrasena"; // Vista Thymeleaf para el formulario
+    }
+
+    @PostMapping("/cambiarContrasena")
+    public String cambiarContrasena(@RequestParam("contrasenaActual") String contrasenaActual,
+                                    @RequestParam("nuevaContrasena") String nuevaContrasena,
+                                    @RequestParam("confirmarContrasena") String confirmarContrasena,
+                                    HttpServletRequest request,
+                                    RedirectAttributes redirectAttributes) {
+        UsuarioRegistrado usuarioActual = (UsuarioRegistrado) request.getSession().getAttribute("usuario");
+
+        if (usuarioActual == null) {
+            return "redirect:/login"; // Redirigir al login si el usuario no está autenticado
+        }
+
+        try {
+            // Llamar al servicio para cambiar la contraseña
+            usuarioService.cambiarContrasena(usuarioActual.getUsuario(), contrasenaActual, nuevaContrasena, confirmarContrasena);
+
+            // Añadir mensaje de éxito
+            redirectAttributes.addFlashAttribute("mensaje", "Contraseña actualizada correctamente.");
+            return "redirect:/login";
+
+        } catch (IllegalArgumentException e) {
+            // Añadir mensaje de error en caso de validaciones fallidas
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/cambiarContrasena?error";
+        } catch (Exception e) {
+            // Manejo de errores generales
+            redirectAttributes.addFlashAttribute("error", "Error inesperado al cambiar la contraseña.");
+            return "redirect:/cambiarContrasena?error";
+        }
+    }
+
+
 }

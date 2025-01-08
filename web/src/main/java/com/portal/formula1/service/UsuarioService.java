@@ -155,5 +155,34 @@ public class UsuarioService {
         }
     }
 
+    @Transactional
+    public void cambiarContrasena(String usuario, String contrasenaActual, String nuevaContrasena, String confirmarContrasena) {
+        // Obtener el usuario por su identificador
+        UsuarioRegistrado usuarioRegistrado = usuarioRegistradoDAO.findById(usuario)
+                .orElseThrow(() -> new IllegalStateException("Usuario no encontrado"));
+
+        // Verificar si la contraseña actual coincide
+        if (!passwordEncoder.matches(contrasenaActual, usuarioRegistrado.getContrasena())) {
+            throw new IllegalArgumentException("La contraseña actual es incorrecta");
+        }
+
+        // Validar que la nueva contraseña tenga al menos 5 caracteres
+        if (nuevaContrasena == null || nuevaContrasena.length() < 5) {
+            throw new IllegalArgumentException("La nueva contraseña debe tener al menos 5 caracteres");
+        }
+
+        // Validar que la nueva contraseña coincida con la confirmación
+        if (!nuevaContrasena.equals(confirmarContrasena)) {
+            throw new IllegalArgumentException("Las contraseñas no coinciden");
+        }
+
+        // Encriptar la nueva contraseña
+        String contrasenaEncriptada = passwordEncoder.encode(nuevaContrasena);
+
+        // Actualizar la contraseña del usuario
+        usuarioRegistradoDAO.actualizarContrasena(usuario, contrasenaEncriptada);
+    }
+
+
 
 }

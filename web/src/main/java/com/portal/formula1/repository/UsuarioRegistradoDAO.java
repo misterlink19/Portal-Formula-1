@@ -32,4 +32,10 @@ public interface UsuarioRegistradoDAO extends JpaRepository<UsuarioRegistrado,St
     @Query("DELETE FROM UsuarioRegistrado u WHERE u.usuario = :usuario")
     void deleteUsuarioRegistradoByUsuario(@Param("usuario") String usuario);
 
+    @Transactional
+    @Modifying
+    @Query("UPDATE UsuarioRegistrado u SET u.contrasena = :nuevaContrasena WHERE u.usuario = :usuario")
+    void actualizarContrasena(@Param("usuario") String usuario, @Param("nuevaContrasena") String nuevaContrasena);
+
+
 }
