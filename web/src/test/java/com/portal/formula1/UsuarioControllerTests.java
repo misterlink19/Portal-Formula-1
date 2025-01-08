@@ -347,4 +347,102 @@ public class UsuarioControllerTests {
         jefeEquipo.setEquipo(equipo);
         return jefeEquipo;
     }
+
+    @Test
+    void eliminarUsuario_CasoExitoso_DebeRetornarMensajeExito() {
+        // Given
+        String usuarioAEliminar = "user1";
+        UsuarioRegistrado adminActual = crearUsuarioRegistrado("admin1", "Admin", Rol.ADMIN);
+
+        when(request.getSession()).thenReturn(session);
+        when(session.getAttribute("usuario")).thenReturn(adminActual);
+        doNothing().when(usuarioService).eliminarUsuario(usuarioAEliminar, adminActual.getUsuario());
+
+        // When
+        String resultado = usuarioController.eliminarUsuario(usuarioAEliminar, request);
+
+        // Then
+        assertTrue(resultado.contains("\"mensaje\""));
+        assertTrue(resultado.contains("Usuario eliminado exitosamente"));
+        verify(usuarioService).eliminarUsuario(usuarioAEliminar, adminActual.getUsuario());
+    }
+
+    @Test
+    void eliminarUsuario_UsuarioNoAutenticado_DebeRetornarError() {
+        // Given
+        String usuarioAEliminar = "user1";
+        when(request.getSession()).thenReturn(session);
+        when(session.getAttribute("usuario")).thenReturn(null);
+
+        // When
+        String resultado = usuarioController.eliminarUsuario(usuarioAEliminar, request);
+
+        // Then
+        assertTrue(resultado.contains("\"error\""));
+        assertTrue(resultado.contains("Usuario no autenticado"));
+        verify(usuarioService, never()).eliminarUsuario(anyString(), anyString());
+    }
+
+    @Test
+    void eliminarUsuario_ErrorAlEliminar_DebeRetornarMensajeError() {
+        // Given
+        String usuarioAEliminar = "user1";
+        UsuarioRegistrado adminActual = crearUsuarioRegistrado("admin1", "Admin", Rol.ADMIN);
+        String mensajeError = "No se puede eliminar al único jefe del equipo";
+
+        when(request.getSession()).thenReturn(session);
+        when(session.getAttribute("usuario")).thenReturn(adminActual);
+        doThrow(new RuntimeException(mensajeError))
+                .when(usuarioService).eliminarUsuario(usuarioAEliminar, adminActual.getUsuario());
+
+        // When
+        String resultado = usuarioController.eliminarUsuario(usuarioAEliminar, request);
+
+        // Then
+        assertTrue(resultado.contains("\"error\""));
+        assertTrue(resultado.contains(mensajeError));
+        verify(usuarioService).eliminarUsuario(usuarioAEliminar, adminActual.getUsuario());
+    }
+
+    @Test
+    void eliminarUsuario_AdminIntentaAutoEliminarse_DebeRetornarError() {
+        // Given
+        String usuarioAEliminar = "admin1";
+        UsuarioRegistrado adminActual = crearUsuarioRegistrado("admin1", "Admin", Rol.ADMIN);
+
+        when(request.getSession()).thenReturn(session);
+        when(session.getAttribute("usuario")).thenReturn(adminActual);
+        doThrow(new RuntimeException("Un administrador no puede eliminarse a sí mismo"))
+                .when(usuarioService).eliminarUsuario(usuarioAEliminar, adminActual.getUsuario());
+
+        // When
+        String resultado = usuarioController.eliminarUsuario(usuarioAEliminar, request);
+
+        // Then
+        assertTrue(resultado.contains("\"error\""));
+        assertTrue(resultado.contains("Un administrador no puede eliminarse a sí mismo"));
+        verify(usuarioService).eliminarUsuario(usuarioAEliminar, adminActual.getUsuario());
+    }
+
+    @Test
+    void eliminarUsuario_UltimoJefeDeEquipo_DebeRetornarError() {
+        // Given
+        String usuarioAEliminar = "jefe1";
+        UsuarioRegistrado adminActual = crearUsuarioRegistrado("admin1", "Admin", Rol.ADMIN);
+        String mensajeError = "No se puede eliminar al único jefe del equipo Toyota";
+
+        when(request.getSession()).thenReturn(session);
+        when(session.getAttribute("usuario")).thenReturn(adminActual);
+        doThrow(new RuntimeException(mensajeError))
+                .when(usuarioService).eliminarUsuario(usuarioAEliminar, adminActual.getUsuario());
+
+        // When
+        String resultado = usuarioController.eliminarUsuario(usuarioAEliminar, request);
+
+        // Then
+        assertTrue(resultado.contains("\"error\""));
+        assertTrue(resultado.contains(mensajeError));
+        verify(usuarioService).eliminarUsuario(usuarioAEliminar, adminActual.getUsuario());
+    }
+
 }

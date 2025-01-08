@@ -144,9 +144,21 @@ public class UsuarioController {
 
     @GetMapping("/admin/usuarios/{usuario}")
     public String verDetallesUsuario(@PathVariable String usuario, Model model) {
-        UsuarioRegistrado usuarioRegistrado = usuarioService.obtenerUsuarioPorUsuario(usuario);
-        model.addAttribute("usuario", usuarioRegistrado);
-        return "admin/detalleUsuario";
+        try {
+            UsuarioRegistrado usuarioRegistrado = usuarioService.obtenerUsuarioPorUsuario(usuario);
+
+            if (usuarioRegistrado == null) {
+                // Manejar el caso cuando el usuario no existe
+                return "redirect:/admin/usuarios?error=usuario-no-encontrado";
+            }
+
+            model.addAttribute("usuario", usuarioRegistrado);
+            return "admin/detalleUsuario";
+
+        } catch (Exception e) {
+            log.error("Error al obtener detalles del usuario: {}", e.getMessage());
+            return "redirect:/admin/usuarios?error=error-interno";
+        }
     }
 
     @PostMapping("/admin/usuarios/validar")
@@ -284,5 +296,22 @@ public class UsuarioController {
         }
     }
 
+    @PostMapping("/admin/usuarios/eliminar/{usuario}")
+    @ResponseBody
+    public String eliminarUsuario(
+            @PathVariable String usuario,
+            HttpServletRequest request) {
+        try {
+            // Obtener el usuario administrador de la sesión
+            UsuarioRegistrado adminActual = (UsuarioRegistrado) request.getSession().getAttribute("usuario");
+            if (adminActual == null) {
+                return "{\"error\": \"Usuario no autenticado\"}";
+            }
 
+            usuarioService.eliminarUsuario(usuario, adminActual.getUsuario());
+            return "{\"mensaje\": \"Usuario eliminado exitosamente\"}";
+        } catch (RuntimeException e) {
+            return "{\"error\": \"" + e.getMessage() + "\"}";
+        }
+    }
 }

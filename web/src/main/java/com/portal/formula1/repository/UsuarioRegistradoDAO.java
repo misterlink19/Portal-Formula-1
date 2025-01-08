@@ -37,5 +37,16 @@ public interface UsuarioRegistradoDAO extends JpaRepository<UsuarioRegistrado,St
     @Query("UPDATE UsuarioRegistrado u SET u.contrasena = :nuevaContrasena WHERE u.usuario = :usuario")
     void actualizarContrasena(@Param("usuario") String usuario, @Param("nuevaContrasena") String nuevaContrasena);
 
+    // Nuevo metodo para contar jefes de equipo por equipo
+    @Query("SELECT COUNT(u) FROM UsuarioRegistrado u WHERE u.equipo.id = :equipoId AND u.rol = 'JEFE_DE_EQUIPO'")
+    long countJefesDeEquipoPorEquipo(@Param("equipoId") Long equipoId);
+
+    // Nuevo metodo para verificar si existe otro admin
+    @Query("SELECT COUNT(u) FROM UsuarioRegistrado u WHERE u.rol = 'ADMIN' AND u.usuario != :usuarioActual")
+    long countOtrosAdministradores(@Param("usuarioActual") String usuarioActual);
+
+    @Query("SELECT u FROM UsuarioRegistrado u LEFT JOIN FETCH u.equipo WHERE u.usuario = :usuario")
+    UsuarioRegistrado findByUsuarioWithEquipo(@Param("usuario") String usuario);
+
 
 }
