@@ -39,7 +39,6 @@ public class WebConfig implements WebMvcConfigurer {
                 .addResourceLocations("file:uploads/")
                 .addResourceLocations("file:src/main/resources/static/uploads/"); // Con esto carga las imagenes que estan en uploads dentro de static;
     }
-
     // Agrega este Bean para manejar métodos HTTP ocultos
     @Bean
     public HiddenHttpMethodFilter hiddenHttpMethodFilter() {

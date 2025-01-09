@@ -155,5 +155,65 @@ public class UsuarioService {
         }
     }
 
+    @Transactional
+    public void cambiarContrasena(String usuario, String contrasenaActual, String nuevaContrasena, String confirmarContrasena) {
+        // Obtener el usuario por su identificador
+        UsuarioRegistrado usuarioRegistrado = usuarioRegistradoDAO.findById(usuario)
+                .orElseThrow(() -> new IllegalStateException("Usuario no encontrado"));
+
+        // Verificar si la contraseña actual coincide
+        if (!passwordEncoder.matches(contrasenaActual, usuarioRegistrado.getContrasena())) {
+            throw new IllegalArgumentException("La contraseña actual es incorrecta");
+        }
+
+        // Validar que la nueva contraseña tenga al menos 5 caracteres
+        if (nuevaContrasena == null || nuevaContrasena.length() < 5) {
+            throw new IllegalArgumentException("La nueva contraseña debe tener al menos 5 caracteres");
+        }
+
+        // Validar que la nueva contraseña coincida con la confirmación
+        if (!nuevaContrasena.equals(confirmarContrasena)) {
+            throw new IllegalArgumentException("Las contraseñas no coinciden");
+        }
+
+        // Encriptar la nueva contraseña
+        String contrasenaEncriptada = passwordEncoder.encode(nuevaContrasena);
+
+        // Actualizar la contraseña del usuario
+        usuarioRegistradoDAO.actualizarContrasena(usuario, contrasenaEncriptada);
+    }
+
+    @Transactional
+    public void eliminarUsuario(String usuarioAEliminar, String usuarioAdmin) {
+        UsuarioRegistrado usuarioEliminar = usuarioRegistradoDAO.findById(usuarioAEliminar)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        UsuarioRegistrado adminEjecutor = usuarioRegistradoDAO.findById(usuarioAdmin)
+                .orElseThrow(() -> new RuntimeException("Administrador no encontrado"));
+
+        // Validar que quien ejecuta es ADMIN
+        if (!adminEjecutor.getRol().equals(Rol.ADMIN)) {
+            throw new RuntimeException("Solo los administradores pueden eliminar usuarios");
+        }
+
+        // Validar que un admin no se elimine a sí mismo
+        if (usuarioAEliminar.equals(usuarioAdmin)) {
+            throw new RuntimeException("Un administrador no puede eliminarse a sí mismo");
+        }
+
+        // Validar si es el único JEFE_DE_EQUIPO del equipo
+        if (usuarioEliminar.getRol().equals(Rol.JEFE_DE_EQUIPO) && usuarioEliminar.getEquipo() != null) {
+            long cantidadJefes = usuarioRegistradoDAO.countJefesDeEquipoPorEquipo(usuarioEliminar.getEquipo().getId());
+            if (cantidadJefes <= 1) {
+                throw new RuntimeException("No se puede eliminar al único jefe del equipo " +
+                        usuarioEliminar.getEquipo().getNombre());
+            }
+        }
+
+        usuarioRegistradoDAO.delete(usuarioEliminar);
+    }
+
+
+
 
 }

@@ -45,6 +45,10 @@ public class EquipoService {
         }
         return null;
     }
+
+    public void eliminarEquipo(Long id) {
+        equipoDAO.deleteById(id);
+    }
 //Metodos de editar y Eliminar comentados para implementarlos en la historia de eliminar y editar equipo
 //    public Equipo removeResponsableFromEquipo(Long equipoId, String usuario) {
 //        Equipo equipo = equipoDAO.findById(equipoId).orElse(null);

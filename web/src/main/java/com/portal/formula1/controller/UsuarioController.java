@@ -30,7 +30,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Controller
@@ -145,9 +144,21 @@ public class UsuarioController {
 
     @GetMapping("/admin/usuarios/{usuario}")
     public String verDetallesUsuario(@PathVariable String usuario, Model model) {
-        UsuarioRegistrado usuarioRegistrado = usuarioService.obtenerUsuarioPorUsuario(usuario);
-        model.addAttribute("usuario", usuarioRegistrado);
-        return "admin/detalleUsuario";
+        try {
+            UsuarioRegistrado usuarioRegistrado = usuarioService.obtenerUsuarioPorUsuario(usuario);
+
+            if (usuarioRegistrado == null) {
+                // Manejar el caso cuando el usuario no existe
+                return "redirect:/admin/usuarios?error=usuario-no-encontrado";
+            }
+
+            model.addAttribute("usuario", usuarioRegistrado);
+            return "admin/detalleUsuario";
+
+        } catch (Exception e) {
+            log.error("Error al obtener detalles del usuario: {}", e.getMessage());
+            return "redirect:/admin/usuarios?error=error-interno";
+        }
     }
 
     @PostMapping("/admin/usuarios/validar")
@@ -241,6 +252,66 @@ public class UsuarioController {
             mv.setViewName("error");
             mv.addObject("mensajeError", "Error inesperado al crear el responsable.");
             return mv;
+        }
+    }
+
+    @GetMapping("/cambiarContrasena")
+    public String mostrarFormularioCambioContrasena(Model model, HttpServletRequest request) {
+        UsuarioRegistrado usuarioActual = (UsuarioRegistrado) request.getSession().getAttribute("usuario");
+        if (usuarioActual == null) {
+            return "redirect:/login"; // Redirigir al login si el usuario no está autenticado
+        }
+        model.addAttribute("usuario", usuarioActual);
+        return "cambiarContrasena"; // Vista Thymeleaf para el formulario
+    }
+
+    @PostMapping("/cambiarContrasena")
+    public String cambiarContrasena(@RequestParam("contrasenaActual") String contrasenaActual,
+                                    @RequestParam("nuevaContrasena") String nuevaContrasena,
+                                    @RequestParam("confirmarContrasena") String confirmarContrasena,
+                                    HttpServletRequest request,
+                                    RedirectAttributes redirectAttributes) {
+        UsuarioRegistrado usuarioActual = (UsuarioRegistrado) request.getSession().getAttribute("usuario");
+
+        if (usuarioActual == null) {
+            return "redirect:/login"; // Redirigir al login si el usuario no está autenticado
+        }
+
+        try {
+            // Llamar al servicio para cambiar la contraseña
+            usuarioService.cambiarContrasena(usuarioActual.getUsuario(), contrasenaActual, nuevaContrasena, confirmarContrasena);
+
+            // Añadir mensaje de éxito
+            redirectAttributes.addFlashAttribute("mensaje", "Contraseña actualizada correctamente.");
+            return "redirect:/login";
+
+        } catch (IllegalArgumentException e) {
+            // Añadir mensaje de error en caso de validaciones fallidas
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/cambiarContrasena?error";
+        } catch (Exception e) {
+            // Manejo de errores generales
+            redirectAttributes.addFlashAttribute("error", "Error inesperado al cambiar la contraseña.");
+            return "redirect:/cambiarContrasena?error";
+        }
+    }
+
+    @PostMapping("/admin/usuarios/eliminar/{usuario}")
+    @ResponseBody
+    public String eliminarUsuario(
+            @PathVariable String usuario,
+            HttpServletRequest request) {
+        try {
+            // Obtener el usuario administrador de la sesión
+            UsuarioRegistrado adminActual = (UsuarioRegistrado) request.getSession().getAttribute("usuario");
+            if (adminActual == null) {
+                return "{\"error\": \"Usuario no autenticado\"}";
+            }
+
+            usuarioService.eliminarUsuario(usuario, adminActual.getUsuario());
+            return "{\"mensaje\": \"Usuario eliminado exitosamente\"}";
+        } catch (RuntimeException e) {
+            return "{\"error\": \"" + e.getMessage() + "\"}";
         }
     }
 }
