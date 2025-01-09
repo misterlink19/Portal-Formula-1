@@ -169,9 +169,10 @@ public class EquipoController {
     }
 
     @GetMapping("/{id}")
-    public ModelAndView mostrarEquipo(@PathVariable Long id, @ModelAttribute("mensaje") String mensaje, HttpServletRequest request) {
+    public ModelAndView mostrarEquipo(@PathVariable Long id, @RequestParam(value = "mensaje", required = false) String mensaje, HttpServletRequest request) {
         logger.debug("Entrando a mostrarEquipo con id: {}", id);
         ModelAndView mv = new ModelAndView("equipos/verEquipo");
+
         try {
             UsuarioRegistrado user = (UsuarioRegistrado) request.getSession().getAttribute("usuario");
             if (user == null) {
@@ -207,8 +208,10 @@ public class EquipoController {
             mv.setViewName("error");
             mv.addObject("mensajeError", "Error al mostrar el equipo.");
         }
+
         return mv;
     }
+
 
     @PostMapping("eliminar/{id}")
     public ModelAndView eliminarEquipo(@PathVariable Long id, @ModelAttribute("mensaje") String mensaje, HttpServletRequest request) {

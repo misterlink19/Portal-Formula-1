@@ -15,6 +15,12 @@
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
   </div>
 
+  <!-- Mostrar mensaje de error si existe -->
+  <div th:if="${mensajeError}" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <span th:text="${mensajeError}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+
   <h1 class="text-center mb-4" th:text="'Detalles del Equipo: ' + ${equipo.nombre}">Detalles del Equipo</h1>
   <div class="card mb-4 shadow-sm">
     <div class="row g-0">
@@ -48,14 +54,12 @@
             <strong>País:</strong><img th:src="@{'/images/pilotos/bandera/' + ${piloto.pais} + '.png'}" alt="Bandera" class="me-2" style="width:24px">
             <span th:text="${piloto.pais}">País</span></p>
           <p class="card-text text-center"><strong>Twitter:</strong><a th:href="'https://twitter.com/' + ${piloto.twitter}" class="text-primary" th:text="${piloto.twitter}">@Twitter</a></p>
-          <div class="card-text text-center">
-            <a th:href="@{/pilotos/{id}(id=${piloto.getDorsal()})}" class="btn btn-secondary">Ver Detalles</a>
+          <div class="d-flex justify-content-center">
+            <a th:href="@{/pilotos/{id}(id=${piloto.getDorsal()})}" class="btn btn-secondary me-2">Ver Detalles</a>
             <form th:action="@{/pilotos/eliminar/{dorsal}(dorsal=${piloto.dorsal})}" method="post" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este piloto? Esta acción no se puede deshacer.');">
               <input type="hidden" name="_method" value="delete" />
               <button type="submit" class="btn btn-danger">Eliminar</button>
             </form>
-
-
           </div>
         </div>
       </div>

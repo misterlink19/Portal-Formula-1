@@ -164,7 +164,7 @@ public class PilotoControllerTests {
         mockMvc.perform(get("/pilotos/1")
                         .session(session)) // Incluir la sesión con el usuario autenticado
                 .andExpect(status().isOk())
-                .andExpect(view().name("pilotos/verPiloto"))
+                .andExpect(view().name("pilotos/detallePiloto"))
                 .andExpect(model().attributeExists("piloto"))
                 .andExpect(model().attribute("piloto", piloto));
     }
@@ -310,6 +310,11 @@ public class PilotoControllerTests {
         Piloto piloto = new Piloto();
         piloto.setDorsal(1);
 
+        // Crear un equipo y asignarlo al piloto
+        Equipo equipo = new Equipo();
+        equipo.setId(1L);
+        piloto.setEquipo(equipo);
+
         UsuarioRegistrado adminUser = new UsuarioRegistrado();
         adminUser.setUsuario("admin");
         adminUser.setRol(Rol.ADMIN);
@@ -321,8 +326,9 @@ public class PilotoControllerTests {
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/pilotos/eliminar/1").session(session))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/equipos?successMessage=El+piloto+ha+sido+eliminado+exitosamente."));
+                .andExpect(redirectedUrl("/equipos/1")); // Ajusta esta URL para redirigir correctamente
     }
+
 
 
     /**
@@ -343,6 +349,11 @@ public class PilotoControllerTests {
         Piloto piloto = new Piloto();
         piloto.setDorsal(1);
 
+        // Crear un equipo y asignarlo al piloto
+        Equipo equipo = new Equipo();
+        equipo.setId(1L);
+        piloto.setEquipo(equipo);
+
         UsuarioRegistrado jefeDeEquipoUser = new UsuarioRegistrado();
         jefeDeEquipoUser.setUsuario("jefe");
         jefeDeEquipoUser.setRol(Rol.JEFE_DE_EQUIPO);
@@ -354,8 +365,9 @@ public class PilotoControllerTests {
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/pilotos/eliminar/1").session(session))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/equipos?successMessage=El+piloto+ha+sido+eliminado+exitosamente."));
+                .andExpect(redirectedUrl("/equipos/1")); // Ajusta esta URL para redirigir correctamente
     }
+
     /**
      * Test para intentar eliminar un piloto que está en una encuesta activa, esperando un error.
      */
