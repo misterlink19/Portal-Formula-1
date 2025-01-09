@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Ver Piloto</title>
+    <link rel="stylesheet" th:href="@{/styles/detallePiloto.css}">
+
+</head>
+<body layout:fragment="body">
+<main class="main">
+    <h1> Detalles Del Piloto </h1>
+    <div class="card">
+
+        <div class="image-container">
+            <img th:src="@{'/uploads/' + ${piloto.rutaImagen}}" th:alt="${piloto.nombre} +' ' + ${piloto.apellidos}" />
+        </div>
+
+
+        <div class="details">
+            <h2 th:text="${piloto.nombre} + ' ' + ${piloto.apellidos}"></h2>
+            <p class="team-name" th:text="${equipo}"></p>
+
+            <div class="info">
+                <div class="info-item">
+                    <span class="label">Dorsal:</span>
+                    <span th:text="${piloto.dorsal}" class="value"></span>
+                </div>
+                <div class="info-item">
+                    <span class="label">País:</span>
+                    <img th:src="@{'/images/pilotos/bandera/' + ${piloto.pais} + '.png'}"
+                         th:alt="${piloto.pais}"
+                         class="flag" />
+                    <span th:text="${piloto.pais}" class="value"></span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Twitter:</span>
+                    <a th:href="'https://twitter.com/' + ${piloto.twitter}"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       th:text="'@' + ${piloto.twitter}" class="twitter"></a>
+                </div>
+                <div class="info-item">
+                    <span class="label">Siglas:</span>
+                    <span th:text="${piloto.siglas}" class="value"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="button-content">
+        <a th:href="@{/equipos/{id}(id=${equipoId})}">Volver a Lista de Pilotos</a>
+    </div>
+</main>
+</body>
+</html>

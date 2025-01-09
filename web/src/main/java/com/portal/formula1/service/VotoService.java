@@ -2,13 +2,19 @@ package com.portal.formula1.service;
 
 import com.portal.formula1.model.Encuesta;
 import com.portal.formula1.model.Voto;
+import com.portal.formula1.repository.EncuestaDAO;
+import com.portal.formula1.repository.PilotoDAO;
 import com.portal.formula1.repository.VotoDAO;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
+
+import org.springframework.transaction.annotation.Transactional;
+import java.util.stream.Collectors;
+import java.util.NoSuchElementException;
+import java.util.Map;
+import java.util.HashMap;
+
 /**
  *
  * @author Misterlink
@@ -19,9 +25,11 @@ public class VotoService {
     @Autowired
     private VotoDAO votoDAO;
 
-    @PersistenceContext //Para manejar pilotos directamente de la base de datos
-    private EntityManager entityManager;
+    @Autowired
+    private PilotoDAO pilotoDAO;
 
+    @Autowired
+    private EncuestaDAO encuestaDAO;
     public Voto crearVoto(Voto voto) {
         return votoDAO.save(voto);
     }
@@ -35,42 +43,30 @@ public class VotoService {
         return votoDAO.existsByCorreoVotanteAndEncuesta(correoVotante, encuesta);
     }
 
-    public List<Object> getRankingVotacion(String permalink) {
-        if (entityManager == null) {
-            throw new IllegalStateException("EntityManager is null");
-        }
+    @Transactional(readOnly = true)
+    public List<Object[]> getRankingVotacion(String permalink) {
+        Encuesta encuesta = encuestaDAO.findById(permalink).orElseThrow(() -> new NoSuchElementException("Encuesta no encontrada"));
 
-        String sql = """
-                SELECT 
-                    p.nombre, 
-                    p.apellidos, 
-                    p.siglas, 
-                    p.dorsal, 
-                    p.rutaImagen, 
-                    p.pais, 
-                    p.twitter, 
-                    COUNT(v.id) AS votos
-                FROM 
-                    piloto p
-                LEFT JOIN 
-                    votos v 
-                ON 
-                    p.dorsal = v.opcion_seleccionada
-                WHERE 
-                    v.encuesta_permalink = ?
-                GROUP BY 
-                    p.nombre, p.apellidos, p.siglas, p.dorsal, p.rutaImagen, p.pais, p.twitter
-                ORDER BY 
-                    votos DESC
-            """;
+        // Mapear votos por piloto utilizando String como clave porque el dorsal es un String
+        Map<String, Long> votosPorPiloto = votoDAO.findByEncuesta(encuesta).stream()
+                .collect(Collectors.groupingBy(Voto::getOpcionSeleccionada, Collectors.counting()));
 
-        Query query = entityManager.createNativeQuery(sql);
-        query.setParameter(1, permalink);
+        // Crear ranking basado en los pilotos y sus votos
+        List<Object[]> ranking = encuesta.getPilotos().stream()
+                .map(piloto -> new Object[]{
+                        piloto.getNombre(),
+                        piloto.getApellidos(),
+                        piloto.getSiglas(),
+                        piloto.getDorsal(),
+                        piloto.getRutaImagen(),
+                        piloto.getPais(),
+                        piloto.getTwitter(),
+                        votosPorPiloto.getOrDefault(piloto.getDorsal().toString(), 0L),
+                        piloto.getEquipo().getNombre()
+                })
+                .sorted((a, b) -> Long.compare((Long) b[7], (Long) a[7]))
+                .collect(Collectors.toList());
 
-        if (query == null) {
-            throw new IllegalStateException("Query is null");
-        }
-
-        return query.getResultList();
+        return ranking;
     }
 }

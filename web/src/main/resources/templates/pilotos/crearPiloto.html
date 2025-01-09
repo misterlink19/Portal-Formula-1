@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Crear Piloto</title>
+    <link rel="stylesheet" th:href="@{/styles/crearPiloto.css}">
+</head>
+<body layout:fragment="body">
+<div class="container">
+    <h1 class="text-center">Crear Nuevo Piloto</h1>
+    <form th:action="@{/pilotos/crear}" th:object="${piloto}" method="post" enctype="multipart/form-data" class="mt-4">
+        <fieldset class="border p-4 text-center">
+            <div class="form-group row justify-content-center">
+                <div class="col-md-8">
+                    <label for="dorsal">Dorsal del Piloto</label>
+                    <input type="text" class="form-control" th:field="*{dorsal}" id="dorsal" maxlength="3" required>
+                    <div class="text-danger" th:if="${#fields.hasErrors('dorsal')}" th:errors="*{dorsal}"></div>
+                </div>
+            </div>
+            <div class="form-group row justify-content-center">
+                <div class="col-md-8">
+                    <label for="nombre">Nombre del Piloto</label>
+                    <input type="text" class="form-control" th:field="*{nombre}" id="nombre" maxlength="125" required>
+                    <div class="text-danger" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></div>
+                </div>
+            </div>
+            <div class="form-group row justify-content-center">
+                <div class="col-md-8">
+                    <label for="apellidos">Apellidos del Piloto</label>
+                    <input type="text" class="form-control" th:field="*{apellidos}" id="apellidos" maxlength="255"
+                           required>
+                    <div class="text-danger" th:if="${#fields.hasErrors('apellidos')}" th:errors="*{apellidos}"></div>
+                </div>
+            </div>
+            <div class="form-group row justify-content-center">
+                <div class="col-md-8">
+                    <label for="siglas">Siglas del Piloto (Generado Automáticamente)</label>
+                    <input type="text" class="form-control" th:field="*{siglas}" id="siglas" maxlength="3" readonly>
+                    <div class="text-danger" th:if="${#fields.hasErrors('siglas')}" th:errors="*{siglas}"></div>
+                </div>
+            </div>
+            <div class="form-group row justify-content-center">
+                <div class="col-md-8">
+                    <label for="rutaImagen">Foto del Piloto</label>
+                    <input type="file" class="form-control" name="fotoArchivo" id="fotoArchivo"
+                           accept="image/jpeg, image/png" required>
+                    <div class="text-danger" th:if="${#fields.hasErrors('rutaImagen')}" th:errors="*{rutaImagen}"></div>
+                </div>
+            </div>
+            <div class="form-group row justify-content-center">
+                <div class="col-md-8"><label for="pais">País del Piloto</label> <input type="text" class="form-control"
+                                                                                       th:field="*{pais}" id="pais"
+                                                                                       maxlength="255" required>
+                    <div class="text-danger" th:if="${#fields.hasErrors('pais')}" th:errors="*{pais}"></div>
+                </div>
+            </div>
+            <div class="form-group row justify-content-center">
+                <div class="col-md-8">
+                    <label for="twitter">Twitter del Piloto</label>
+                    <input type="text" class="form-control" th:field="*{twitter}" id="twitter" maxlength="255" required>
+                    <div class="text-danger" th:if="${#fields.hasErrors('twitter')}" th:errors="*{twitter}"></div>
+                </div>
+            </div>
+            <div class="form-group col-md-12 mt-3">
+                <input type="submit" class="btn btn-primary" value="Crear Piloto">
+                <input type="button" class="btn btn-danger" value="Borrar los datos introducidos"
+                       onclick="resetFormFields()">
+            </div>
+        </fieldset>
+    </form>
+</div>
+<script src="/javascript/crearPiloto.js"></script>
+<script>
+
+</script>
+</body>
+</html>

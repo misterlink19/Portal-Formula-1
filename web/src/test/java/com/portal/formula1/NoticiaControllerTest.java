@@ -18,9 +18,8 @@ import java.util.List;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 public class NoticiaControllerTest {
 
@@ -95,4 +94,16 @@ public class NoticiaControllerTest {
         verifyNoMoreInteractions(noticiaService);
     }
 
+    @Test
+    public void testEliminarNoticia() throws Exception {
+        int noticiaId = 1;
+
+        mockMvc.perform(post("/noticias/{id}/eliminar", noticiaId))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/noticias/listar"))
+                .andExpect(flash().attribute("mensaje", "La noticia ha sido eliminada correctamente."));
+
+        verify(noticiaService, times(1)).eliminarNoticia(noticiaId);
+        verifyNoMoreInteractions(noticiaService);
+    }
 }

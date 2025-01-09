@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Eliminar Responsable</title>
+  <link rel="stylesheet" th:href="@{/styles/eliminarResponsable.css}">
+</head>
+<body layout:fragment="body">
+<div class="container">
+  <div id="user-email" th:data-user-email="${user.getEmail()}"></div>
+  <div class="card">
+    <div class="card-header">
+      <h3>Eliminar Usuario</h3>
+    </div>
+    <div class="card-content">
+      <!-- Select User Section -->
+      <div class="form-group">
+        <label for="user-select">Seleccionar Usuario</label>
+        <select id="user-select" class="select">
+          <option value="">Seleccione un usuario</option>
+          <th:block th:each="usuario : ${responsablesEquipo}">
+            <option
+                    th:value="${usuario.usuario}"
+                    th:data-nombre="${usuario.nombre}"
+                    th:data-email="${usuario.email}"
+                    th:data-rol="${usuario.rol}"
+                    th:data-fecha-registro="${usuario.fechaRegistro}"
+                    th:data-validacion="${usuario.validacion}"
+                    th:data-equipo-id="${usuario.equipo.getId()}"
+                    th:data-rol-solicitado="${usuario.rolSolicitado}"
+                    th:text="${usuario.nombre}"></option>
+          </th:block>
+        </select>
+      </div>
+
+      <!-- User Details Section -->
+      <div class="user-details">
+        <div class="detail">
+          <label>Usuario</label>
+          <p id="detalle-usuario"></p>
+        </div>
+        <div class="detail">
+          <label>Nombre</label>
+          <p id="detalle-nombre"></p>
+        </div>
+        <div class="detail">
+          <label>Email</label>
+          <p id="detalle-email"></p>
+        </div>
+        <div class="detail">
+          <label>Rol</label>
+          <p id="detalle-rol"></p>
+        </div>
+        <div class="detail">
+          <label>Fecha de Registro</label>
+          <p id="detalle-fecha-registro"></p>
+        </div>
+        <div class="detail">
+          <label>Validación</label>
+          <p id="detalle-validacion"></p>
+        </div>
+        <div class="detail">
+          <label>ID de Equipo</label>
+          <p id="detalle-equipo-id"></p>
+        </div>
+      </div>
+    </div>
+    <div class="card-footer">
+      <button class="delete-button">Eliminar Usuario</button>
+    </div>
+  </div>
+
+  <div class="dialog hidden">
+    <div class="dialog-content">
+      <h2>¿Está seguro?</h2>
+      <p>Esta acción no se puede deshacer. Se eliminará permanentemente el usuario y todos sus datos asociados.</p>
+      <div class="dialog-actions">
+        <button class="cancel-button">Cancelar</button>
+        <button class="confirm-button">Eliminar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/javascript/eliminarResponsable.js"></script>
+</body>
+</html>

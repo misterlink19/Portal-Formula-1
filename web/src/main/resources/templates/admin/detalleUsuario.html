@@ -23,7 +23,10 @@
                 <span th:if="${usuario.validacion}" class="badge bg-success">Verificado</span>
                 <span th:if="${!usuario.validacion}" class="badge bg-danger">No Verificado</span>
             </p>
-            <p class="card-text"><strong>Equipo:</strong> <span th:text="${usuario.equipo.nombre}">equipo</span></p>
+            <p class="card-text"><strong>Equipo:</strong>
+                <span th:if="${usuario.equipo != null}" th:text="${usuario.equipo.nombre}">equipo</span>
+                <span th:unless="${usuario.equipo != null}">Sin equipo asignado</span>
+            </p>
             <a th:href="@{/admin/usuarios}" class="btn btn-primary">Volver a la Lista</a>
         </div>
     </div>

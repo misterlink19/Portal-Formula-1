@@ -39,11 +39,14 @@ public class Encuesta {
     @OneToMany(mappedBy = "encuesta", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Voto> votos;
 
-    //Para manejar la coleccion de pilotos y relacionarlo con su encuesta
-    @ElementCollection
-    @CollectionTable(name = "encuesta_piloto", joinColumns = @JoinColumn(name = "encuesta_id"))
-    @Column(name = "piloto_id")
-    private Set<String> pilotos = new HashSet<>();
+
+    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @JoinTable(
+            name = "encuesta_piloto",
+            joinColumns = @JoinColumn(name = "encuesta_id"),
+            inverseJoinColumns = @JoinColumn(name = "piloto_id")
+    )
+    private Set<Piloto> pilotos = new HashSet<>();
 
     // Para que genere el codigo permalink antes de registrarlo en la base datos
     @PrePersist
@@ -113,7 +116,7 @@ public class Encuesta {
         this.votos = votos;
     }
 
-    public Set<String> getPilotos() {return pilotos;}
+    public Set<Piloto> getPilotos() {return pilotos;}
 
-    public void setPilotos(Set<String> pilotos) { this.pilotos = pilotos;}
+    public void setPilotos(Set<Piloto> pilotos) { this.pilotos = pilotos;}
 }

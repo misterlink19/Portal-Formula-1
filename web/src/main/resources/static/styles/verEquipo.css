@@ -17,3 +17,8 @@
     max-height: 150px; /* Altura máxima */
     object-fit: contain; /* Ajusta la imagen para que no se recorte */
 }
+.card-img-top img-thumbnail {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+}

@@ -23,6 +23,8 @@ public class SessionInterceptor  implements HandlerInterceptor {
     
     public SessionInterceptor(){
         routeRoles.put("/admin",Rol.ADMIN);
+        routeRoles.put("/noticias/crear",Rol.ADMIN);
+        routeRoles.put("/noticias/eliminar",Rol.ADMIN);
     }
 
     private final Map<String, Rol> routeRoles = new HashMap<>();
