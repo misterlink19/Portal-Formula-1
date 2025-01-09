@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+/logs/spring-boot-application.log
+/logs/spring-boot-application.log.2024-12-10.0.gz
+/logs/spring-boot-application.log.2024-12-12.0.gz
