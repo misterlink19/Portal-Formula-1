@@ -76,6 +76,11 @@ public class UsuarioRegistrado implements Serializable {
         this.validacion = false;
         this.fechaRegistro = LocalDateTime.now();
     }
+    public UsuarioRegistrado(String usuario, Rol rol) {
+        super();
+        this.usuario = usuario;
+        this.rol = rol;
+    }
 
     public boolean isValidacion() {
         return this.validacion;

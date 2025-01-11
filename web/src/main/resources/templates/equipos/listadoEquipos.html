@@ -10,45 +10,56 @@
 </head>
 <body>
 <div layout:fragment="body">
-    <main role="main" class="">
-        <h1>Lista de Equipos</h1>
-        <div class="grid">
-            <div th:each="equipo : ${equipos}" class="card">
-                <div class="card-content">
-                    <div class="team-info">
+    <main role="main" class="container mt-4">
+    <h1 class="mb-4">Lista de Equipos</h1>
+    <div class="row">
+        <div th:each="equipo : ${equipos}" class="col-md-4 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="team-info d-flex align-items-center">
                         <img th:src="@{/uploads/{logo}(logo=${equipo.logo})}"
                              th:alt="'Logo de ' + ${equipo.nombre}"
-                             class="team-logo">
+                             class="team-logo rounded-circle me-3" style="width: 60px; height: 60px; object-fit: cover;">
                         <div>
-                            <h2 class="team-name" th:text="${equipo.nombre}"></h2>
-                            <p class="team-twitter" th:text="${equipo.twitter}"></p>
+                            <h5 class="team-name mb-1" th:text="${equipo.nombre}"></h5>
+                            <p class="team-twitter text-muted small mb-0" th:text="${equipo.twitter}"></p>
                         </div>
                     </div>
                 </div>
-                <div class="card-footer">
-                    <span class="badge" th:text="${#lists.size(equipo.responsables)}  + ' Responsables'"></span>
-                    <a th:href="@{/equipos/{id}(id=${equipo.id})}" class="details-link">Ver detalles</a>
-
-                    <!-- Botón de eliminar con icono de papelera -->
-                    <button type="button" class="delete-btn" th:attr="data-id=${equipo.id}" onclick="mostrarModal(this)">
-                        <i class="fas fa-trash"></i>
-                    </button>
+                <div class="card-footer d-flex justify-content-between align-items-center">
+                    <span class="badge bg-primary" th:text="${#lists.size(equipo.responsables)}  + ' Responsables'"></span>
+                    <div>
+                        <a th:href="@{/equipos/{id}(id=${equipo.id})}" class="btn btn-outline-primary btn-sm me-2">Ver detalles</a>
+                        <a th:href="@{/equipos/editar/{id}(id=${equipo.id})}" class="btn btn-outline-warning btn-sm me-2">Editar</a>
+                        <button type="button" class="btn btn-outline-danger btn-sm delete-btn" th:attr="data-id=${equipo.id}" onclick="mostrarModal(this)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
-        <a th:href="@{/equipos}" class="btn btn-secondary mt-3">Volver a Equipos</a>
+    </div>
+    <a th:href="@{/equipos}" class="btn btn-secondary mt-3">Volver a Equipos</a>
     </main>
     <!-- Modal de confirmación -->
-    <div id="modalConfirmacion" class="modal" style="display:none;">
-        <div class="modal-content">
-            <span class="close" onclick="cerrarModal()">&times;</span>
-            <h2>Confirmar eliminación</h2>
-            <p>¿Está seguro de que desea eliminar este equipo?</p>
-            <form id="deleteForm" method="post" th:action="@{/equipos/eliminar/{id}(id=0)}">
-                <input type="hidden" id="equipoId" name="id">
-                <button type="submit" class="confirm-btn">Eliminar</button>
-                <button type="button" class="cancel-btn" onclick="cerrarModal()">Cancelar</button>
-            </form>
+    <div id="modalConfirmacion" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Está seguro de que desea eliminar este equipo?</p>
+                    <form id="deleteForm" method="post" th:action="@{/equipos/eliminar/{id}(id=0)}">
+                        <input type="hidden" id="equipoId" name="id">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" form="deleteForm" class="btn btn-danger">Eliminar</button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -59,17 +70,10 @@
         const equipoId = button.getAttribute("data-id");
         document.getElementById("equipoId").value = equipoId;
         document.getElementById("deleteForm").action = `/equipos/eliminar/${equipoId}`;
-        document.getElementById("modalConfirmacion").style.display = "block";
+
+        // Mostrar el modal usando Bootstrap
+        const modal = new bootstrap.Modal(document.getElementById('modalConfirmacion'));
+        modal.show();
     }
 
-    function cerrarModal() {
-        document.getElementById("modalConfirmacion").style.display = "none";
-    }
-
-    window.onclick = function(event) {
-        const modal = document.getElementById("modalConfirmacion");
-        if (event.target === modal) {
-            modal.style.display = "none";
-        }
-    }
 </script>
