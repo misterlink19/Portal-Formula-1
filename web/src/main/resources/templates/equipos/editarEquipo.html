@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Editar Equipo</title>
+    <link rel="stylesheet" th:href="@{/styles/editarEquipo.css}">
+</head>
+<body layout:fragment="body">
+<div class="container">
+    <h1 class="text-center">Editar Equipo</h1>
+    <form th:action="@{/equipos/editar/{id}(id=${equipo.id})}" th:object="${equipo}" method="post" enctype="multipart/form-data" class="mt-4">
+        <fieldset class="border p-4 text-center">
+            <div class="form-group row justify-content-center">
+                <div class="col-md-8">
+                    <label for="nombre">Nombre del Equipo</label>
+                    <input type="text" class="form-control" th:field="*{nombre}" id="nombre" maxlength="255" required>
+                    <div class="text-danger" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></div>
+                </div>
+            </div>
+            <div class="form-group row justify-content-center">
+                <div class="col-md-8">
+                    <label for="logoArchivo">Logo del Equipo</label>
+                    <input type="file" class="form-control" name="logoArchivo" id="logoArchivo" accept="image/jpeg, image/png">
+                    <div class="text-danger" th:if="${#fields.hasErrors('logo')}" th:errors="*{logo}"></div>
+                </div>
+            </div>
+            <div class="form-group row justify-content-center">
+                <div class="col-md-8">
+                    <label for="twitter">Twitter del Equipo</label>
+                    <input type="text" class="form-control" th:field="*{twitter}" id="twitter" maxlength="255" required>
+                    <div class="text-danger" th:if="${#fields.hasErrors('twitter')}" th:errors="*{twitter}"></div>
+                </div>
+            </div>
+            <div class="form-group col-md-12 mt-3">
+                <input type="submit" class="btn btn-success" value="Guardar Cambios">
+                <a th:href="@{/equipos}" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </fieldset>
+    </form>
+</div>
+<script src="/javascript/editarEquipo.js"></script>
+</body>
+</html>
