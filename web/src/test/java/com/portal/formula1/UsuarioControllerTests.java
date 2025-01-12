@@ -327,10 +327,6 @@ public class UsuarioControllerTests {
         verify(redirectAttributes).addFlashAttribute("error", "Error inesperado al cambiar la contraseña.");
     }
 
-
-
-
-
     // Métodos auxiliares
     private UsuarioRegistrado crearUsuarioRegistrado(String usuario, String nombre, Rol rol) {
         UsuarioRegistrado usuarioRegistrado = new UsuarioRegistrado();
@@ -443,6 +439,54 @@ public class UsuarioControllerTests {
         assertTrue(resultado.contains("\"error\""));
         assertTrue(resultado.contains(mensajeError));
         verify(usuarioService).eliminarUsuario(usuarioAEliminar, adminActual.getUsuario());
+    }
+    @Test
+    void darseDeBaja_UsuarioAutenticado_DebeRedirigirConMensajeExito() {
+        // Given
+        UsuarioRegistrado usuario = crearUsuarioRegistrado("user1", "Usuario Test", Rol.USUARIO_BASICO);
+        when(request.getSession()).thenReturn(session);
+        when(session.getAttribute("usuario")).thenReturn(usuario);
+
+        // When
+        String viewName = usuarioController.darseDeBaja(request, redirectAttributes);
+
+        // Then
+        assertEquals("redirect:/?mensaje=Usuario eliminado correctamente. Lamentamos verte ir.", viewName);
+        verify(usuarioService).darseDeBaja(usuario.getUsuario());
+        verify(redirectAttributes).addFlashAttribute("mensaje", "Usuario eliminado correctamente. Lamentamos verte ir.");
+    }
+
+    @Test
+    void darseDeBaja_UsuarioNoAutenticado_DebeRedirigirLogin() {
+        // Given
+        when(request.getSession()).thenReturn(session);
+        when(session.getAttribute("usuario")).thenReturn(null);
+
+        // When
+        String viewName = usuarioController.darseDeBaja(request, redirectAttributes);
+
+        // Then
+        assertEquals("redirect:/login", viewName);
+        verify(usuarioService, never()).darseDeBaja(anyString());
+    }
+
+    @Test
+    void darseDeBaja_ErrorAlDarseDeBaja_DebeRedirigirConError() {
+        // Given
+        UsuarioRegistrado usuario = crearUsuarioRegistrado("user1", "Usuario Test", Rol.USUARIO_BASICO);
+        when(request.getSession()).thenReturn(session);
+        when(session.getAttribute("usuario")).thenReturn(usuario);
+
+        String mensajeError = "Error al intentar darse de baja";
+        doThrow(new RuntimeException(mensajeError)).when(usuarioService).darseDeBaja(usuario.getUsuario());
+
+        // When
+        String viewName = usuarioController.darseDeBaja(request, redirectAttributes);
+
+        // Then
+        assertEquals("redirect:/", viewName);
+        verify(usuarioService).darseDeBaja(usuario.getUsuario());
+        verify(redirectAttributes).addFlashAttribute("error", mensajeError);
     }
 
 }

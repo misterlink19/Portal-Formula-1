@@ -212,8 +212,19 @@ public class UsuarioService {
 
         usuarioRegistradoDAO.delete(usuarioEliminar);
     }
+    @Transactional
+    public void darseDeBaja(String usuarioAEliminar) {
+        UsuarioRegistrado usuarioEliminar = usuarioRegistradoDAO.findById(usuarioAEliminar)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
+        if (usuarioEliminar.getRol().equals(Rol.JEFE_DE_EQUIPO) && usuarioEliminar.getEquipo() != null) {
+            long cantidadJefes = usuarioRegistradoDAO.countJefesDeEquipoPorEquipo(usuarioEliminar.getEquipo().getId());
 
-
+            if (cantidadJefes <= 1) {
+                throw new RuntimeException("No se puede eliminar al único jefe del equipo ");
+            }
+        }
+        usuarioRegistradoDAO.delete(usuarioEliminar);
+    }
 
 }
