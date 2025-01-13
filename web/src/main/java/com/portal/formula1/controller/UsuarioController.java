@@ -314,4 +314,21 @@ public class UsuarioController {
             return "{\"error\": \"" + e.getMessage() + "\"}";
         }
     }
+
+    @PostMapping("/darseBaja")
+    public String darseDeBaja(HttpServletRequest request, RedirectAttributes redirectAttributes) {
+        try {
+            UsuarioRegistrado usuarioActual = (UsuarioRegistrado) request.getSession().getAttribute("usuario");
+            if (usuarioActual == null) {
+                return "redirect:/login";
+            }
+            usuarioService.darseDeBaja(usuarioActual.getUsuario());
+            request.getSession().invalidate(); // Invalida la sesión después de la baja
+            redirectAttributes.addFlashAttribute("mensaje", "Usuario eliminado correctamente. Lamentamos verte ir.");
+            return "redirect:/?mensaje=Usuario eliminado correctamente. Lamentamos verte ir.";
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/";
+        }
+    }
 }

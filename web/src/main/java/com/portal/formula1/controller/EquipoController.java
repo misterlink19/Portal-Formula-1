@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
@@ -212,7 +213,45 @@ public class EquipoController {
         return mv;
     }
 
+    @GetMapping("/editar/{id}")
+    public ModelAndView editarEquipo(@PathVariable Long id, HttpServletRequest request) {
+        logger.debug("Entrando a mostrarEquipo con id: {}", id);
+        ModelAndView mv = new ModelAndView("equipos/editarEquipo");
 
+        try {
+            UsuarioRegistrado user = (UsuarioRegistrado) request.getSession().getAttribute("usuario");
+            if (user == null) {
+                throw new AccessDeniedException("Usuario no autenticado.");
+            }
+
+            Equipo equipo = equipoService.obtenerEquipoPorId(id)
+                    .orElseThrow(() -> new NoSuchElementException("Equipo no encontrado"));
+
+            boolean esResponsable = equipo.getResponsables().stream()
+                    .anyMatch(responsable -> responsable.getUsuario().equals(user.getUsuario()));
+            if (!esResponsable && user.getRol() != Rol.ADMIN) {
+                throw new AccessDeniedException("No tienes permisos para editar este equipo.");
+            }
+
+            mv.addObject("equipo", equipo);
+
+        } catch (NoSuchElementException e) {
+            logger.error("Equipo no encontrado con id: {}", id);
+            mv.setViewName("error");
+            mv.addObject("mensajeError", "Equipo no encontrado.");
+        } catch (AccessDeniedException e) {
+            logger.error("Acceso denegado para el usuario: {}", request.getSession().getAttribute("usuario"));
+            mv.setViewName("error");
+            mv.addObject("mensajeError", e.getMessage());
+        } catch (Exception e) {
+            logger.error("Error al mostrar el equipo con id: {}", id, e);
+            mv.setViewName("error");
+            mv.addObject("mensajeError", "Error al cargar la vista de editar el equipo.");
+        }
+
+        return mv;
+    }
+    @Transactional
     @PostMapping("eliminar/{id}")
     public ModelAndView eliminarEquipo(@PathVariable Long id, @ModelAttribute("mensaje") String mensaje, HttpServletRequest request) {
         logger.debug("Entrando a mostrarEquipo con id: {}", id);
@@ -253,6 +292,77 @@ public class EquipoController {
             logger.error("Error al mostrar el equipo con id: {}", id, e);
             mv.setViewName("error");
             mv.addObject("mensajeError", "Error al eliminar el equipo.");
+        }
+        return mv;
+    }
+    @PostMapping("/editar/{id}")
+    public ModelAndView editarEquipo(@PathVariable Long id,
+                                     @Valid @ModelAttribute("equipo") Equipo equipo,
+                                     BindingResult result,
+                                     @RequestParam(value = "logoArchivo", required = false) MultipartFile logoArchivo,
+                                     RedirectAttributes redirectAttributes,
+                                     HttpServletRequest request) {
+        logger.debug("Entrando a editarEquipo");
+        ModelAndView mv = new ModelAndView("equipos/editarEquipo");
+        UsuarioRegistrado user = (UsuarioRegistrado) request.getSession().getAttribute("usuario");
+
+        // Validación del lado del servidor
+        if (result.hasErrors()) {
+            mv.addObject("equipo", equipo);
+            return mv;
+        }
+
+        try {
+            // Recuperar el equipo existente
+            Equipo equipoExistente = equipoService.obtenerEquipoPorId(id).orElseGet(null);
+            if (equipoExistente == null) {
+                mv.setViewName("error");
+                mv.addObject("mensajeError", "Equipo no encontrado.");
+                return mv;
+            }
+
+            // Validar si el nombre del equipo ya existe y no es el mismo equipo actual
+            if (!equipo.getNombre().equals(equipoExistente.getNombre()) && equipoService.existePorNombre(equipo.getNombre())) {
+                result.rejectValue("nombre", "error.equipo", "Ya existe un equipo con este nombre.");
+                mv.addObject("equipo", equipo);
+                return mv;
+            }
+
+            // Validación y guardado de la imagen si se ha subido una nueva
+            if (logoArchivo != null && !logoArchivo.isEmpty()) {
+                if (!imagenService.isFormatoValido(logoArchivo)) {
+                    result.rejectValue("logo", "error.equipo", "Formato de imagen no permitido. Solo JPG y PNG.");
+                    mv.addObject("equipo", equipo);
+                    return mv;
+                }
+                if (!imagenService.isTamanoValido(logoArchivo)) {
+                    result.rejectValue("logo", "error.equipo", "La imagen supera el tamaño máximo permitido de 2 MB.");
+                    mv.addObject("equipo", equipo);
+                    return mv;
+                }
+
+                // Guardar la nueva imagen
+                String nombreArchivo = System.currentTimeMillis() + "_" + logoArchivo.getOriginalFilename();
+                Path rutaArchivo = Paths.get("src/main/resources/static/uploads").resolve(nombreArchivo).toAbsolutePath();
+                Files.copy(logoArchivo.getInputStream(), rutaArchivo, StandardCopyOption.REPLACE_EXISTING);
+
+                // Establecer el nuevo nombre de archivo en el objeto equipo
+                equipo.setLogo(nombreArchivo);
+            } else {
+                // Si no se ha subido nueva imagen, mantener el logo actual
+                equipo.setLogo(equipoExistente.getLogo());
+            }
+
+            // Actualizar los datos del equipo
+            equipo.setId(equipoExistente.getId());
+            equipoService.actualizarEquipo(equipo);
+
+            redirectAttributes.addFlashAttribute("mensaje", "El equipo ha sido actualizado exitosamente.");
+            mv.setViewName("redirect:/equipos/" + equipo.getId());
+        } catch (Exception e) {
+            logger.error("Error al editar el equipo: ", e);
+            mv.setViewName("error");
+            mv.addObject("mensajeError", "Error al actualizar el equipo.");
         }
         return mv;
     }
