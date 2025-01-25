@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml" lang="es"
+      layout:decorate="~{layout}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Calendario</title>
+</head>
+<body layout:fragment="body">
+<div layout:fragment="body" class="container mt-5">
+    <h1 class="text-center">Gestión de Calendario</h1>
+    <div class="d-flex justify-content-center mb-4">
+        <a th:href="@{/calendario/crear}" class="btn btn-primary me-2">Crear un Evento</a>
+        <a th:href="@{/}" class="btn btn-secondary">Volver al Inicio</a>
+    </div>
+    <h2>Eventos Actuales</h2>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Fecha</th>
+            <th>Evento</th>
+            <th>Circuito</th>
+            <th>Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="evento : ${eventos}">
+            <td th:text="${evento.fecha}">Fecha</td>
+            <td th:text="${evento.nombreEvento}">Nombre del Evento</td>
+            <td th:text="${evento.circuito.nombre}">Circuito</td>
+            <td>
+                <form th:action="@{/calendario/{id}/eliminar(id=${evento.id})}" method="post">
+                    <button class="btn btn-danger" type="submit">Eliminar</button>
+                </form>
+            </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(eventos)}">
+            <td colspan="4" class="text-center">No hay eventos registrados</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

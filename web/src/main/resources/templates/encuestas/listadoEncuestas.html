@@ -35,40 +35,48 @@
             <input class="filters-date" type="date" id="fecha" placeholder="Fecha límite">
         </div>
 
-        <div id="votaciones" class="votaciones">
-            <p id="no-coincidencias" class="no-coincidencias">No hay encuestas que coincidan con el filtro</p>
+        <!-- Mostrar mensaje si no hay encuestas registradas -->
+        <div th:if="${#lists.isEmpty(encuestas)}">
+            <p class="alert alert-warning">No hay encuestas registradas en este momento.</p>
+        </div>
 
-            <div th:each="encuesta : ${encuestas}" class="votacion" th:data-titulo="${encuesta.titulo}"
-                 th:data-descripcion="${encuesta.descripcion}"
-                 th:data-fecha-limite="${#temporals.format(encuesta.fechaLimite, 'yyyy-MM-dd')}"
-                 th:data-disponible="${encuesta.fechaLimite >= #temporals.createNow()}">
-                <div class="votacion-header">
-                    <h3 class="votacion-title" th:text="${encuesta.titulo}">Título de la encuesta</h3>
-                </div>
-                <div class="votacion-content">
-                    <p class="votacion-description" th:text="${encuesta.descripcion}">Descripción de la encuesta</p>
-                    <p class="votacion-date" th:text="'Fecha límite: ' + ${#temporals.format(encuesta.fechaLimite, 'yyyy-MM-dd')}">Fecha límite</p>
-                </div>
-                <div class="votacion-footer">
-                    <p class="estado" th:classappend="${encuesta.fechaLimite >= #temporals.createNow()} ? 'disponible' : 'no-disponible'" th:text="${encuesta.fechaLimite >= #temporals.createNow() ? 'Disponible' : 'No disponible'}"></p>
+        <!-- Mostrar las encuestas si hay registros -->
+        <div th:if="${!#lists.isEmpty(encuestas)}">
+            <div id="votaciones" class="votaciones">
+                <p id="no-coincidencias" class="no-coincidencias">No hay encuestas que coincidan con el filtro</p>
 
-                    <button th:if="${encuesta.fechaLimite >= #temporals.createNow()}"
-                            th:text="'Realizar votación'"
-                            th:attr="onclick= 'location.href=\'/votos/' + ${encuesta.permalink} + '/votar'+ '\''">
-                    </button>
+                <div th:each="encuesta : ${encuestas}" class="votacion" th:data-titulo="${encuesta.titulo}"
+                     th:data-descripcion="${encuesta.descripcion}"
+                     th:data-fecha-limite="${#temporals.format(encuesta.fechaLimite, 'yyyy-MM-dd')}"
+                     th:data-disponible="${encuesta.fechaLimite >= #temporals.createNow()}">
+                    <div class="votacion-header">
+                        <h3 class="votacion-title" th:text="${encuesta.titulo}">Título de la encuesta</h3>
+                    </div>
+                    <div class="votacion-content">
+                        <p class="votacion-description" th:text="${encuesta.descripcion}">Descripción de la encuesta</p>
+                        <p class="votacion-date" th:text="'Fecha límite: ' + ${#temporals.format(encuesta.fechaLimite, 'yyyy-MM-dd')}">Fecha límite</p>
+                    </div>
+                    <div class="votacion-footer">
+                        <p class="estado" th:classappend="${encuesta.fechaLimite >= #temporals.createNow()} ? 'disponible' : 'no-disponible'" th:text="${encuesta.fechaLimite >= #temporals.createNow() ? 'Disponible' : 'No disponible'}"></p>
 
-                    <button th:unless="${encuesta.fechaLimite >= #temporals.createNow()}"
-                            th:text="'Ver Resultados'"
-                            th:attr="onclick= 'location.href=\'/votos/' + ${encuesta.permalink} + '/resultados'+ '\''">
-                    </button>
+                        <button th:if="${encuesta.fechaLimite >= #temporals.createNow()}"
+                                th:text="'Realizar votación'"
+                                th:attr="onclick= 'location.href=\'/votos/' + ${encuesta.permalink} + '/votar'+ '\''">
+                        </button>
 
-                    <!-- Botón de eliminación solo visible para administradores -->
-                    <form th:if="${session.usuario != null and session.usuario.rol == T(com.portal.formula1.model.Rol).ADMIN}"
-                          th:action="@{/encuestas/eliminar/{permalink}(permalink=${encuesta.permalink})}" method="post"
-                          onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta encuesta? Esta acción no se puede deshacer.');">
-                        <input type="hidden" name="_method" value="delete" />
-                        <button type="submit" class="btn btn-danger text-black text-bg-danger">Eliminar Encuesta</button>
-                    </form>
+                        <button th:unless="${encuesta.fechaLimite >= #temporals.createNow()}"
+                                th:text="'Ver Resultados'"
+                                th:attr="onclick= 'location.href=\'/votos/' + ${encuesta.permalink} + '/resultados'+ '\''">
+                        </button>
+
+                        <!-- Botón de eliminación solo visible para administradores -->
+                        <form th:if="${session.usuario != null and session.usuario.rol == T(com.portal.formula1.model.Rol).ADMIN}"
+                              th:action="@{/encuestas/eliminar/{permalink}(permalink=${encuesta.permalink})}" method="post"
+                              onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta encuesta? Esta acción no se puede deshacer.');">
+                            <input type="hidden" name="_method" value="delete" />
+                            <button type="submit" class="btn btn-danger text-black text-bg-danger">Eliminar Encuesta</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
