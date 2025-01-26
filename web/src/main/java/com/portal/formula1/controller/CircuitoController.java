@@ -5,10 +5,7 @@ import com.portal.formula1.service.CircuitoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -51,4 +48,11 @@ public class CircuitoController {
             return "circuitos/crearCircuito";
         }
     }
+    @GetMapping("/{id}")
+    public String mostrarCircuito(@PathVariable Long id, Model model) {
+        Circuito circuito = circuitoService.obtenerCircuitoPorId(id);
+        model.addAttribute("circuito", circuito);
+        return "circuitos/verCircuito";
+    }
+
 }
