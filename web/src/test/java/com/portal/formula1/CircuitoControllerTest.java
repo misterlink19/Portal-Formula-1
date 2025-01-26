@@ -41,10 +41,8 @@ public class CircuitoControllerTest {
 
     @Test
     public void testMostrarFormulario() {
-        // Ejecutar el método
         String viewName = circuitoController.mostrarFormulario();
 
-        // Verificar el resultado
         assertEquals("circuitos/crearCircuito", viewName, "La vista no coincide");
     }
 
@@ -85,6 +83,17 @@ public class CircuitoControllerTest {
         verify(model, times(1)).addAttribute(eq("mensaje"), eq("Circuito registrado exitosamente!"));
 
         assertEquals("circuitos/crearCircuito", viewName, "La vista no coincide");
+    }
+    @Test
+    public void testMostrarCircuito() {
+        Circuito circuito = new Circuito();
+        circuito.setId(1L);
+        circuito.setNombre("Circuito de Monza");
+
+        when(circuitoService.obtenerCircuitoPorId(1L)).thenReturn(circuito);
+        String viewName = circuitoController.mostrarCircuito(1L,model);
+        when(mockFile.isEmpty()).thenReturn(true);
+        assertEquals("circuitos/verCircuito", viewName, "La vista no coincide");
     }
 
 }
