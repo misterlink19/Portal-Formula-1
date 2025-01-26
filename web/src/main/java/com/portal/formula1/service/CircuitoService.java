@@ -14,4 +14,8 @@ public class CircuitoService {
     public void crearCircuito(Circuito circuito) {
         circuitoDAO.save(circuito);
     }
+
+    public Circuito obtenerCircuitoPorId(Long id) {
+        return circuitoDAO.findById(id).orElse(null);
+    }
 }
