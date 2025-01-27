@@ -27,10 +27,10 @@ public class CalendarioEventoController {
     }
 
     @GetMapping("/gestion")
-    public String gestionEventos(Model model) {
+    public String menuEventos(Model model) {
         List<CalendarioEvento> eventos = calendarioEventoService.listarEventos();
         model.addAttribute("eventos", eventos);
-        return "calendario/gestionCalendario";
+        return "calendario/calendario";
     }
 
     @GetMapping("/crear")

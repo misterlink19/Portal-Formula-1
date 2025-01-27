@@ -1,22 +1,35 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml" lang="es"
       layout:decorate="~{layout}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>Inicio</title>
+    <!-- FullCalendar CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.7/index.global.min.css" rel="stylesheet">
+    <!-- Estilo personalizado -->
+    <link type="text/css" th:href="@{/styles/home.css}" rel="stylesheet">
 </head>
 <body layout:fragment="body">
-<div class="container">
+<div class="container mt-5">
     <div class="row">
         <!-- Noticias -->
         <div class="col-md-8">
             <h2>Noticias</h2>
-            <div th:each="noticia : ${noticias}">
-                <div>
-                    <h4 th:text="${noticia.titulo}"></h4>
-                    <p th:text="${noticia.texto}"></p>
+            <div class="row">
+                <div th:each="noticia : ${noticias}" class="col-md-12 mb-4">
+                    <div class="card">
+                        <div th:if="${noticia.imagen}" class="card-img-top">
+                            <img th:src="@{'/uploads/' + ${noticia.imagen}}" class="img-fluid" alt="Imagen de la noticia">
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a th:href="@{/noticias/{id}(id=${noticia.id})}" th:text="${noticia.titulo}"></a>
+                            </h5>
+                            <p class="card-text" th:text="${#strings.substring(noticia.texto, 0, 150) + '...'}"></p>
+                            <a th:href="@{/noticias/{id}(id=${noticia.id})}" class="btn btn-primary btn-sm">Leer más</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -24,17 +37,14 @@
         <!-- Calendario -->
         <div class="col-md-4">
             <h2>Calendario de Eventos</h2>
-            <ul>
-                <li th:each="evento : ${eventos}">
-                    <strong th:text="${#temporals.format(evento.fecha, 'dd/MM/yyyy')}"></strong>:
-                    <span th:text="${evento.nombreEvento}"></span>
-                </li>
-            </ul>
-            <div class="mt-3" th:if="${session.usuario != null && session.usuario.rol == T(com.portal.formula1.model.Rol).ADMIN}">
-                <a th:href="@{/calendario/gestion}" class="btn btn-primary">Gestionar Calendario</a>
-            </div>
+            <div id="calendario"></div>
         </div>
     </div>
 </div>
+
+<!-- FullCalendar JS -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.7/index.global.min.js"></script>
+<!-- Archivo JavaScript personalizado -->
+<script th:src="@{/javascript/home.js}"></script>
 </body>
 </html>

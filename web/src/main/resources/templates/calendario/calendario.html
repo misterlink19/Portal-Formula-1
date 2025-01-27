@@ -7,7 +7,7 @@
     <title>Gestión de Calendario</title>
 </head>
 <body layout:fragment="body">
-<div layout:fragment="body" class="container mt-5">
+<div class="container mt-5">
     <h1 class="text-center">Gestión de Calendario</h1>
     <div class="d-flex justify-content-center mb-4">
         <a th:href="@{/calendario/crear}" class="btn btn-primary me-2">Crear un Evento</a>
@@ -25,7 +25,7 @@
         </thead>
         <tbody>
         <tr th:each="evento : ${eventos}">
-            <td th:text="${evento.fecha}">Fecha</td>
+            <td th:text="${#temporals.format(evento.fecha, 'dd/MM/yyyy')}">Fecha</td>
             <td th:text="${evento.nombreEvento}">Nombre del Evento</td>
             <td th:text="${evento.circuito.nombre}">Circuito</td>
             <td>

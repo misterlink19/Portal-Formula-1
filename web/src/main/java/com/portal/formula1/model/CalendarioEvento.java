@@ -18,12 +18,22 @@ public class CalendarioEvento implements Serializable {
     private Long id;
 
     @Column(name = "fecha", nullable = false)
-    private LocalDate fecha; // Usamos LocalDate para manejar la fecha
+    private LocalDate fecha;
 
     @Column(name = "nombre_evento", nullable = false, length = 255)
     private String nombreEvento;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "circuito_id", nullable = true)
-    private CircuitoPlaceholder  circuito; // Relación opcional con el circuito
+    private Circuito  circuito;
+
+
+    public CalendarioEvento() {
+    }
+
+    public CalendarioEvento(String nombreEvento, LocalDate fecha, Circuito circuito) {
+        this.nombreEvento = nombreEvento;
+        this.fecha = fecha;
+        this.circuito = circuito;
+    }
 }

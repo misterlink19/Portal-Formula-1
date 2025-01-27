@@ -8,9 +8,14 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 </head>
 <body layout:fragment="body">
-<div layout:fragment="body" class="container mt-5">
+<div class="container mt-5">
     <h1 class="text-center">Crear Nuevo Evento</h1>
-    <form th:action="@{/calendario/crear}" method="post" th:object="${evento}">
+    <!-- Mostrar mensaje si no hay circuitos -->
+    <div th:if="${#lists.isEmpty(circuitos)}" class="alert alert-warning text-center">
+        <strong>No hay circuitos disponibles para crear un evento.</strong>
+    </div>
+
+    <form th:action="@{/calendario/crear}" method="post" th:object="${evento}" th:if="${!#lists.isEmpty(circuitos)}">
         <div class="mb-3">
             <label for="nombreEvento" class="form-label">Nombre del Evento</label>
             <input type="text" id="nombreEvento" th:field="*{nombreEvento}" class="form-control" required>
