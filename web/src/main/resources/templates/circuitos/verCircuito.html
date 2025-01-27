@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalles del Circuito</title>
+</head>
+<body layout:fragment="body" class="bg-light">
+<div class="container py-5">
+  <h1 class="text-center mb-4">Detalles del Circuito</h1>
+
+  <div th:if="${circuito == null}" class="alert alert-danger text-center" role="alert">
+    <p>No se encontró información sobre este circuito.</p>
+    <a href="/admin/circuitos" class="btn btn-primary mt-3">Volver</a>
+  </div>
+
+  <div th:if="${circuito != null}" class="p-4 border bg-white rounded shadow">
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <h2 th:text="${circuito.nombre}"></h2>
+        <p><strong>Ciudad:</strong> <span th:text="${circuito.ciudad}"></span></p>
+        <p><strong>País:</strong> <span th:text="${circuito.pais}"></span></p>
+        <p><strong>Número de Vueltas:</strong> <span th:text="${circuito.numeroVueltas}"></span></p>
+        <p><strong>Longitud:</strong> <span th:text="${circuito.longitud}"></span> metros</p>
+        <p><strong>Curvas:</strong></p>
+        <ul>
+          <li>Lentas: <span th:text="${circuito.numeroCurvasLentas}"></span></li>
+          <li>Medias: <span th:text="${circuito.numeroCurvasMedia}"></span></li>
+          <li>Rápidas: <span th:text="${circuito.numeroCurvasRapidas}"></span></li>
+        </ul>
+      </div>
+      <div class="col-md-6 text-center">
+        <h3 class="mb-3">Trazado del Circuito</h3>
+        <img th:src="${circuito.trazado != null ? '/uploads/circuitos/' + circuito.trazado : '/images/default-trazado.png'}"
+             alt="Trazado del Circuito" class="img-fluid rounded shadow" style="max-height: 400px;" />
+      </div>
+    </div>
+
+    <div class="text-center mt-4">
+      <a href="/admin/circuitos" class="btn btn-secondary">Volver</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>
