@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -67,6 +68,12 @@ public class CalendarioEventoController {
     @PostMapping("/crear")
     public String crearEvento(@ModelAttribute CalendarioEvento evento, RedirectAttributes redirectAttributes) {
         try {
+            // Validar que la fecha sea posterior al día actual
+            if (evento.getFecha() == null || evento.getFecha().isBefore(LocalDate.now())) {
+                redirectAttributes.addFlashAttribute("mensajeError", "La fecha debe ser posterior al día actual.");
+                return "redirect:/calendario/crear";
+            }
+
             calendarioEventoService.guardarEvento(evento);
             redirectAttributes.addFlashAttribute("mensaje", "El evento ha sido creado exitosamente.");
             return "redirect:/calendario/gestion";
@@ -76,6 +83,7 @@ public class CalendarioEventoController {
             return "redirect:/calendario/crear";
         }
     }
+
 
     @PostMapping("/{id}/eliminar")
     public String eliminarEvento(@PathVariable Long id, RedirectAttributes redirectAttributes ) {
