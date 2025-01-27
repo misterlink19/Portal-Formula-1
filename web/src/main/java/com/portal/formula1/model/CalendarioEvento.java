@@ -36,4 +36,11 @@ public class CalendarioEvento implements Serializable {
         this.fecha = fecha;
         this.circuito = circuito;
     }
+
+    public CalendarioEvento(Long id, String nombreEvento, LocalDate fecha, Circuito circuito) {
+        this.id = id;
+        this.nombreEvento = nombreEvento;
+        this.fecha = fecha;
+        this.circuito = circuito;
+    }
 }

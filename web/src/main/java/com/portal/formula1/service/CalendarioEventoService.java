@@ -1,6 +1,7 @@
 package com.portal.formula1.service;
 
 import com.portal.formula1.model.CalendarioEvento;
+import com.portal.formula1.model.Encuesta;
 import com.portal.formula1.repository.CalendarioEventoDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 public class CalendarioEventoService {
@@ -20,7 +22,7 @@ public class CalendarioEventoService {
         return calendarioEventoDAO.findAll();
     }
 
-    // Crear un evento
+    // Crea un evento
     public CalendarioEvento guardarEvento(CalendarioEvento evento) {
         return calendarioEventoDAO.save(evento);
     }
@@ -47,4 +49,8 @@ public class CalendarioEventoService {
     public List<CalendarioEvento> buscarPorFecha(LocalDate fecha) {
         return calendarioEventoDAO.findByFecha(fecha);
     }
+
+    public CalendarioEvento obtenerEventoPorId(Long id) {
+        Optional<CalendarioEvento> calendarioEventoOptional = calendarioEventoDAO.findById(id);
+        return calendarioEventoOptional.orElseThrow(() -> new NoSuchElementException("Evento no encontrado con id: " + id)); }
 }

@@ -29,10 +29,12 @@
             <td th:text="${evento.nombreEvento}">Nombre del Evento</td>
             <td th:text="${evento.circuito.nombre}">Circuito</td>
             <td>
-                <form th:action="@{/calendario/{id}/eliminar(id=${evento.id})}" method="post">
+                <form th:action="@{/calendario/{id}/eliminar(id=${evento.id})}" method="post" class="d-inline">
                     <button class="btn btn-danger" type="submit">Eliminar</button>
                 </form>
+                <a th:href="@{/calendario/evento/{id}(id=${evento.id})}" class="btn btn-info">Ver Detalle</a>
             </td>
+
         </tr>
         <tr th:if="${#lists.isEmpty(eventos)}">
             <td colspan="4" class="text-center">No hay eventos registrados</td>

@@ -20,7 +20,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+
+import java.time.LocalDate;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -41,27 +47,15 @@ public class InicioController {
 
     private static final String SESSION_USUARIO = "usuario";
 
-    // Home para usuarios autenticados y no autenticados
     @GetMapping(value = "/")
     public ModelAndView home(HttpSession session) {
         ModelAndView mv = new ModelAndView("home");
-
-        // Obtener noticias y eventos
-        List<Noticia> noticias = noticiaService.obtenerNoticias();
-        List<CalendarioEvento> eventos = calendarioEventoService.listarEventos();
-
-        // Pasar las noticias y los eventos al modelo
-        mv.addObject("noticias", noticias);
-        mv.addObject("eventos", eventos);
-
-        // Verificar si hay usuario autenticado y añadirlo al modelo
-        UsuarioRegistrado usuario = (UsuarioRegistrado) session.getAttribute("usuario");
-        if (usuario != null) {
-            mv.addObject(SESSION_USUARIO, usuario);
-        }
-
+        configurarModelo(mv, session);
         return mv;
     }
+
+
+
     // Mostrar el formulario de inicio de sesión
     @GetMapping("/login")
     public ModelAndView login(HttpSession session) {
@@ -69,7 +63,9 @@ public class InicioController {
 
         // Si ya hay un usuario autenticado, redirigir a home
         if (usuario != null) {
-            return new ModelAndView("redirect:/");
+            ModelAndView mv = new ModelAndView("redirect:/");
+            configurarModelo(mv, session);
+            return mv;
         }
 
         // Cargar la vista del formulario de inicio de sesión
@@ -89,9 +85,10 @@ public class InicioController {
                  mv.setViewName("admin");
             }else{
                 mv.setViewName("home");
-            }  
+            }
             mv.addObject(SESSION_USUARIO, user);
             session.setAttribute(SESSION_USUARIO, user);
+            configurarModelo(mv, session);
         } else {
             mv.setViewName("inicioSesion");
             mv.addObject("error", "Correo electrónico o contraseña incorrectos");
@@ -104,6 +101,45 @@ public class InicioController {
         return "redirect:/";
     }
 
+    private void configurarModelo(ModelAndView mv, HttpSession session) {
+        // Obtener noticias y eventos
+        List<Noticia> noticias = noticiaService.obtenerNoticias();
+        List<CalendarioEvento> eventos = calendarioEventoService.listarEventos();
+
+        // Ordenar eventos por fecha
+        eventos = eventos.stream()
+                .sorted(Comparator.comparing(CalendarioEvento::getFecha))
+                .toList();
+
+        // Filtrar próximos eventos de esta semana
+        LocalDate hoy = LocalDate.now();
+        LocalDate finDeSemana = hoy.plusDays(7); // Siete días desde hoy
+        List<CalendarioEvento> proximosEventos = eventos.stream()
+                .filter(evento -> evento.getFecha().isAfter(hoy.minusDays(1)) && evento.getFecha().isBefore(finDeSemana))
+                .toList();
+
+        // Convertir eventos a JSON para FullCalendar
+        List<Map<String, Object>> eventosCalendario = eventos.stream().map(evento -> {
+            Map<String, Object> eventoJson = new HashMap<>();
+            eventoJson.put("id", evento.getId());
+            eventoJson.put("title", evento.getNombreEvento());
+            eventoJson.put("start", evento.getFecha().toString()); // Formato ISO
+            eventoJson.put("url", "/calendario/evento/" + evento.getId());
+            eventoJson.put("color", evento.getFecha().isAfter(LocalDate.now()) ? "blue" : "gray");
+            return eventoJson;
+        }).toList();
+
+        // Pasar noticias y eventos al modelo
+        mv.addObject("noticias", noticias);
+        mv.addObject("eventosCalendario", eventosCalendario); // Esto se procesará en el HTML
+        mv.addObject("proximosEventos", proximosEventos); // Próximos eventos
+
+        // Verificar si hay usuario autenticado y añadirlo al modelo
+        UsuarioRegistrado usuario = (UsuarioRegistrado) session.getAttribute("usuario");
+        if (usuario != null) {
+            mv.addObject(SESSION_USUARIO, usuario);
+        }
+    }
 
 
 }

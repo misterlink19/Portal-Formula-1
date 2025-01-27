@@ -41,14 +41,9 @@
             <li class="nav-item" th:if="${session.usuario == null}">
                 <a class="nav-link" th:href="@{/encuestas/listar}">Lista de Encuestas</a>
             </li>
-            <li class="nav-item" th:if="${session.usuario != null} and ${session.usuario.rol != T(com.portal.formula1.model.Rol).ADMIN}">
+            <li class="nav-item" th:if="${session.usuario == null or (session.usuario != null and session.usuario.rol != T(com.portal.formula1.model.Rol).ADMIN)}">
                 <a class="nav-link" th:href="@{/noticias/listar}">Noticias</a>
             </li>
-
-            <!-- Mostrar solo si el usuario NO es Admin -->
-<!--            <li class="nav-item" th:if="${session.usuario != null} and ${session.usuario.rol != T(com.portal.formula1.model.Rol).ADMIN}">-->
-<!--                <a class="nav-link" th:href="@{/encuestas/listar}">Encuestas</a>-->
-<!--            </li>-->
 
             <!-- Solo para Administradores -->
             <li class="nav-item" th:if="${session.usuario != null} and ${session.usuario.rol == T(com.portal.formula1.model.Rol).ADMIN}">
@@ -70,7 +65,6 @@
                 <a class="nav-link" th:href="@{/calendario/gestion}">Gestionar eventos</a>
             </li>
 
-
             <!-- Solo para Responsables de Equipo -->
             <li class="nav-item" th:if="${session.usuario != null} and ${session.usuario.rol == T(com.portal.formula1.model.Rol).JEFE_DE_EQUIPO}">
                 <a class="nav-link" th:href="@{/equipos}">Gestionar Equipos</a>
@@ -81,7 +75,6 @@
             <li class="nav-item" th:if="${session.usuario != null} and ${session.usuario.rol == T(com.portal.formula1.model.Rol).JEFE_DE_EQUIPO}">
                 <a class="nav-link" th:href="@{/coches}">Gestionar Coches</a>
             </li>
-
         </ul>
 
         <!-- Opciones de usuario a la derecha -->

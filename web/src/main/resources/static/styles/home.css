@@ -1,3 +1,26 @@
+/* Estilo para el separador de títulos */
+.title-separator {
+    border: none;
+    height: 2px;
+    background-color: #007bff;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+    /* Imágenes de noticias */
+.noticia-img {
+    width: 100%; /* Ancho completo */
+    height: 300px; /* Altura uniforme */
+    object-fit: cover; /* Recorta imágenes proporcionalmente */
+    border-radius: 5px;
+}
+
+/* Tarjetas de noticias */
+.card {
+    width: 100%; /* Ancho completo */
+    margin: 0 auto;
+}
+
+/* Calendario */
 #calendario {
     max-width: 100%;
     margin: 0 auto;
@@ -5,7 +28,24 @@
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    height: 50%; /* Más alto para evitar scroll */
 }
 .fc-toolbar {
     margin-bottom: 20px;
+}
+
+/* Botón Agregar Evento */
+.btn-success {
+    width: 100%;
+}
+
+/* Próximos Eventos */
+.list-group-item a {
+    text-decoration: none;
+    color: #007bff;
+}
+.list-group-item a:hover {
+    text-decoration: underline;
+    color: #0056b3;
 }

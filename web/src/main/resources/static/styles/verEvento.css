@@ -1,0 +1,29 @@
+
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.event-details {
+    margin-right: 20px;
+}
+
+.circuit-image {
+    max-width: 100%;
+}
+
+.img-fluid {
+    width: 100%;
+    height: auto;
+}
+
+@media (max-width: 768px) {
+    .event-details, .circuit-image {
+        max-width: 100%;
+        margin-right: 0;
+        margin-bottom: 20px;
+    }
+}
