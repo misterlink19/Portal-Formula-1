@@ -42,5 +42,4 @@ public class Circuito {
         this.numeroCurvasMedia = numeroCurvasMedia;
         this.numeroCurvasRapidas = numeroCurvasRapidas;
     }
-
 }

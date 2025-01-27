@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml" lang="es"
+      layout:decorate="~{layout}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Evento</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+</head>
+<body layout:fragment="body">
+<div class="container mt-5">
+    <h1 class="text-center">Crear Nuevo Evento</h1>
+    <!-- Mostrar mensaje si no hay circuitos -->
+    <div th:if="${#lists.isEmpty(circuitos)}" class="alert alert-warning text-center">
+        <strong>No hay circuitos disponibles para crear un evento.</strong>
+    </div>
+
+    <form th:action="@{/calendario/crear}" method="post" th:object="${evento}" th:if="${!#lists.isEmpty(circuitos)}">
+        <div class="mb-3">
+            <label for="nombreEvento" class="form-label">Nombre del Evento</label>
+            <input type="text" id="nombreEvento" th:field="*{nombreEvento}" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label for="fecha" class="form-label">Fecha</label>
+            <input type="text" id="fecha" th:field="*{fecha}" class="form-control flatpickr" required>
+        </div>
+        <div class="mb-3">
+            <label for="circuito" class="form-label">Circuito</label>
+            <select id="circuito" th:field="*{circuito.id}" class="form-select" required>
+                <option th:each="circuito : ${circuitos}" th:value="${circuito.id}" th:text="${circuito.nombre}"></option>
+            </select>
+        </div>
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">Crear Evento</button>
+            <a th:href="@{/calendario}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        flatpickr(".flatpickr", {dateFormat: "Y-m-d"});
+    });
+</script>
+</body>
+</html>
