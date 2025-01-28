@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CocheService {
@@ -22,5 +23,13 @@ public class CocheService {
 
     public boolean existeCocheByCodigo(String codigo) {
         return cocheDAO.existsCocheByCodigo(codigo);
+    }
+
+    public Optional<Coches> obtnerCochePorCodigo(String codigo) {
+        return cocheDAO.findById(codigo);
+    }
+
+    public void actualizarCoche(Coches coche) {
+        cocheDAO.save(coche);
     }
 }
