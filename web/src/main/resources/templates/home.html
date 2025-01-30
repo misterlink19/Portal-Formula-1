@@ -1,13 +1,72 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml" lang="es"
       layout:decorate="~{layout}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>Inicio</title>
+    <!-- Estilo personalizado -->
+    <link type="text/css" th:href="@{/styles/home.css}" rel="stylesheet">
 </head>
 <body layout:fragment="body">
-    <h1 th:text="'Bienvenido, ' + ${usuario.nombre}">Bienvenido, usuario</h1>
+<div class="container mt-4">
+    <div class="row">
+        <!-- Noticias -->
+        <div class="col-md-8">
+            <h2 class="table-header">Noticias</h2>
+            <hr class="title-separator">
+            <div class="row">
+                <div th:each="noticia : ${noticias}" class="col-12 mb-4">
+                    <div class="card">
+                        <div class="card-img-top">
+                            <img th:src="@{'/uploads/' + ${noticia.imagen}}" class="img-fluid noticia-img" alt="Imagen de la noticia">
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a th:href="@{/noticias/{id}(id=${noticia.id})}" th:text="${noticia.titulo}"></a>
+                            </h5>
+                            <p class="card-text" th:text="${#strings.substring(noticia.texto, 0, 150) + '...'}"></p>
+                            <a th:href="@{/noticias/{id}(id=${noticia.id})}" class="btn btn-primary btn-sm">Leer más</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Calendario -->
+        <div class="col-4">
+            <h2>Calendario de Eventos</h2>
+            <hr class="title-separator">
+            <div id="calendario"></div>
+            <!-- Botón Agregar Evento -->
+            <div th:if="${session.usuario != null} and ${session.usuario.rol == T(com.portal.formula1.model.Rol).ADMIN}" class="mt-4">
+                <a th:href="@{/calendario/crear}" class="btn btn-success btn-block">Agregar Evento</a>
+            </div>
+            <!-- Lista de próximos eventos -->
+            <div class="mt-4">
+                <h3>Próximos Eventos</h3>
+                <ul class="list-group">
+                    <li class="list-group-item" th:each="evento : ${proximosEventos}">
+                        <a th:href="@{/calendario/evento/{id}(id=${evento.id})}">
+                            <strong th:text="${#temporals.format(evento.fecha, 'dd/MM/yyyy')}"></strong> -
+                            <span th:text="${evento.nombreEvento}"></span>
+                        </a>
+                    </li>
+                    <li th:if="${#lists.isEmpty(proximosEventos)}" class="list-group-item text-center">
+                        No hay eventos próximos esta semana.
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FullCalendar JS -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.7/index.global.min.js"></script>
+<script th:inline="javascript">
+    const eventos = /*[[${eventosCalendario}]]*/ [];
+</script>
+
+<!-- Archivo JavaScript personalizado -->
+<script th:src="@{/javascript/home.js}"></script>
 </body>
 </html>

@@ -23,13 +23,17 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(sessionInterceptor)
-                .addPathPatterns("/**").excludePathPatterns("/")
+                .addPathPatterns("/**")
+                .excludePathPatterns("/")
+                .excludePathPatterns("/login")
+                .excludePathPatterns("/calendario/evento/**")
+                .excludePathPatterns("/encuestas/**")
+                .excludePathPatterns("/noticias/**")
                 .excludePathPatterns("/styles/**")
                 .excludePathPatterns("/javascript/**")
                 .excludePathPatterns("/images/**")
                 .excludePathPatterns("/favicon.ico")
                 .excludePathPatterns("/votos/**")
-//                .excludePathPatterns("/equipos/**") removi exclusión de /equipos/** para asegurar que pase por el interceptor
                 .excludePathPatterns("/registro/**")
                 .excludePathPatterns("/uploads/**");
     }

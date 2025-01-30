@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml" lang="es"
+      layout:decorate="~{layout}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Calendario</title>
+</head>
+<body layout:fragment="body">
+<div class="container mt-5">
+    <!-- Mostrar mensaje de éxito si existe -->
+    <div th:if="${mensaje}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${mensaje}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <!-- Mostrar mensaje de error si existe -->
+    <div th:if="${mensajeError}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${mensajeError}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <h1 class="text-center">Gestión de Calendario</h1>
+    <div class="d-flex justify-content-center mb-4">
+        <a th:href="@{/calendario/crear}" class="btn btn-primary me-2">Crear un Evento</a>
+        <a th:href="@{/}" class="btn btn-secondary">Volver al Inicio</a>
+    </div>
+    <h2>Eventos Actuales</h2>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Fecha</th>
+            <th>Evento</th>
+            <th>Circuito</th>
+            <th>Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="evento : ${eventos}">
+            <td th:text="${#temporals.format(evento.fecha, 'dd/MM/yyyy')}">Fecha</td>
+            <td th:text="${evento.nombreEvento}">Nombre del Evento</td>
+            <td th:text="${evento.circuito.nombre}">Circuito</td>
+            <td>
+                <form th:action="@{/calendario/{id}/eliminar(id=${evento.id})}" method="post" class="d-inline">
+                    <button class="btn btn-danger" type="submit">Eliminar</button>
+                </form>
+                <a th:href="@{/calendario/evento/{id}(id=${evento.id})}" class="btn btn-info">Ver Detalle</a>
+            </td>
+
+        </tr>
+        <tr th:if="${#lists.isEmpty(eventos)}">
+            <td colspan="4" class="text-center">No hay eventos registrados</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
