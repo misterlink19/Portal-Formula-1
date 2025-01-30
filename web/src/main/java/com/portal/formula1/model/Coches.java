@@ -28,10 +28,14 @@ public class Coches {
     @JoinColumn(name = "id_equipo", nullable = false)
     private Equipo equipo;
 
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_piloto", unique = true)
+    private Piloto piloto;
+
     // Constructores
     public Coches() {}
 
-    public Coches(String codigo, String nombre, Double ersCurvaLenta, Double ersCurvaMedia, Double ersCurvaRapida, Double consumo, Equipo equipo) {
+    public Coches(String codigo, String nombre, Double ersCurvaLenta, Double ersCurvaMedia, Double ersCurvaRapida, Double consumo, Equipo equipo, Piloto piloto) {
         this.codigo = codigo;
         this.nombre = nombre;
         this.ersCurvaLenta = ersCurvaLenta;
@@ -39,6 +43,7 @@ public class Coches {
         this.ersCurvaRapida = ersCurvaRapida;
         this.consumo = consumo;
         this.equipo = equipo;
+        this.piloto = piloto;
     }
 
     // Getters y Setters
@@ -98,15 +103,11 @@ public class Coches {
         this.equipo = equipo;
     }
 
-    @Override
-    public String toString() {
-        return "Coche{" +
-                "codigo='" + codigo + '\'' +
-                ", nombre='" + nombre + '\'' +
-                ", ersCurvaLenta=" + ersCurvaLenta +
-                ", ersCurvaMedia=" + ersCurvaMedia +
-                ", ersCurvaRapida=" + ersCurvaRapida +
-                ", consumo=" + consumo +
-                '}';
+    public Piloto getPiloto() {
+        return piloto;
+    }
+
+    public void setPiloto(Piloto piloto) {
+        this.piloto = piloto;
     }
 }

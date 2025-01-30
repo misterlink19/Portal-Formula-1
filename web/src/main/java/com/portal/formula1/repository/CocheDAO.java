@@ -11,5 +11,11 @@ import java.util.List;
 public interface CocheDAO extends JpaRepository<Coches, String> {
     boolean existsCocheByCodigo(String codigo);
 
-    List<Coches> findCocheByEquipo_Id(Long equipoId);
+    Coches findCocheByCodigo(String codigo);
+
+    List<Coches> findCocheByEquipo_Id(long equipoId);
+
+    Coches findCocheByPiloto_Dorsal(Integer pilotoDorsal);
+
+    List<Coches> findCocheByEquipo_IdAndPilotoIsNull(long equipoId);
 }

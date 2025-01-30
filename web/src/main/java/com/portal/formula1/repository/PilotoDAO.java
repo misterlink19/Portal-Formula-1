@@ -10,4 +10,6 @@ import java.util.List;
 public interface PilotoDAO extends JpaRepository<Piloto, Integer> {
     boolean existsByDorsal(Integer dorsal);
     List<Piloto> findByEquipo_Id(Long equipoId);
+    List<Piloto> findByEquipo_IdAndCocheIsNull(Long equipoId);
+    Piloto findPilotoByDorsal(Integer dorsal);
 }

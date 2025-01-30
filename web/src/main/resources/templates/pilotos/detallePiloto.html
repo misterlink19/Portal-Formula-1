@@ -44,6 +44,10 @@
                     <span class="label">Siglas:</span>
                     <span th:text="${piloto.siglas}" class="value"></span>
                 </div>
+                <div class="info-item">
+                    <span class="label">Coche Asignado:</span>
+                    <span th:text="${piloto.coche.getNombre()}" class="value"></span>
+                </div>
             </div>
         </div>
     </div>

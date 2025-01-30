@@ -22,6 +22,7 @@
                     <th>ERS Curva Media</th>
                     <th>ERS Curva Rápida</th>
                     <th>Consumo (L/100km)</th>
+                    <th>Piloto Asignado</th>
                     <th>Operaciones</th>
                 </tr>
                 </thead>
@@ -33,6 +34,8 @@
                     <td th:text="${coche.ersCurvaMedia}">ERS Curva Media</td>
                     <td th:text="${coche.ersCurvaRapida}">ERS Curva Rápida</td>
                     <td th:text="${coche.consumo}">Consumo</td>
+                    <td th:text="${coche.piloto.getDorsal()}">Piloto Asignado</td>
+
                     <td>
                         <div class="button-group">
                             <button class="button-accions button-accions-edit">Editar</button>

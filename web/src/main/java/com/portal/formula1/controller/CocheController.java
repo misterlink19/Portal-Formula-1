@@ -1,12 +1,10 @@
 package com.portal.formula1.controller;
 
 
-import com.portal.formula1.model.Coches;
-import com.portal.formula1.model.Equipo;
-import com.portal.formula1.model.Rol;
-import com.portal.formula1.model.UsuarioRegistrado;
+import com.portal.formula1.model.*;
 import com.portal.formula1.service.AutentificacionService;
 import com.portal.formula1.service.CocheService;
+import com.portal.formula1.service.PilotoService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
@@ -32,6 +30,8 @@ public class CocheController {
 
     @Autowired
     private AutentificacionService autentificacionService;
+    @Autowired
+    private PilotoService pilotoService;
 
     @GetMapping
     public ModelAndView mostrarMenuCoches(HttpServletRequest request) {
@@ -169,6 +169,83 @@ public class CocheController {
             mv.addObject("listaCoches", null);
         }
         mv.addObject("usuario", usuario);
+        return mv;
+    }
+
+    @GetMapping("asignar")
+    public ModelAndView asignarCoche(HttpSession session) {
+        logger.debug("Entrando a la asignacion de Coches");
+        UsuarioRegistrado usuario = (UsuarioRegistrado) session.getAttribute("usuario");
+
+        // Verificar si el usuario es JEFE DE EQUIPO
+        if (usuario == null || (usuario.getRol() != Rol.JEFE_DE_EQUIPO )) {
+            return new ModelAndView("error").addObject("mensajeError", "Acceso denegado.");
+        }
+        ModelAndView mv = new ModelAndView("coches/asignarCoches");
+
+        List<Coches> listaCoches = cocheService.listarCochesPorEquipoSinPiloto(usuario.getEquipo().getId());
+        List<Piloto> listaPilotos = pilotoService.listarPilotosPorEquipoSinCoche(usuario.getEquipo().getId());
+
+        if(!listaCoches.isEmpty()) {
+            mv.addObject("listaCoches", listaCoches);
+
+        }else{
+            mv.addObject("listaCoches", null);
+        }
+        if(!listaPilotos.isEmpty()) {
+            mv.addObject("listaPilotos", listaPilotos);
+
+        }else{
+            mv.addObject("listaPilotos", null);
+        }
+        mv.addObject("usuario", usuario);
+        return mv;
+    }
+
+    @PostMapping("/asignar")
+    public ModelAndView asignarCoche(@RequestParam("idPiloto") Integer idPiloto,
+                                     @RequestParam("idCoche") String idCoche,
+                                   RedirectAttributes redirectAttributes,
+                                   HttpServletRequest request) {
+        logger.debug("Entrando a asignacion de un coche");
+        ModelAndView mv = new ModelAndView("coches/asignarCoches");
+
+        // Obtener usuario de la sesión
+        UsuarioRegistrado user = (UsuarioRegistrado) request.getSession().getAttribute("usuario");
+        logger.debug("Usuario en sesión: {}", user);
+
+        // Verificar permisos del usuario
+        try {
+            user = autentificacionService.checkUser(user.getUsuario());
+            if (user.getRol() != Rol.JEFE_DE_EQUIPO) {
+                logger.debug("El usuario no tiene permisos para asignar un coche.");
+                mv.setViewName("error");
+                mv.addObject("mensajeError", "No tienes permiso para asignar un coche.");
+                return mv;
+            }
+        } catch (Exception e) {
+            logger.error("Error al autenticar al usuario: ", e);
+            mv.setViewName("error");
+            mv.addObject("mensajeError", "Error al autenticar al usuario.");
+            return mv;
+        }
+
+        if(idPiloto == null || idCoche == null) {
+            mv.setViewName("error");
+            mv.addObject("mensajeError", "Error al Asignar un coche.");
+            return mv;
+        }
+
+        if(!pilotoService.existeDorsal(idPiloto) && !cocheService.existeCocheByCodigo(idCoche)) {
+            mv.setViewName("error");
+            mv.addObject("mensajeError", "No existe el piloto o coche seleccionado.");
+            return mv;
+        }
+
+        pilotoService.asignarCoche(idPiloto, idCoche);
+        cocheService.asignarPiloto(idPiloto, idCoche);
+        redirectAttributes.addFlashAttribute("mensaje", "El coche ha sido asignado exitosamente.");
+        mv.setViewName("redirect:/coches");
         return mv;
     }
 }

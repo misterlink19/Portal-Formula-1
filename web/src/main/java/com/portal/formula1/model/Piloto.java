@@ -37,6 +37,9 @@ public class Piloto implements Serializable {
     @JoinColumn(name = "equipo")
     private Equipo equipo;
 
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_coche", unique = true)
+    private Coches coche;
     // Getters and Setters
 
     public void setDorsal(Integer dorsal) {
@@ -69,5 +72,13 @@ public class Piloto implements Serializable {
 
     public void setEquipo(Equipo equipo) {
         this.equipo = equipo;
+    }
+
+    public Coches getCoche() {
+        return coche;
+    }
+
+    public void setCoche(Coches coche) {
+        this.coche = coche;
     }
 }
