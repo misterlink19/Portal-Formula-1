@@ -120,16 +120,26 @@ public class CalendarioEventoControllerTests {
      */
     @Test
     public void testCrearEventoConError() throws Exception {
+        // Simular una excepción al guardar el evento
         doThrow(new RuntimeException("Error al guardar el evento")).when(calendarioEventoService).guardarEvento(any(CalendarioEvento.class));
+
+        // Mockear la lista de circuitos
+        List<Circuito> circuitos = new ArrayList<>();
+        circuitos.add(new Circuito());
+        when(circuitoService.listarCircuitos()).thenReturn(circuitos);
 
         mockMvc.perform(post("/calendario/crear")
                         .param("nombreEvento", "Evento Erróneo")
                         .param("fecha", LocalDate.now().toString())
                         .param("circuito.id", "1")
                         .session(session))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/calendario/crear"));
+                .andExpect(status().isOk())
+                .andExpect(view().name("calendario/crearEvento"))
+                .andExpect(model().attributeExists("evento"))
+                .andExpect(model().attributeExists("circuitos"))
+                .andExpect(model().attributeHasErrors("evento"));
     }
+
 
     /**
      * Verifica que se pueda eliminar un evento existente.
@@ -228,13 +238,21 @@ public class CalendarioEventoControllerTests {
      */
     @Test
     public void testCrearEventoConFechaInvalida() throws Exception {
+        // Mockear la lista de circuitos
+        List<Circuito> circuitos = new ArrayList<>();
+        circuitos.add(new Circuito());
+        when(circuitoService.listarCircuitos()).thenReturn(circuitos);
+
         mockMvc.perform(post("/calendario/crear")
                         .param("nombreEvento", "Evento Inválido")
                         .param("fecha", LocalDate.now().minusDays(1).toString())
                         .param("circuito.id", "1"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(flash().attributeExists("mensajeError"))
-                .andExpect(redirectedUrl("/calendario/crear"));
+                .andExpect(status().isOk())
+                .andExpect(view().name("calendario/crearEvento"))
+                .andExpect(model().attributeHasFieldErrors("evento", "fecha"))
+                .andExpect(model().attributeExists("evento"))
+                .andExpect(model().attributeExists("circuitos"));
     }
+
 
 }

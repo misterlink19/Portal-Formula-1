@@ -24,6 +24,12 @@ public class CalendarioEventoService {
 
     // Crea un evento
     public CalendarioEvento guardarEvento(CalendarioEvento evento) {
+        Optional<CalendarioEvento> eventoExistente = calendarioEventoDAO.findByNombreEventoAndFecha(
+                evento.getNombreEvento(), evento.getFecha());
+
+        if (eventoExistente.isPresent()) {
+            throw new IllegalArgumentException("Ya existe un evento con el mismo nombre en esa fecha.");
+        }
         return calendarioEventoDAO.save(evento);
     }
 
