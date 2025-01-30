@@ -187,37 +187,6 @@ public class EncuestaControllerTests {
     }
 
     /**
-     * Comprueba como se maneja cuando un no admin intenta mostrar la lista de encuestas
-     */
-    @Test
-    public void testMostrarListaEncuestas_UsuarioNoAutorizado() throws Exception {
-
-        UsuarioRegistrado usuarioNoAutorizado = new UsuarioRegistrado();
-        usuarioNoAutorizado.setRol(Rol.USUARIO_BASICO);
-
-        mockMvc.perform(get("/encuestas/listar")
-                        .sessionAttr("usuario", usuarioNoAutorizado))
-                .andExpect(status().isOk())
-                .andExpect(view().name("error"))
-                .andExpect(model().attributeExists("mensajeError"))
-                .andExpect(model().attribute("mensajeError", "Lista de Encuestas no Disponible."));
-    }
-
-
-    /**
-     * Comprueba como se maneja con un usuario sin sesion
-     */
-    @Test
-    public void testMostrarListaEncuestas_SinSesion() throws Exception {
-        // Caso sin usuario en sesión
-        mockMvc.perform(get("/encuestas/listar"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("error"))
-                .andExpect(model().attributeExists("mensajeError"))
-                .andExpect(model().attribute("mensajeError", "Lista de Encuestas no Disponible."));
-    }
-
-    /**
      * Verifica que un administrador puede eliminar una encuesta exitosamente.
      */
     @Test

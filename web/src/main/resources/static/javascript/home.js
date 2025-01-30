@@ -8,9 +8,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const calendar = new FullCalendar.Calendar(calendarioEl, {
         initialView: "dayGridMonth",
         locale: "es",
+        buttonText: {
+            today: 'Hoy'
+        },
         events: eventos,
-        height: 600, // Más alto para evitar scroll
-        contentHeight: 570, // Ajustar el contenido interno
+        height: 600,
+        contentHeight: 570,
         eventClick: function (info) {
             if (info.event.url) {
                 window.location.href = info.event.url;
