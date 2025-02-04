@@ -12,7 +12,7 @@ public class CircuitoService {
     @Autowired
     CircuitoDAO circuitoDAO;
 
-    public void crearCircuito(Circuito circuito) {
+    public void crearOActualizarCircuito(Circuito circuito) {
         circuitoDAO.save(circuito);
     }
 
