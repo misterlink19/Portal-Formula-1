@@ -171,4 +171,79 @@ public class CocheController {
         mv.addObject("usuario", usuario);
         return mv;
     }
+
+    @GetMapping("/editar/{codigo}")
+    public ModelAndView mostrarFormularioDeEdicionCoche(@PathVariable String codigo, HttpServletRequest request) {
+        logger.debug("Entrando a editar un coche");
+        ModelAndView mv = new ModelAndView("coches/editarCoche");
+        UsuarioRegistrado user = (UsuarioRegistrado) request.getSession().getAttribute("usuario");
+        try {
+            user = autentificacionService.checkUser(user.getUsuario());
+            if (user.getRol() != Rol.JEFE_DE_EQUIPO || user.getEquipo() == null) {
+                mv.setViewName("error");
+                mv.addObject("mensajeError", "No tienes permiso para acceder a esta sección.");
+                return mv;
+            }
+            Optional<Coches> cocheOpt = cocheService.obtnerCochePorCodigo(codigo);
+            if (cocheOpt.isPresent()) {
+                mv.addObject("coche", cocheOpt.get());
+            } else {
+                mv.setViewName("error");
+                mv.addObject("mensajeError", "Coche no encontrado.");
+            }
+        } catch (Exception e) {
+            logger.error("Error al cargar el formulario de edición de coches: ", e);
+            mv.setViewName("error");
+            mv.addObject("mensajeError", "Error al cargar el formulario de edición de coche.");
+        }
+        return mv;
+    }
+
+    @PostMapping("/editar")
+    public ModelAndView editarCoche(@Valid @ModelAttribute("coche") Coches coche,
+                                    BindingResult result,
+                                    RedirectAttributes redirectAttributes,
+                                    HttpServletRequest request) {
+        logger.debug("Entrando a editar un coche");
+        ModelAndView mv = new ModelAndView("coches/editarCoche");
+
+        // Obtener usuario de la sesión
+        UsuarioRegistrado user = (UsuarioRegistrado) request.getSession().getAttribute("usuario");
+        logger.debug("Usuario en sesión: {}", user);
+
+        // Verificar permisos del usuario
+        try {
+            user = autentificacionService.checkUser(user.getUsuario());
+            if (user.getRol() != Rol.JEFE_DE_EQUIPO) {
+                logger.debug("El usuario no tiene permisos para editar un coche.");
+                mv.setViewName("error");
+                mv.addObject("mensajeError", "No tienes permiso para editar un coche.");
+                return mv;
+            }
+        } catch (Exception e) {
+            logger.error("Error al autenticar al usuario: ", e);
+            mv.setViewName("error");
+            mv.addObject("mensajeError", "Error al autenticar al usuario.");
+            return mv;
+        }
+
+        // Validar formulario y otros errores
+        if (result.hasErrors()) {
+            mv.addObject("coche", coche);
+            return mv;
+        }
+
+        try {
+            coche.setEquipo(user.getEquipo());
+            cocheService.actualizarCoche(coche);
+            redirectAttributes.addFlashAttribute("mensaje", "El coche ha sido editado exitosamente.");
+            mv.setViewName("redirect:/coches");
+        } catch (Exception e) {
+            logger.error("Error al editar el coche: ", e);
+            mv.setViewName("error");
+            mv.addObject("mensajeError", "Error al editar el coche.");
+        }
+
+        return mv;
+    }
 }

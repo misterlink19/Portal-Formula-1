@@ -35,7 +35,7 @@
                     <td th:text="${coche.consumo}">Consumo</td>
                     <td>
                         <div class="button-group">
-                            <button class="button-accions button-accions-edit">Editar</button>
+                            <a th:href="@{/coches/editar/{codigo}(codigo=${coche.codigo})}" class="button-accions button-accions-edit">Editar</a>
                             <button class="button-accions button-accions-delete">Eliminar</button>
                         </div>
                     </td>
