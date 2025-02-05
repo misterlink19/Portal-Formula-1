@@ -125,7 +125,13 @@ public class InicioController {
             eventoJson.put("title", evento.getNombreEvento());
             eventoJson.put("start", evento.getFecha().toString()); // Formato ISO
             eventoJson.put("url", "/calendario/evento/" + evento.getId());
-            eventoJson.put("color", evento.getFecha().isAfter(LocalDate.now()) ? "blue" : "gray");
+            if (evento.getFecha().isBefore(LocalDate.now())) {
+                eventoJson.put("color", "gray"); // Eventos pasados
+            } else if (evento.getFecha().isEqual(LocalDate.now())) {
+                eventoJson.put("color", "red"); // Evento de hoy
+            } else {
+                eventoJson.put("color", "blue"); // Eventos futuros
+            }
             return eventoJson;
         }).toList();
 

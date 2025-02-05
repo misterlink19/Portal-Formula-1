@@ -1,6 +1,7 @@
 package com.portal.formula1;
 import com.portal.formula1.model.Piloto;
 import com.portal.formula1.repository.PilotoDAO;
+import com.portal.formula1.service.EncuestaService;
 import com.portal.formula1.service.PilotoService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,9 @@ public class PilotoServiceTests {
 
     @Mock
     private PilotoDAO pilotoDAO;
+
+    @Mock
+    private EncuestaService encuestaService;
 
     @InjectMocks
     private PilotoService pilotoService;
@@ -51,7 +55,12 @@ public class PilotoServiceTests {
      **/
     @Test
     public void testEliminarPiloto() {
-        doNothing().when(pilotoDAO).deleteById(anyInt());
+        Piloto piloto = new Piloto();
+        piloto.setDorsal(1);
+
+        when(pilotoDAO.findById(1)).thenReturn(Optional.of(piloto));
+        when(encuestaService.estaPilotoEnEncuestaActiva(1)).thenReturn(false);
+
         pilotoService.eliminarPiloto(1);
 
         verify(pilotoDAO, times(1)).deleteById(1);
@@ -119,10 +128,11 @@ public class PilotoServiceTests {
      **/
     @Test
     public void testEliminarPilotoNoExistente() {
-        doThrow(new NoSuchElementException()).when(pilotoDAO).deleteById(1);
+        when(pilotoDAO.findById(1)).thenReturn(Optional.empty());
         assertThrows(NoSuchElementException.class, () -> {
             pilotoService.eliminarPiloto(1);
         });
-        verify(pilotoDAO, times(1)).deleteById(1);
+        // Verificar que no se llamó a deleteById
+        verify(pilotoDAO, never()).deleteById(anyInt());
     }
 }
