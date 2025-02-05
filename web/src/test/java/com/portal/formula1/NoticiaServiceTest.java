@@ -12,6 +12,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -100,5 +101,44 @@ public class NoticiaServiceTest {
         assertNotNull(result);
         assertEquals(1, result.size());
         verify(noticiaDAO, times(1)).findByTituloContainingIgnoreCaseOrTextoContainingIgnoreCase("prueba", "prueba");
+    }
+
+    @Test
+    void testActualizarNoticia_WhenNoticiaIsEditable() {
+        // Arrange
+        Noticia noticiaExistente = new Noticia();
+        noticiaExistente.setId(1);
+        noticiaExistente.setFechaPublicacion(LocalDateTime.now().minusHours(12)); // Menos de 24h
+
+        when(noticiaDAO.findById(1)).thenReturn(Optional.of(noticiaExistente));
+
+        Noticia noticiaActualizada = new Noticia();
+        noticiaActualizada.setTitulo("Nuevo título");
+        noticiaActualizada.setTexto("Nuevo contenido");
+
+        // Act
+        noticiaService.actualizarNoticia(1, "Nuevo título", null, "Nuevo contenido");
+
+        // Assert
+        verify(noticiaDAO).save(noticiaExistente);
+        assertEquals("Nuevo título", noticiaExistente.getTitulo());
+        assertEquals("Nuevo contenido", noticiaExistente.getTexto());
+    }
+
+    @Test
+    void testActualizarNoticia_WhenNoticiaIsNotEditable() {
+        // Arrange
+        Noticia noticiaAntigua = new Noticia();
+        noticiaAntigua.setId(1);
+        noticiaAntigua.setFechaPublicacion(LocalDateTime.now().minusDays(2)); // Más de 24h
+
+        when(noticiaDAO.findById(1)).thenReturn(Optional.of(noticiaAntigua));
+
+        // Act & Assert
+        assertThrows(IllegalStateException.class, () -> {
+            noticiaService.actualizarNoticia(1, "Título", null, "Contenido");
+        });
+
+        verify(noticiaDAO, never()).save(any());
     }
 }
