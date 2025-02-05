@@ -12,7 +12,9 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.security.test.context.support.WithMockUser;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -106,4 +108,37 @@ public class NoticiaControllerTest {
         verify(noticiaService, times(1)).eliminarNoticia(noticiaId);
         verifyNoMoreInteractions(noticiaService);
     }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void testMostrarFormularioEdicion_WhenAdminAndEditable() throws Exception {
+        // Arrange
+        Noticia noticia = new Noticia();
+        noticia.setId(1);
+        noticia.setFechaPublicacion(LocalDateTime.now().minusHours(12));
+
+        when(noticiaService.obtenerNoticiaParaEdicion(1)).thenReturn(noticia);
+
+        // Act & Assert
+        mockMvc.perform(get("/noticias/editar/1"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("noticias/editar"))
+                .andExpect(model().attributeExists("noticia"));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void testMostrarFormularioEdicion_WhenNotEditable() throws Exception {
+        // Arrange
+        when(noticiaService.obtenerNoticiaParaEdicion(1))
+                .thenThrow(new IllegalStateException("No se puede editar"));
+
+        // Act & Assert
+        mockMvc.perform(get("/noticias/editar/1"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/noticias/listar"))
+                .andExpect(flash().attributeExists("error"));
+    }
+
+
 }

@@ -121,3 +121,8 @@ body {
     margin-top: -109px;
     margin-left: -50px;
 }
+
+.noticia-card .btn {
+    margin-top: 10px;
+    margin-right: 5px;
+}

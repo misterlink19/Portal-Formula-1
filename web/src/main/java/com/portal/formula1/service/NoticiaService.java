@@ -6,9 +6,11 @@ package com.portal.formula1.service;
 
 import com.portal.formula1.model.Noticia;
 import com.portal.formula1.repository.NoticiaDAO;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
 import java.text.Normalizer;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -77,7 +79,7 @@ public class NoticiaService {
     
     public Noticia obtenerNoticiaPorId(Integer id) {
         return noticiaDAO.findById(id)
-                .orElse(null);
+                .orElseThrow(() -> new EntityNotFoundException("Noticia no encontrada"));
     }
     
     @Transactional
@@ -90,7 +92,52 @@ public class NoticiaService {
     public List<Noticia> buscarNoticias(String query) {
         return noticiaDAO.findByTituloContainingIgnoreCaseOrTextoContainingIgnoreCase(query, query);
     }
-    
+
+    public Noticia obtenerNoticiaParaEdicion(Integer id) {
+        Noticia noticia = noticiaDAO.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Noticia no encontrada"));
+
+        // Validar si tiene más de 24 horas
+        if (noticia.getFechaPublicacion().isBefore(LocalDateTime.now().minusDays(1))) {
+            throw new IllegalStateException("No se puede editar una noticia con más de 24 horas de publicación");
+        }
+
+        return noticia;
+    }
+
+    @Transactional
+    public void actualizarNoticia(Integer id, String titulo, MultipartFile imagen, String texto) {
+        Noticia noticia = obtenerNoticiaParaEdicion(id); // Valida antigüedad
+
+        // Actualizar campos editables
+        noticia.setTitulo(titulo);
+        noticia.setTexto(texto);
+
+        // Manejo de imagen (similar al metodo de creación)
+        try {
+            if (imagen != null && !imagen.isEmpty()) {
+                String nombreImagen = imagenService.guardarImagen(imagen);
+                noticia.setImagen(nombreImagen);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Error al actualizar la imagen: " + e.getMessage());
+        }
+
+        noticiaDAO.save(noticia);
+    }
+
+
+    public class EntityNotFoundException extends RuntimeException {
+        public EntityNotFoundException(String message) {
+            super(message);
+        }
+    }
+
+    public class NoticiaNoEditableException extends RuntimeException {
+        public NoticiaNoEditableException(String message) {
+            super(message);
+        }
+    }
 
 
 

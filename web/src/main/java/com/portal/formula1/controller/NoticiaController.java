@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -142,10 +144,72 @@ public class NoticiaController {
         return mv;
     }
 
+    @GetMapping("/editar/{id}")
+    public String mostrarFormularioEdicion(@PathVariable Integer id,
+                                           Model model,
+                                           RedirectAttributes redirectAttributes) {
+        try {
+            // Valida si la noticia existe y es editable (menos de 24 horas)
+            Noticia noticia = noticiaService.obtenerNoticiaParaEdicion(id);
+
+            // Si pasa las validaciones, muestra el formulario
+            model.addAttribute("noticia", noticia);
+            return "noticias/editar";
+
+        } catch (NoticiaService.EntityNotFoundException e) {
+            redirectAttributes.addFlashAttribute("error", "Noticia no encontrada");
+            return "redirect:/noticias/listar";
+
+        } catch (IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/noticias/listar";
+        }
+    }
+
+    @PostMapping("/editar/{id}")
+    public String editarNoticia(
+            @PathVariable Integer id,
+            @Valid @ModelAttribute("noticia") Noticia noticiaActualizada,
+            BindingResult result,
+            @RequestParam("imagenArchivo") MultipartFile imagenArchivo,
+            RedirectAttributes redirectAttributes
+    ) {
+        if (result.hasErrors()) {
+            return "noticias/editar";
+        }
+
+        try {
+            noticiaService.actualizarNoticia(id, noticiaActualizada.getTitulo(), imagenArchivo, noticiaActualizada.getTexto());
+            redirectAttributes.addFlashAttribute("mensaje", "Noticia actualizada correctamente");
+            return "redirect:/noticias/listar";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/noticias/editar/" + id;
+        }
+    }
+
+
     @PostMapping("/{id}/eliminar")
     public ModelAndView eliminarNoticia(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
         noticiaService.eliminarNoticia(id);
         redirectAttributes.addFlashAttribute("mensaje", "La noticia ha sido eliminada correctamente.");
         return new ModelAndView("redirect:/noticias/listar");
     }
+
+    @ControllerAdvice
+    public class GlobalExceptionHandler {
+
+        @ExceptionHandler(IllegalStateException.class)
+        public String handleEdicionNoPermitida(IllegalStateException ex, RedirectAttributes redirectAttributes) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+            return "redirect:/noticias/listar";
+        }
+
+        @ExceptionHandler(NoticiaService.EntityNotFoundException.class)
+        public String handleNoticiaNoEncontrada(NoticiaService.EntityNotFoundException ex, RedirectAttributes redirectAttributes) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+            return "redirect:/noticias/listar";
+        }
+    }
+
 }
