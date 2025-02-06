@@ -1,19 +1,19 @@
 package com.portal.formula1.service;
 
 import com.portal.formula1.model.Encuesta;
+import com.portal.formula1.model.EncuestaArchivada;
 import com.portal.formula1.model.Voto;
+import com.portal.formula1.repository.EncuestaArchivadaDAO;
 import com.portal.formula1.repository.EncuestaDAO;
 import com.portal.formula1.repository.PilotoDAO;
 import com.portal.formula1.repository.VotoDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.List;
+
+import java.util.*;
 
 import org.springframework.transaction.annotation.Transactional;
 import java.util.stream.Collectors;
-import java.util.NoSuchElementException;
-import java.util.Map;
-import java.util.HashMap;
 
 /**
  *
@@ -30,6 +30,10 @@ public class VotoService {
 
     @Autowired
     private EncuestaDAO encuestaDAO;
+
+    @Autowired
+    private EncuestaArchivadaDAO encuestaArchivadaDAO;
+
     public Voto crearVoto(Voto voto) {
         return votoDAO.save(voto);
     }
@@ -45,28 +49,42 @@ public class VotoService {
 
     @Transactional(readOnly = true)
     public List<Object[]> getRankingVotacion(String permalink) {
-        Encuesta encuesta = encuestaDAO.findById(permalink).orElseThrow(() -> new NoSuchElementException("Encuesta no encontrada"));
+        Encuesta encuesta = encuestaDAO.findById(permalink).orElse(null);
+        EncuestaArchivada encuestaArchivada = encuestaArchivadaDAO.findByPermalink(permalink).orElse(null);
 
-        // Mapear votos por piloto utilizando String como clave porque el dorsal es un String
-        Map<String, Long> votosPorPiloto = votoDAO.findByEncuesta(encuesta).stream()
+        if (encuesta == null && encuestaArchivada == null) {
+            throw new NoSuchElementException("Encuesta no encontrada");
+        }
+
+        // Obtener los votos de la encuesta original (aunque esté archivada, sigue existiendo)
+        List<Voto> votos = votoDAO.findByEncuesta(encuesta);
+
+        // Mapear votos por piloto usando su dorsal como clave
+        Map<String, Long> votosPorPiloto = votos.stream()
                 .collect(Collectors.groupingBy(Voto::getOpcionSeleccionada, Collectors.counting()));
 
-        // Crear ranking basado en los pilotos y sus votos
-        List<Object[]> ranking = encuesta.getPilotos().stream()
-                .map(piloto -> new Object[]{
-                        piloto.getNombre(),
-                        piloto.getApellidos(),
-                        piloto.getSiglas(),
-                        piloto.getDorsal(),
-                        piloto.getRutaImagen(),
-                        piloto.getPais(),
-                        piloto.getTwitter(),
-                        votosPorPiloto.getOrDefault(piloto.getDorsal().toString(), 0L),
-                        piloto.getEquipo().getNombre()
-                })
-                .sorted((a, b) -> Long.compare((Long) b[7], (Long) a[7]))
-                .collect(Collectors.toList());
+        // Determinar la lista de pilotos desde EncuestaArchivada
+        List<Object[]> ranking;
 
+        if (encuestaArchivada != null) {
+            // Usar los pilotos archivados para reconstruir el ranking
+            ranking = encuestaArchivada.getPilotosArchivados().stream()
+                    .map(piloto -> new Object[]{
+                            piloto.getNombre(),
+                            piloto.getApellidos(),
+                            piloto.getSiglas(),
+                            piloto.getDorsal(),
+                            piloto.getRutaImagen(),
+                            piloto.getPais(),
+                            piloto.getTwitter(),
+                            votosPorPiloto.getOrDefault(piloto.getDorsal().toString(), 0L), // Asignar votos por dorsal
+                            piloto.getEquipo()
+                    })
+                    .sorted((a, b) -> Long.compare((Long) b[7], (Long) a[7])) // Ordenar por votos
+                    .collect(Collectors.toList());
+        } else {
+            ranking = Collections.emptyList();
+        }
         return ranking;
     }
 }

@@ -127,6 +127,7 @@ public class EncuestaController {
 
         ModelAndView mv = new ModelAndView();
         // Obtener todas las encuestas
+        encuestaService.archivarEncuestasExpiradas();
         List<Encuesta> encuestas = encuestaService.getAllEncuestas();
 
         // Configurar la vista y pasar los datos

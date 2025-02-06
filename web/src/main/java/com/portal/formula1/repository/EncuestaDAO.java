@@ -34,4 +34,6 @@ public interface EncuestaDAO extends JpaRepository<Encuesta, String>{
      * Encuentra todas las encuestas activas cuya fecha de finalización es posterior a la fecha actual.
      */
     List<Encuesta> findByFechaLimiteAfter(LocalDateTime fechaLimite);
+
+    List<Encuesta> findByFechaLimiteBefore(LocalDateTime now);
 }

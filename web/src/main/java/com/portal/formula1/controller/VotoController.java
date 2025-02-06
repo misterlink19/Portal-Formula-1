@@ -1,8 +1,6 @@
 package com.portal.formula1.controller;
 
-import com.portal.formula1.model.Encuesta;
-import com.portal.formula1.model.Piloto;
-import com.portal.formula1.model.Voto;
+import com.portal.formula1.model.*;
 import com.portal.formula1.service.EncuestaService;
 import com.portal.formula1.service.VotoService;
 import org.slf4j.Logger;
@@ -98,18 +96,25 @@ public class VotoController {
     public ModelAndView mostrarResultados(@PathVariable String permalink) {
         logger.debug("Entrando a mostrarResultados con permalink: {}", permalink);
         ModelAndView mv = new ModelAndView("votos/resultadosEncuesta");
+
         try {
-            Encuesta encuesta = encuestaService.obtenerEncuestaPorPermalink(permalink);
-            List<Object[]> ranking = votoService.getRankingVotacion(permalink); // Corrección aquí
-            mv.addObject("encuesta", encuesta);
+            EncuestaArchivada encuestaArchivada = encuestaService.obtenerEncuestaArchivadaPorPermalink(permalink);
+            List<PilotoArchivado> pilotosArchivados = encuestaArchivada.getPilotosArchivados();
+            List<Object[]> ranking = votoService.getRankingVotacion(permalink);
+
+            mv.addObject("encuestaArchivada", encuestaArchivada);
+            mv.addObject("pilotosArchivados", pilotosArchivados);
             mv.addObject("ranking", ranking);
         } catch (NoSuchElementException e) {
             logger.error("Encuesta no encontrada con permalink: {}", permalink);
             mv.setViewName("error");
             mv.addObject("mensajeError", "Encuesta no encontrada.");
         }
+
         return mv;
     }
+
+
 
 
 }

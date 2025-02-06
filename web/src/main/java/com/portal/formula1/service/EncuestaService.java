@@ -5,8 +5,12 @@
 package com.portal.formula1.service;
 
 import com.portal.formula1.model.Encuesta;
+import com.portal.formula1.model.EncuestaArchivada;
 import com.portal.formula1.model.Piloto;
+import com.portal.formula1.model.PilotoArchivado;
+import com.portal.formula1.repository.EncuestaArchivadaDAO;
 import com.portal.formula1.repository.EncuestaDAO;
+import com.portal.formula1.repository.PilotoArchivadoDAO;
 import com.portal.formula1.repository.PilotoDAO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -26,6 +30,12 @@ public class EncuestaService {
 
     @Autowired
     private EncuestaDAO encuestaDAO;
+
+    @Autowired
+    private EncuestaArchivadaDAO encuestaArchivadaDAO;
+
+    @Autowired
+    private PilotoArchivadoDAO pilotoArchivadoDAO;
 
     @Autowired
     private PilotoDAO pilotoDAO;
@@ -72,6 +82,27 @@ public class EncuestaService {
             }
         }
         return false;
+    }
+
+    public void archivarEncuestasExpiradas() {
+        List<Encuesta> encuestasExpiradas = encuestaDAO.findByFechaLimiteBefore(LocalDateTime.now());
+        for (Encuesta encuesta : encuestasExpiradas) {
+            if (!encuestaArchivadaDAO.existsByPermalink(encuesta.getPermalink())) { // Verificar si ya existe la encuesta archivada
+                EncuestaArchivada archivada = new EncuestaArchivada(encuesta);
+
+                // Guardar cada piloto archivado
+                for (PilotoArchivado pilotoArchivado : archivada.getPilotosArchivados()) {
+                    pilotoArchivadoDAO.save(pilotoArchivado);
+                }
+                encuestaArchivadaDAO.save(archivada);
+                encuesta.setPilotos(new HashSet<>()); // Limpiar la relación con los pilotos
+                encuestaDAO.save(encuesta);
+            }
+        }
+    }
+    public EncuestaArchivada obtenerEncuestaArchivadaPorPermalink(String permalink) {
+        Optional<EncuestaArchivada> encuestaOptional = encuestaArchivadaDAO.findByPermalink(permalink);
+        return encuestaOptional.orElseThrow(() -> new NoSuchElementException("Encuesta no encontrada con permalink: " + permalink));
     }
 
 }

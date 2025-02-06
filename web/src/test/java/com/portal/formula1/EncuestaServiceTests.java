@@ -4,9 +4,10 @@
  */
 package com.portal.formula1;
 
-import com.portal.formula1.model.Encuesta;
-import com.portal.formula1.model.Piloto;
+import com.portal.formula1.model.*;
+import com.portal.formula1.repository.EncuestaArchivadaDAO;
 import com.portal.formula1.repository.EncuestaDAO;
+import com.portal.formula1.repository.PilotoArchivadoDAO;
 import com.portal.formula1.repository.PilotoDAO;
 import com.portal.formula1.service.EncuestaService;
 import jakarta.persistence.EntityManager;
@@ -36,9 +37,14 @@ public class EncuestaServiceTests {
     @Mock
     private EncuestaDAO encuestaDAO;
 
+    @Mock
+    private EncuestaArchivadaDAO encuestaArchivadaDAO;
 
     @Mock
     private PilotoDAO pilotoDAO;
+
+    @Mock
+    private PilotoArchivadoDAO pilotoArchivadoDAO;
 
     @InjectMocks
     private EncuestaService encuestaService;
@@ -205,5 +211,77 @@ public class EncuestaServiceTests {
         when(encuestaDAO.findById(permalink)).thenReturn(Optional.empty());
         assertThrows(NoSuchElementException.class, () -> encuestaService.obtenerEncuestaPorPermalink(permalink));
     }
+
+    @Test
+    /**
+     * Probar que se eliminan las encuestas por permalink
+     */
+    public void testEliminarEncuesta() {
+        Encuesta encuesta = new Encuesta("Título 1", "Descripción 1", LocalDateTime.now(), LocalDateTime.now().plusDays(1));
+        String permalink = encuesta.getPermalink();
+        when(encuestaDAO.findById(permalink)).thenReturn(Optional.of(encuesta));
+
+        encuestaService.eliminarEncuesta(permalink);
+
+        verify(encuestaDAO, times(1)).delete(encuesta);
+    }
+
+    @Test
+    /**
+     * Test para verificar si un piloto está
+     * en una encuesta activa
+     */
+    public void testEstaPilotoEnEncuestaActiva() {
+        Piloto piloto = new Piloto();
+        piloto.setDorsal(44);
+        Encuesta encuesta = new Encuesta("Título 1", "Descripción 1", LocalDateTime.now().minusDays(1), LocalDateTime.now().plusDays(1));
+        encuesta.setPilotos(new HashSet<>(Collections.singletonList(piloto)));
+        when(encuestaDAO.findByFechaLimiteAfter(any(LocalDateTime.class))).thenReturn(Collections.singletonList(encuesta));
+
+        boolean result = encuestaService.estaPilotoEnEncuestaActiva(44);
+
+        assertTrue(result);
+    }
+    @Test
+    /**
+     * Test para archivar encuestas expiradas
+     */
+    public void testArchivarEncuestasExpiradas() {
+        Encuesta encuesta = new Encuesta("Título 1", "Descripción 1", LocalDateTime.now().minusDays(2), LocalDateTime.now().minusDays(1));
+        encuesta.setPermalink("test-permalink");
+
+        Piloto piloto = new Piloto();
+        piloto.setDorsal(44);
+        Equipo equipo = new Equipo();
+        equipo.setNombre("Equipo 1");
+        piloto.setEquipo(equipo);
+
+        encuesta.setPilotos(new HashSet<>(Collections.singletonList(piloto)));
+
+        when(encuestaDAO.findByFechaLimiteBefore(any(LocalDateTime.class))).thenReturn(Collections.singletonList(encuesta));
+        when(encuestaArchivadaDAO.existsByPermalink("test-permalink")).thenReturn(false);
+
+        encuestaService.archivarEncuestasExpiradas();
+
+        verify(encuestaArchivadaDAO, times(1)).save(any(EncuestaArchivada.class));
+        verify(pilotoArchivadoDAO, times(1)).save(any(PilotoArchivado.class));
+        verify(encuestaDAO, times(1)).save(encuesta); // Verifica que la encuesta actualizada se guarda
+    }
+
+
+    @Test
+    /**
+     * Test para obtener una encuesta archivada por permalink:
+     */
+    public void testObtenerEncuestaArchivadaPorPermalink() {
+        EncuestaArchivada encuestaArchivada = new EncuestaArchivada();
+        encuestaArchivada.setPermalink("test-permalink");
+        when(encuestaArchivadaDAO.findByPermalink("test-permalink")).thenReturn(Optional.of(encuestaArchivada));
+
+        EncuestaArchivada result = encuestaService.obtenerEncuestaArchivadaPorPermalink("test-permalink");
+
+        assertEquals("test-permalink", result.getPermalink());
+    }
+
 
 }

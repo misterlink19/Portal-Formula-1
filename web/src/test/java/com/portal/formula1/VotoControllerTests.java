@@ -1,9 +1,7 @@
 package com.portal.formula1;
 
 import com.portal.formula1.controller.VotoController;
-import com.portal.formula1.model.Encuesta;
-import com.portal.formula1.model.Piloto;
-import com.portal.formula1.model.Voto;
+import com.portal.formula1.model.*;
 import com.portal.formula1.service.EncuestaService;
 import com.portal.formula1.service.VotoService;
 import org.junit.jupiter.api.BeforeEach;
@@ -129,33 +127,33 @@ public class VotoControllerTests {
      */
     @Test
     public void testMostrarResultados_EncuestaEncontrada() throws Exception {
-        // Mock para una encuesta encontrada
-        Encuesta encuesta = new Encuesta();
-        encuesta.setTitulo("Test Encuesta");
-        encuesta.setDescripcion("Descripción de prueba");
+        // Mock para una encuesta archivada encontrada
+        EncuestaArchivada encuestaArchivada = new EncuestaArchivada();
+        encuestaArchivada.setPermalink("test-permalink");
+        PilotoArchivado pilotoArchivado = new PilotoArchivado();
+        pilotoArchivado.setDorsal(44);
+        pilotoArchivado.setNombre("Lewis");
+        encuestaArchivada.setPilotosArchivados(Collections.singletonList(pilotoArchivado));
 
         // Mock para el ranking de votación
         List<Object[]> ranking = new ArrayList<>();
         ranking.add(new Object[]{"Lewis", "Hamilton", "HAM", 44, "/img/hamilton.jpg", "Reino Unido", "@LewisHamilton", 10L, "Mercedes"});
-        ranking.add(new Object[]{"Max", "Verstappen", "VER", 33, "/img/verstappen.jpg", "Países Bajos", "@Max33Verstappen", 8L, "Red Bull Racing"});
 
         // Configuración de los mocks
-        when(encuestaService.obtenerEncuestaPorPermalink("test-permalink")).thenReturn(encuesta);
+        when(encuestaService.obtenerEncuestaArchivadaPorPermalink("test-permalink")).thenReturn(encuestaArchivada);
         when(votoService.getRankingVotacion("test-permalink")).thenReturn(ranking);
 
         // Ejecución del test
         mockMvc.perform(get("/votos/test-permalink/resultados"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("votos/resultadosEncuesta"))
-                .andExpect(model().attributeExists("encuesta"))
-                .andExpect(model().attribute("encuesta", encuesta))
+                .andExpect(model().attributeExists("encuestaArchivada"))
+                .andExpect(model().attribute("encuestaArchivada", encuestaArchivada))
+                .andExpect(model().attributeExists("pilotosArchivados"))
+                .andExpect(model().attribute("pilotosArchivados", encuestaArchivada.getPilotosArchivados()))
                 .andExpect(model().attributeExists("ranking"))
                 .andExpect(model().attribute("ranking", ranking));
     }
-
-
-
-
     /**
      *
      * Prueba como se maneja cuando no se encuentra la encuesta de la que se busca el resultado.
@@ -163,7 +161,7 @@ public class VotoControllerTests {
     @Test
     public void testMostrarResultados_EncuestaNoEncontrada() throws Exception {
         // Mock para una encuesta no encontrada
-        when(encuestaService.obtenerEncuestaPorPermalink("test-permalink")).thenThrow(new NoSuchElementException());
+        when(encuestaService.obtenerEncuestaArchivadaPorPermalink("test-permalink")).thenThrow(new NoSuchElementException());
 
         // Ejecución del test
         mockMvc.perform(get("/votos/test-permalink/resultados"))
@@ -172,4 +170,6 @@ public class VotoControllerTests {
                 .andExpect(model().attributeExists("mensajeError"))
                 .andExpect(model().attribute("mensajeError", "Encuesta no encontrada."));
     }
+
+
 }

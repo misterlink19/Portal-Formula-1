@@ -59,9 +59,6 @@
                 <a class="nav-link" th:href="@{/admin/usuarios}">Gestionar Usuarios</a>
             </li>
             <li class="nav-item" th:if="${session.usuario != null} and ${session.usuario.rol == T(com.portal.formula1.model.Rol).ADMIN}">
-                <a class="nav-link" th:href="@{/admin/usuarios}">Gestionar Usuarios</a>
-            </li>
-            <li class="nav-item" th:if="${session.usuario != null} and ${session.usuario.rol == T(com.portal.formula1.model.Rol).ADMIN}">
                 <a class="nav-link" th:href="@{/calendario/gestion}">Gestionar eventos</a>
             </li>
 

@@ -5,6 +5,7 @@
 package com.portal.formula1.repository;
 
 import com.portal.formula1.model.Encuesta;
+import com.portal.formula1.model.EncuestaArchivada;
 import com.portal.formula1.model.Voto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
