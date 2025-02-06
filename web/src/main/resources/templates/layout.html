@@ -75,6 +75,9 @@
             <li class="nav-item" th:if="${session.usuario != null} and ${session.usuario.rol == T(com.portal.formula1.model.Rol).JEFE_DE_EQUIPO}">
                 <a class="nav-link" th:href="@{/coches}">Gestionar Coches</a>
             </li>
+            <li class="nav-item" th:if="${session.usuario != null} and ${session.usuario.rol == T(com.portal.formula1.model.Rol).JEFE_DE_EQUIPO}">
+                <a class="nav-link" th:href="@{/simulacion}">Herramientas de Simulacion</a>
+            </li>
         </ul>
 
         <!-- Opciones de usuario a la derecha -->

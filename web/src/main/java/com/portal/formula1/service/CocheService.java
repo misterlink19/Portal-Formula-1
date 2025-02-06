@@ -28,6 +28,10 @@ public class CocheService {
         return cocheDAO.findCocheByEquipo_IdAndPilotoIsNull(idEquipo);
     }
 
+    public Coches obtenerCocheByCodigo(String idCoche){
+        return cocheDAO.findCocheByCodigo(idCoche);
+    }
+
     public boolean existeCocheByCodigo(String codigo) {
         return cocheDAO.existsCocheByCodigo(codigo);
     }
