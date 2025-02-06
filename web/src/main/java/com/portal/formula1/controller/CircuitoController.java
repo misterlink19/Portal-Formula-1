@@ -25,13 +25,12 @@ public class CircuitoController {
 
     @GetMapping()
     public String mostrarFormulario() {
-        return "circuitos/crearCircuito"; // Vista del formulario HTML
+        return "circuitos/crearCircuito";
     }
 
     @PostMapping
     public String registrarCircuito(Circuito circuito, @RequestParam("trazadoImg") MultipartFile trazado, Model model) {
         try {
-            // Guardar la imagen del trazado
             if (!trazado.isEmpty()) {
                 String fileName = System.currentTimeMillis() + "_" + trazado.getOriginalFilename();
                 Path rutaArchivo = Paths.get("src/main/resources/static/uploads/circuitos").resolve(fileName).toAbsolutePath();
@@ -39,7 +38,7 @@ public class CircuitoController {
                 circuito.setTrazado(fileName);
             }
 
-            circuitoService.crearCircuito(circuito);
+            circuitoService.crearOActualizarCircuito(circuito);
 
             model.addAttribute("mensaje", "Circuito registrado exitosamente!");
             return "circuitos/crearCircuito";
@@ -48,6 +47,32 @@ public class CircuitoController {
             return "circuitos/crearCircuito";
         }
     }
+    @GetMapping("/editar/{id}")
+    public String mostrarFormularioEditar(@PathVariable Long id, Model model) {
+        Circuito circuito = circuitoService.obtenerCircuitoPorId(id);
+        model.addAttribute("circuito", circuito);
+        return "circuitos/editarCircuito";
+    }
+    @PostMapping("/editar")
+    public String editarCircuito(Circuito circuito, @RequestParam("trazadoImg") MultipartFile trazado, Model model) {
+        try {
+            if (!trazado.isEmpty()) {
+                String fileName = System.currentTimeMillis() + "_" + trazado.getOriginalFilename();
+                Path rutaArchivo = Paths.get("src/main/resources/static/uploads/circuitos").resolve(fileName).toAbsolutePath();
+                Files.copy(trazado.getInputStream(), rutaArchivo, StandardCopyOption.REPLACE_EXISTING);
+                circuito.setTrazado(fileName);
+            }
+
+            circuitoService.crearOActualizarCircuito(circuito);
+
+            model.addAttribute("mensaje", "Circuito editado exitosamente!");
+            return "circuitos/editarCircuito";
+        } catch (IOException e) {
+            model.addAttribute("error", "Hubo un error al guardar el trazado.");
+            return "circuitos/editarCircuito";
+        }
+    }
+
     @GetMapping("/{id}")
     public String mostrarCircuito(@PathVariable Long id, Model model) {
         Circuito circuito = circuitoService.obtenerCircuitoPorId(id);

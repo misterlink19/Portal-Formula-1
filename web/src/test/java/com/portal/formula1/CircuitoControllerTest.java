@@ -62,7 +62,7 @@ public class CircuitoControllerTest {
 
         String viewName = circuitoController.registrarCircuito(circuito, mockFile, model);
 
-        verify(circuitoService, times(1)).crearCircuito(circuito);
+        verify(circuitoService, times(1)).crearOActualizarCircuito(circuito);
         verify(model, times(1)).addAttribute(eq("mensaje"), anyString());
 
         assertEquals("circuitos/crearCircuito", viewName, "La vista no coincide");
@@ -77,7 +77,7 @@ public class CircuitoControllerTest {
 
         String viewName = circuitoController.registrarCircuito(circuito, mockFile, model);
 
-        verify(circuitoService, times(1)).crearCircuito(circuito);
+        verify(circuitoService, times(1)).crearOActualizarCircuito(circuito);
         assertEquals(null, circuito.getTrazado(), "El trazado debe ser null si no hay archivo");
 
         verify(model, times(1)).addAttribute(eq("mensaje"), eq("Circuito registrado exitosamente!"));
