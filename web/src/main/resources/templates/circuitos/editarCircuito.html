@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editar Circuito</title>
+</head>
+<body layout:fragment="body" class="bg-light">
+<div class="container py-5">
+  <h1 class="text-center mb-4">Editar Circuito</h1>
+
+  <!-- Mensaje de éxito -->
+  <div th:if="${mensaje}" class="alert alert-success text-center" role="alert">
+    <p th:text="${mensaje}"></p>
+  </div>
+
+  <!-- Mensaje de error -->
+  <div th:if="${error}" class="alert alert-danger text-center" role="alert">
+    <p th:text="${error}"></p>
+  </div>
+
+  <form action="/admin/circuitos/editar" method="POST" enctype="multipart/form-data" class="p-4 border bg-white rounded shadow">
+    <input type="hidden" name="id" th:value="${circuito.getId()}" />
+
+    <div class="mb-3">
+      <label for="nombre" class="form-label">Nombre del Circuito:</label>
+      <input type="text" id="nombre" name="nombre" class="form-control" required aria-required="true"
+             th:value="${circuito.getNombre()}" placeholder="Ejemplo: Circuito de Mónaco" />
+    </div>
+    <div class="mb-3">
+      <label for="ciudad" class="form-label">Ciudad:</label>
+      <input type="text" id="ciudad" name="ciudad" class="form-control" required aria-required="true"
+             th:value="${circuito.getCiudad()}" placeholder="Ejemplo: Mónaco" />
+    </div>
+    <div class="mb-3">
+      <label for="pais" class="form-label">País:</label>
+      <input type="text" id="pais" name="pais" class="form-control" required aria-required="true"
+             th:value="${circuito.getPais()}" placeholder="Ejemplo: Francia" />
+    </div>
+    <div class="mb-3">
+      <label for="trazadoImg" class="form-label">Trazado (imagen):</label>
+      <input type="file" id="trazadoImg" name="trazadoImg" class="form-control" accept="image/*" aria-required="true" />
+      <div th:if="${circuito.getTrazado()}" class="mt-2">
+        <p>Imagen actual:</p>
+        <img th:src="@{/uploads/circuitos/{filename}(filename=${circuito.getTrazado()})}" alt="Trazado" class="img-thumbnail" style="max-width: 200px;" />
+      </div>
+    </div>
+    <div class="mb-3">
+      <label for="numeroVueltas" class="form-label">Número de Vueltas:</label>
+      <input type="number" id="numeroVueltas" name="numeroVueltas" class="form-control" min="1" required aria-required="true"
+             th:value="${circuito.getNumeroVueltas()}" />
+    </div>
+    <div class="mb-3">
+      <label for="longitud" class="form-label">Longitud (en metros):</label>
+      <input type="number" id="longitud" name="longitud" class="form-control" min="1" step="0.01" required aria-required="true"
+             th:value="${circuito.getLongitud()}" />
+    </div>
+    <div class="mb-3">
+      <label for="numeroCurvasLentas" class="form-label">Número de Curvas Lentas:</label>
+      <input type="number" id="numeroCurvasLentas" name="numeroCurvasLentas" class="form-control" min="0" required aria-required="true"
+             th:value="${circuito.getNumeroCurvasLentas()}" />
+    </div>
+    <div class="mb-3">
+      <label for="numeroCurvasMedia" class="form-label">Número de Curvas Medias:</label>
+      <input type="number" id="numeroCurvasMedia" name="numeroCurvasMedia" class="form-control" min="0" required aria-required="true"
+             th:value="${circuito.getNumeroCurvasMedia()}" />
+    </div>
+    <div class="mb-3">
+      <label for="numeroCurvasRapidas" class="form-label">Número de Curvas Rápidas:</label>
+      <input type="number" id="numeroCurvasRapidas" name="numeroCurvasRapidas" class="form-control" min="0" required aria-required="true"
+             th:value="${circuito.getNumeroCurvasRapidas()}" />
+    </div>
+    <div class="text-center">
+      <button type="submit" class="btn btn-primary w-100">Guardar Cambios</button>
+    </div>
+  </form>
+</div>
+</body>
+</html>
