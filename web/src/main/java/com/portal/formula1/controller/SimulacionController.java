@@ -24,7 +24,8 @@ public class SimulacionController {
 
     @Autowired
     private CocheService cocheService;
-
+    @Autowired
+    private ConsultaERSService consultaERSService;
     @Autowired
     private AutentificacionService autentificacionService;
     @Autowired
@@ -148,6 +149,111 @@ public class SimulacionController {
         try {
             // Guardar la consulta en la base de datos
             consultaCombustibleService.guardarConsulta(consultaCombustible);
+            redirectAttributes.addFlashAttribute("mensaje", "Consulta guardada con éxito");
+            mv.setViewName("redirect:/simulacion");
+        } catch (Exception e) {
+            logger.error("Error al guardar la consulta: ", e);
+            mv.setViewName("error");
+            mv.addObject("mensajeError", "Hubo un problema al guardar la consulta. Intente nuevamente más tarde.");
+        }
+
+        return mv;
+    }
+
+    @GetMapping("ERS")
+    public ModelAndView calculoERS(HttpSession session) {
+        logger.debug("Entrando a la herramienta de Calculo de Recuperacion de Energia");
+        UsuarioRegistrado usuario = (UsuarioRegistrado) session.getAttribute("usuario");
+
+        // Verificar si el usuario es JEFE DE EQUIPO
+        if (usuario == null || (usuario.getRol() != Rol.JEFE_DE_EQUIPO )) {
+            return new ModelAndView("error").addObject("mensajeError", "Acceso denegado.");
+        }
+        ModelAndView mv = new ModelAndView("simulacion/ERS");
+
+        List<Coches> listaCoches = cocheService.listarCochesPorEquipos(usuario.getEquipo().getId());
+        List<Circuito> listaCircuito = circuitoService.listarCircuitos();
+        mv.addObject("equipo", usuario.getEquipo());
+        if(!listaCoches.isEmpty()) {
+            mv.addObject("listaCoches", listaCoches);
+
+        }else{
+            mv.addObject("listaCoches", null);
+        }
+        if(!listaCircuito.isEmpty()) {
+            mv.addObject("listaCircuito", listaCircuito);
+
+        }else{
+            mv.addObject("listaCircuito", null);
+        }
+        mv.addObject("consultaERS", new ConsultaERS());
+        mv.addObject("usuario", usuario);
+        return mv;
+    }
+
+    @PostMapping("/ERS")
+    public ModelAndView guardarSimulacionERS(@RequestParam("idCircuito") Long idCircuito,
+                                        @RequestParam("idCoche") String idCoche,
+                                        @Valid @ModelAttribute("consultaERS") ConsultaERS consultaERS,
+                                        BindingResult result,
+                                        RedirectAttributes redirectAttributes,
+                                        HttpServletRequest request) {
+        logger.debug("Entrando a guardar consulta");
+        ModelAndView mv = new ModelAndView("simulacion/ERS");
+
+        // Obtener usuario de la sesión
+        UsuarioRegistrado user = (UsuarioRegistrado) request.getSession().getAttribute("usuario");
+        if (user == null) {
+            logger.error("No hay usuario en sesión.");
+            mv.setViewName("error");
+            mv.addObject("mensajeError", "No hay usuario en sesión.");
+            return mv;
+        }
+
+        logger.debug("Usuario en sesión: {}", user);
+
+        // Verificar permisos del usuario
+        try {
+            user = autentificacionService.checkUser(user.getUsuario());
+            if (user.getRol() != Rol.JEFE_DE_EQUIPO) {
+                logger.debug("El usuario no tiene permisos para esta acción.");
+                mv.setViewName("error");
+                mv.addObject("mensajeError", "No tienes permiso para realizar esta acción.");
+                return mv;
+            }
+        } catch (Exception e) {
+            logger.error("Error al autenticar al usuario: ", e);
+            mv.setViewName("error");
+            mv.addObject("mensajeError", "Error al autenticar al usuario.");
+            return mv;
+        }
+
+        // Convertir IDs en objetos reales de la base de datos
+        Circuito circuito = circuitoService.obtenerCircuitoPorId(idCircuito);
+        Coches coche = cocheService.obtenerCocheByCodigo(idCoche);
+
+        if (circuito == null) {
+            result.rejectValue("circuito", "error.circuito", "Debe seleccionar un circuito válido.");
+        }
+        if (coche == null) {
+            result.rejectValue("coche", "error.coche", "Debe seleccionar un coche válido.");
+        }
+
+        // Verificar si hay errores en el formulario
+        if (result.hasErrors()) {
+            logger.error("Errores en el formulario: {}", result.getAllErrors());
+            mv.addObject("consultaERS", consultaERS);
+            return mv;
+        }
+
+        // Asignar los objetos a la entidad antes de guardarla
+        consultaERS.setCircuito(circuito);
+        consultaERS.setCoche(coche);
+        consultaERS.setEquipo(user.getEquipo());
+
+        try {
+            // Guardar la consulta en la base de datos
+            consultaERSService.guardarConsultaERS(consultaERS);
             redirectAttributes.addFlashAttribute("mensaje", "Consulta guardada con éxito");
             mv.setViewName("redirect:/simulacion");
         } catch (Exception e) {
