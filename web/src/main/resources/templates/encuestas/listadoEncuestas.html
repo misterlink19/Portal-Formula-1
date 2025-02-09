@@ -68,7 +68,10 @@
                                 th:text="'Ver Resultados'"
                                 th:attr="onclick= 'location.href=\'/votos/' + ${encuesta.permalink} + '/resultados'+ '\''">
                         </button>
-
+                        <button th:unless="${encuesta.fechaLimite < #temporals.createNow()}"
+                                th:text="'Editar'"
+                                th:attr="onclick= 'location.href=\'/encuestas/editarEncuesta/' + ${encuesta.permalink} + '\''">
+                        </button>
                         <!-- Botón de eliminación solo visible para administradores -->
                         <form th:if="${session.usuario != null and session.usuario.rol == T(com.portal.formula1.model.Rol).ADMIN}"
                               th:action="@{/encuestas/eliminar/{permalink}(permalink=${encuesta.permalink})}" method="post"
