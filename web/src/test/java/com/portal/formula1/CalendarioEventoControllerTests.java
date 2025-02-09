@@ -253,8 +253,9 @@ public class CalendarioEventoControllerTests {
                 .andExpect(model().attributeExists("evento"))
                 .andExpect(model().attributeExists("circuitos"));
     }
-
-    // Nuevo Test: Mostrar el formulario de edición de un evento
+    /**
+     * Verifica que se muestre el formulario de edición de un evento.
+     */
     @Test
     public void testMostrarFormularioEditarEvento() throws Exception {
         Circuito circuito = new Circuito();
@@ -272,8 +273,9 @@ public class CalendarioEventoControllerTests {
                 .andExpect(model().attributeExists("evento"))
                 .andExpect(model().attributeExists("circuitos"));
     }
-
-    // Nuevo Test: Editar un evento con datos válidos
+    /**
+     * Verifica que se puede editar un evento con datos válidos.
+     */
     @Test
     public void testEditarEvento() throws Exception {
         CalendarioEvento eventoExistente = new CalendarioEvento(1L, "Evento Existente", LocalDate.now().plusDays(1), new Circuito());
@@ -288,8 +290,9 @@ public class CalendarioEventoControllerTests {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/calendario/gestion"));
     }
-
-    // Nuevo Test: Editar un evento con datos inválidos (fecha pasada)
+    /**
+     * Verifica que no se puede editar un evento con datos inválidos.
+     */
     @Test
     public void testEditarEventoConFechaInvalida() throws Exception {
         List<Circuito> circuitos = new ArrayList<>();
@@ -308,8 +311,9 @@ public class CalendarioEventoControllerTests {
                 .andExpect(model().attributeExists("evento"))
                 .andExpect(model().attributeExists("circuitos"));
     }
-
-    // Nuevo Test: Editar un evento inexistente
+    /**
+     * Verifica que no se puede editar un evento que no existe.
+     */
     @Test
     public void testEditarEventoNoExistente() throws Exception {
         when(calendarioEventoService.editarEvento(anyLong(), any(CalendarioEvento.class)))
