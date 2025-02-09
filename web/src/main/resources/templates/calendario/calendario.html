@@ -45,8 +45,9 @@
                     <button class="btn btn-danger" type="submit">Eliminar</button>
                 </form>
                 <a th:href="@{/calendario/evento/{id}(id=${evento.id})}" class="btn btn-info">Ver Detalle</a>
+                <a th:if="${evento.fecha.isAfter(now) || evento.fecha.isEqual(now)}"
+                   th:href="@{/calendario/editar/{id}(id=${evento.id})}" class="btn btn-warning">Editar</a>
             </td>
-
         </tr>
         <tr th:if="${#lists.isEmpty(eventos)}">
             <td colspan="4" class="text-center">No hay eventos registrados</td>
