@@ -253,6 +253,81 @@ public class CalendarioEventoControllerTests {
                 .andExpect(model().attributeExists("evento"))
                 .andExpect(model().attributeExists("circuitos"));
     }
+    /**
+     * Verifica que se muestre el formulario de edición de un evento.
+     */
+    @Test
+    public void testMostrarFormularioEditarEvento() throws Exception {
+        Circuito circuito = new Circuito();
+        circuito.setId(1L);
+        CalendarioEvento evento = new CalendarioEvento(1L, "Evento Existente", LocalDate.now().plusDays(1), circuito);
+        List<Circuito> circuitos = new ArrayList<>();
+        circuitos.add(circuito);
 
+        when(calendarioEventoService.obtenerEventoPorId(1L)).thenReturn(evento);
+        when(circuitoService.listarCircuitos()).thenReturn(circuitos);
+
+        mockMvc.perform(get("/calendario/editar/1").session(session))
+                .andExpect(status().isOk())
+                .andExpect(view().name("calendario/crearEvento"))
+                .andExpect(model().attributeExists("evento"))
+                .andExpect(model().attributeExists("circuitos"));
+    }
+    /**
+     * Verifica que se puede editar un evento con datos válidos.
+     */
+    @Test
+    public void testEditarEvento() throws Exception {
+        CalendarioEvento eventoExistente = new CalendarioEvento(1L, "Evento Existente", LocalDate.now().plusDays(1), new Circuito());
+        when(calendarioEventoService.editarEvento(anyLong(), any(CalendarioEvento.class))).thenReturn(eventoExistente);
+
+        mockMvc.perform(post("/calendario/editar")
+                        .param("id", "1")
+                        .param("nombreEvento", "Evento Editado")
+                        .param("fecha", LocalDate.now().plusDays(1).toString())
+                        .param("circuito.id", "1")
+                        .session(session))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/calendario/gestion"));
+    }
+    /**
+     * Verifica que no se puede editar un evento con datos inválidos.
+     */
+    @Test
+    public void testEditarEventoConFechaInvalida() throws Exception {
+        List<Circuito> circuitos = new ArrayList<>();
+        circuitos.add(new Circuito());
+        when(circuitoService.listarCircuitos()).thenReturn(circuitos);
+
+        mockMvc.perform(post("/calendario/editar")
+                        .param("id", "1")
+                        .param("nombreEvento", "Evento Inválido")
+                        .param("fecha", LocalDate.now().minusDays(1).toString())
+                        .param("circuito.id", "1")
+                        .session(session))
+                .andExpect(status().isOk())
+                .andExpect(view().name("calendario/crearEvento"))
+                .andExpect(model().attributeHasFieldErrors("evento", "fecha"))
+                .andExpect(model().attributeExists("evento"))
+                .andExpect(model().attributeExists("circuitos"));
+    }
+    /**
+     * Verifica que no se puede editar un evento que no existe.
+     */
+    @Test
+    public void testEditarEventoNoExistente() throws Exception {
+        when(calendarioEventoService.editarEvento(anyLong(), any(CalendarioEvento.class)))
+                .thenThrow(new NoSuchElementException("Evento no encontrado"));
+
+        mockMvc.perform(post("/calendario/editar")
+                        .param("id", "999")
+                        .param("nombreEvento", "Evento No Existente")
+                        .param("fecha", LocalDate.now().plusDays(1).toString())
+                        .param("circuito.id", "1")
+                        .session(session))
+                .andExpect(status().isOk())
+                .andExpect(view().name("calendario/crearEvento"))
+                .andExpect(model().attributeExists("mensajeError"));
+    }
 
 }

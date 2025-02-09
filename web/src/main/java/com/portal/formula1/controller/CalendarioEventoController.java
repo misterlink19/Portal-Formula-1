@@ -49,6 +49,7 @@ public class CalendarioEventoController {
         try {
             List<CalendarioEvento> eventos = calendarioEventoService.listarEventos();
             mv.addObject("eventos", eventos);
+            mv.addObject("now", LocalDate.now()); // Añadimos la fecha actual al modelo
         } catch (Exception e) {
             logger.error("Error al cargar los eventos: ", e);
             mv.setViewName("error");
@@ -56,6 +57,7 @@ public class CalendarioEventoController {
         }
         return mv;
     }
+
 
 
     @GetMapping("/crear")
@@ -148,4 +150,66 @@ public class CalendarioEventoController {
         }
         return mv;
     }
+
+    @GetMapping("/editar/{id}")
+    public ModelAndView mostrarFormularioEditarEvento(@PathVariable Long id) {
+        ModelAndView mv = new ModelAndView("calendario/crearEvento"); // Usamos la misma vista de creación
+        try {
+            CalendarioEvento evento = calendarioEventoService.obtenerEventoPorId(id);
+            if (evento.getFecha().isBefore(LocalDate.now())) {
+                throw new IllegalArgumentException("No se puede editar eventos pasados.");
+            }
+            mv.addObject("evento", evento);
+            mv.addObject("circuitos", circuitoService.listarCircuitos());
+        } catch (NoSuchElementException e) {
+            logger.error("Evento no encontrado con id:{}", id);
+            mv.setViewName("error");
+            mv.addObject("mensajeError", "Evento no encontrado.");
+        } catch (IllegalArgumentException e) {
+            logger.error("Error de validación: ", e);
+            mv.setViewName("error");
+            mv.addObject("mensajeError", e.getMessage());
+        } catch (Exception e) {
+            logger.error("Error al mostrar el formulario de edición: ", e);
+            mv.setViewName("error");
+            mv.addObject("mensajeError", "Error al mostrar el formulario de edición.");
+        }
+        return mv;
+    }
+
+    @PostMapping("/editar")
+    public ModelAndView editarEvento(@Valid @ModelAttribute("evento") CalendarioEvento evento,
+                                     BindingResult result,
+                                     RedirectAttributes redirectAttributes) {
+        ModelAndView mv = new ModelAndView();
+        if (evento.getFecha() == null || evento.getFecha().isBefore(LocalDate.now())) {
+            result.rejectValue("fecha", "error.evento", "La fecha debe ser hoy o posterior.");
+        }
+        if (result.hasErrors()) {
+            mv.setViewName("calendario/crearEvento"); // Usamos la misma vista de creación
+            mv.addObject("evento", evento);
+            mv.addObject("circuitos", circuitoService.listarCircuitos());
+            return mv;
+        }
+        try {
+            calendarioEventoService.editarEvento(evento.getId(), evento); // Usamos el método editarEvento del servicio
+            redirectAttributes.addFlashAttribute("mensaje", "El evento ha sido actualizado exitosamente.");
+            mv.setViewName("redirect:/calendario/gestion");
+            return mv;
+        } catch (NoSuchElementException e) {
+            logger.error("Evento no encontrado con id:{}", evento.getId());
+            mv.setViewName("calendario/crearEvento");
+            mv.addObject("mensajeError", "Evento no encontrado.");
+        } catch (Exception e) {
+            logger.error("Error al actualizar el evento: ", e);
+            result.reject("error.evento", "Ha ocurrido un error al actualizar el evento.");
+        }
+        mv.setViewName("calendario/crearEvento"); // Usamos la misma vista de creación
+        mv.addObject("evento", evento);
+        mv.addObject("circuitos", circuitoService.listarCircuitos());
+        return mv;
+    }
+
+
+
 }
