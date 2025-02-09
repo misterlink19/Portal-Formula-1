@@ -74,6 +74,49 @@ public class EncuestaController {
         return mv;
     }
 
+    @GetMapping({"/editarEncuesta/{permalink}"})
+    public ModelAndView mostrarFormularioEdicion(@PathVariable String permalink,HttpSession session) {
+        logger.debug("Entrando a mostrarFormularioCreacion");
+        UsuarioRegistrado usuario = (UsuarioRegistrado) session.getAttribute("usuario");
+
+        if (usuario == null || usuario.getRol() != Rol.ADMIN) {
+            return new ModelAndView("error").addObject("mensajeError", "Acceso denegado.");
+        }
+        ModelAndView mv = new ModelAndView("encuestas/editarEncuesta");
+        try {
+            Encuesta encuesta = encuestaService.obtenerEncuestaPorPermalink(permalink);
+            List<Piloto> pilotos = pilotoDAO.findAll();
+            mv.addObject("encuesta", encuesta);
+            mv.addObject("pilotos", pilotos);
+        }catch (NoSuchElementException e) {
+            logger.error("Encuesta no encontrada con permalink: {}", permalink);
+            mv.setViewName("error");
+            mv.addObject("mensajeError", "Encuesta no encontrada.");
+        }
+        return mv;
+    }
+    @PostMapping("/editarEncuesta")
+    public ModelAndView editarEncuesta(@ModelAttribute Encuesta encuesta, @RequestParam Set<Integer> pilotosSeleccionados, HttpSession session) {
+        logger.debug("Entrando a editar Encuesta");
+        UsuarioRegistrado usuario = (UsuarioRegistrado) session.getAttribute("usuario");
+
+        if (usuario == null || usuario.getRol() != Rol.ADMIN) {
+            return new ModelAndView("error").addObject("mensajeError", "Acceso denegado.");
+        }
+
+        ModelAndView mv = new ModelAndView();
+        try {
+
+            Set<Integer> pilotoSet = new HashSet<>(pilotosSeleccionados);
+            Encuesta nuevaEncuesta = encuestaService.editarEncuesta(encuesta, pilotoSet);
+            mv.setViewName("redirect:/encuestas/" + nuevaEncuesta.getPermalink());
+        } catch (Exception e) {
+            logger.error("Error al crear la encuesta: ", e);
+            mv.setViewName("error");
+            mv.addObject("mensajeError", "Error al crear la encuesta.");
+        }
+        return mv;
+    }
     @PostMapping
     public ModelAndView crearEncuesta(@ModelAttribute Encuesta encuesta, @RequestParam Set<Integer> pilotosSeleccionados, HttpSession session) {
         logger.debug("Entrando a crearEncuesta");

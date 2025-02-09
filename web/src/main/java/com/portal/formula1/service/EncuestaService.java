@@ -56,6 +56,18 @@ public class EncuestaService {
         encuesta.getPilotos().addAll(pilotos);
         return encuestaDAO.save(encuesta);
     }
+    public Encuesta editarEncuesta(Encuesta encuesta, Set<Integer> pilotoIds) {
+        if (encuesta.getFechaInicio() == null) {
+            encuesta.setFechaInicio(LocalDateTime.now());
+        }
+        Set<Piloto> pilotos = new HashSet<>();
+        for (Integer pilotoId : pilotoIds) {
+            Piloto piloto = pilotoDAO.findById(pilotoId).orElseThrow(() -> new NoSuchElementException("Piloto no encontrado con id: " + pilotoId));
+            pilotos.add(piloto);
+        }
+        encuesta.setPilotos(pilotos);
+        return encuestaDAO.save(encuesta);
+    }
 
     public Encuesta obtenerEncuestaPorPermalink(String permalink) {
         Optional<Encuesta> encuestaOptional = encuestaDAO.findById(permalink);
