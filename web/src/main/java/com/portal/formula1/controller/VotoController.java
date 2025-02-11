@@ -3,6 +3,7 @@ package com.portal.formula1.controller;
 import com.portal.formula1.model.*;
 import com.portal.formula1.service.EncuestaService;
 import com.portal.formula1.service.VotoService;
+import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,15 +34,24 @@ public class VotoController {
 
 
     @GetMapping("/{permalink}/votar")
-    public ModelAndView mostrarFormularioVotacion(@PathVariable String permalink) {
+    public ModelAndView mostrarFormularioVotacion(@PathVariable String permalink, HttpSession session) {
         logger.debug("Entrando a mostrarFormularioVotacion con permalink: {}", permalink);
         ModelAndView mv = new ModelAndView("votos/votarEncuesta");
         try {
             Encuesta encuesta = encuestaService.obtenerEncuestaPorPermalink(permalink);
             List<Piloto> pilotos = new ArrayList<>(encuesta.getPilotos());
+            UsuarioRegistrado usuario = (UsuarioRegistrado)  session.getAttribute("usuario");
+
+            Voto voto = new Voto();
+            if (usuario != null)
+            {
+                voto.setNombreVotante(usuario.getNombre());
+                voto.setCorreoVotante(usuario.getEmail());
+            }
+
             mv.addObject("encuesta", encuesta);
             mv.addObject("pilotos", pilotos);
-            mv.addObject("voto", new Voto()); // Añadir nuevo objeto Voto al modelo
+            mv.addObject("voto", voto);
         } catch (NoSuchElementException e) {
             logger.error("Encuesta no encontrada con permalink: {}", permalink);
             mv.setViewName("error");
@@ -51,7 +61,7 @@ public class VotoController {
     }
 
     @PostMapping("/{permalink}/votar")
-    public ModelAndView crearVoto(@PathVariable String permalink, @ModelAttribute Voto voto) {
+    public ModelAndView crearVoto(@PathVariable String permalink, @ModelAttribute Voto voto, HttpSession session) {
         logger.debug("Entrando a crearVoto con permalink: {}", permalink);
         ModelAndView mv = new ModelAndView("votos/votarEncuesta");
         try {
@@ -61,11 +71,24 @@ public class VotoController {
             // Validar si el usuario ya ha votado usando el mismo correo electrónico
             boolean yaHaVotado = votoService.haVotadoAntes(voto.getCorreoVotante(), encuesta);
             if (yaHaVotado) {
+                UsuarioRegistrado usuario = (UsuarioRegistrado) session.getAttribute("usuario");
+                if (usuario != null) {
+                    voto.setNombreVotante(usuario.getNombre());
+                    voto.setCorreoVotante(usuario.getEmail());
+                }
+
                 mv.addObject("encuesta", encuesta);
                 mv.addObject("pilotos", new ArrayList<>(encuesta.getPilotos()));
                 mv.addObject("voto", voto);
                 mv.addObject("mensajeError", "Ya has votado en esta encuesta con este correo electrónico.");
                 return mv;
+            }
+
+            // Asegurarse de que los datos del usuario estén presentes antes de guardar el voto
+            UsuarioRegistrado usuario = (UsuarioRegistrado) session.getAttribute("usuario");
+            if (usuario != null) {
+                voto.setNombreVotante(usuario.getNombre());
+                voto.setCorreoVotante(usuario.getEmail());
             }
 
             Voto nuevoVoto = votoService.crearVoto(voto);
@@ -93,7 +116,7 @@ public class VotoController {
     }
 
     @GetMapping("/{permalink}/resultados")
-    public ModelAndView mostrarResultados(@PathVariable String permalink) {
+    public ModelAndView mostrarResultados(@PathVariable String permalink, HttpSession session) {
         logger.debug("Entrando a mostrarResultados con permalink: {}", permalink);
         ModelAndView mv = new ModelAndView("votos/resultadosEncuesta");
 
@@ -102,9 +125,16 @@ public class VotoController {
             List<PilotoArchivado> pilotosArchivados = encuestaArchivada.getPilotosArchivados();
             List<Object[]> ranking = votoService.getRankingVotacion(permalink);
 
+            UsuarioRegistrado usuario = (UsuarioRegistrado) session.getAttribute("usuario");
+            Voto votoUsuario = null;
+            if (usuario != null) {
+                votoUsuario = votoService.obtenerVotoPorCorreoYEncuesta(usuario.getEmail(), encuestaArchivada.getPermalink());
+            }
+
             mv.addObject("encuestaArchivada", encuestaArchivada);
             mv.addObject("pilotosArchivados", pilotosArchivados);
             mv.addObject("ranking", ranking);
+            mv.addObject("votoUsuario", votoUsuario);
         } catch (NoSuchElementException e) {
             logger.error("Encuesta no encontrada con permalink: {}", permalink);
             mv.setViewName("error");

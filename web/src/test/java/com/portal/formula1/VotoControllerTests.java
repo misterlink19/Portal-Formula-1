@@ -20,9 +20,7 @@ import java.util.*;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 /**
@@ -171,5 +169,62 @@ public class VotoControllerTests {
                 .andExpect(model().attribute("mensajeError", "Encuesta no encontrada."));
     }
 
+    /**
+     * Verifica que se redirige correctamente a la página de votación de la última encuesta disponible.
+     */
+    @Test
+    public void testRedirigirAVotar_UltimaEncuestaDisponible() throws Exception {
+        Encuesta ultimaEncuesta = new Encuesta();
+        ultimaEncuesta.setPermalink("ultima-encuesta");
+        when(encuestaService.obtenerUltimaEncuestaDisponible()).thenReturn(ultimaEncuesta);
 
+        mockMvc.perform(get("/votos/votar"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/votos/ultima-encuesta/votar"));
+    }
+
+    /**
+     * Verifica que se muestra un mensaje de error si no hay encuestas disponibles.
+     */
+    @Test
+    public void testRedirigirAVotar_NoEncuestasDisponibles() throws Exception {
+        when(encuestaService.obtenerUltimaEncuestaDisponible()).thenThrow(new NoSuchElementException());
+
+        mockMvc.perform(get("/votos/votar"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("error"))
+                .andExpect(model().attributeExists("mensajeError"))
+                .andExpect(model().attribute("mensajeError", "No hay encuestas disponibles en este momento."));
+    }
+
+    /**
+     * Verifica que se maneja correctamente el caso en que la encuesta no se encuentra al mostrar el formulario de votación.
+     */
+    @Test
+    public void testMostrarFormularioVotacion_EncuestaNoEncontrada() throws Exception {
+        when(encuestaService.obtenerEncuestaPorPermalink(anyString())).thenThrow(new NoSuchElementException());
+
+        mockMvc.perform(get("/votos/test-permalink/votar"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("error"))
+                .andExpect(model().attributeExists("mensajeError"))
+                .andExpect(model().attribute("mensajeError", "Encuesta no encontrada."));
+    }
+
+    /**
+     * Verifica que se maneja correctamente el caso en que la encuesta no se encuentra al crear un voto.
+     */
+    @Test
+    public void testCrearVoto_EncuestaNoEncontrada() throws Exception {
+        when(encuestaService.obtenerEncuestaPorPermalink(anyString())).thenThrow(new NoSuchElementException());
+
+        mockMvc.perform(post("/votos/test-permalink/votar")
+                        .param("nombreVotante", "Test")
+                        .param("correoVotante", "test@example.com")
+                        .param("opcionSeleccionada", "1"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("error"))
+                .andExpect(model().attributeExists("mensajeError"))
+                .andExpect(model().attribute("mensajeError", "Encuesta no encontrada."));
+    }
 }

@@ -21,4 +21,8 @@ public interface VotoDAO extends JpaRepository<Voto, Long>{
     List<Voto> findByEncuesta(Encuesta encuesta);
 
     boolean existsByCorreoVotanteAndEncuesta(String correoVotante, Encuesta encuesta);
+
+    List<Voto> findVotoByCorreoVotante(String correoVotante);
+
+    Voto findVotoByCorreoVotanteAndEncuesta_Permalink(String correoVotante, String encuestaPermalink);
 }

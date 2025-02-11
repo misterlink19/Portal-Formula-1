@@ -5,16 +5,14 @@
 package com.portal.formula1;
 
 import com.portal.formula1.controller.EncuestaController;
-import com.portal.formula1.model.Encuesta;
-import com.portal.formula1.model.Piloto;
-import com.portal.formula1.model.Rol;
-import com.portal.formula1.model.UsuarioRegistrado;
+import com.portal.formula1.model.*;
 import com.portal.formula1.repository.PilotoDAO;
 import com.portal.formula1.repository.VotoDAO;
 import com.portal.formula1.service.EncuestaService;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import com.portal.formula1.service.VotoService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
@@ -48,7 +46,7 @@ public class EncuestaControllerTests {
     private EncuestaService encuestaService;
 
     @Mock
-    private VotoDAO votoDAO;
+    private VotoService votoService;
 
     @Mock
     private PilotoDAO  pilotoDAO;
@@ -244,5 +242,30 @@ public class EncuestaControllerTests {
                 .andExpect(redirectedUrl("/encuestas/listar"))
                 .andExpect(flash().attributeExists("mensajeError"))
                 .andExpect(flash().attribute("mensajeError", "Encuesta no encontrada."));
+    }
+
+    /**
+     * Verifica que el historial de encuestas votadas por el usuario se muestra correctamente.
+     */
+    @Test
+    public void testMostrarListaHistorialDeEncuestas() throws Exception {
+        UsuarioRegistrado usuario = new UsuarioRegistrado();
+        usuario.setEmail("admin@example.com");
+        usuario.setRol(Rol.ADMIN);
+        session.setAttribute("usuario", usuario);
+
+        Voto voto = new Voto();
+        Encuesta encuesta = new Encuesta();
+        encuesta.setPermalink("test-permalink");
+        voto.setEncuesta(encuesta);
+        List<Voto> votos = Collections.singletonList(voto);
+        when(votoService.obtenerVotosPorUsuario("admin@example.com")).thenReturn(votos);
+        when(encuestaService.obtenerEncuestaPorPermalink("test-permalink")).thenReturn(encuesta);
+
+        mockMvc.perform(get("/encuestas/listar/historial").session(session))
+                .andExpect(status().isOk())
+                .andExpect(view().name("encuestas/listadoEncuestas"))
+                .andExpect(model().attributeExists("encuestas"))
+                .andExpect(model().attribute("encuestas", Collections.singletonList(encuesta)));
     }
 }

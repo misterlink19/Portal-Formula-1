@@ -37,11 +37,11 @@
         <div class="form-group row justify-content-center mt-4">
             <div class="col-md-4">
                 <label for="nombreVotante"><b>Nombre del Aficionado:</b></label>
-                <input type="text" class="form-control" id="nombreVotante" th:field="*{nombreVotante}" required>
+                <input type="text" class="form-control" id="nombreVotante" th:field="*{nombreVotante}" th:attr="readonly=${voto.nombreVotante != null}" required>
             </div>
             <div class="col-md-4">
                 <label for="correoVotante"><b>Correo electrónico:</b></label>
-                <input type="email" class="form-control" id="correoVotante" th:field="*{correoVotante}" required>
+                <input type="email" class="form-control" id="correoVotante" th:field="*{correoVotante}" th:attr="readonly=${voto.correoVotante != null}" required>
             </div>
         </div>
 
