@@ -20,7 +20,7 @@ public class AutentificacionService {
     
     public UsuarioRegistrado checkUser(String usuario){
         return usuarioRegistradoDAO.findById(usuario)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElse(null);
     }
     
     

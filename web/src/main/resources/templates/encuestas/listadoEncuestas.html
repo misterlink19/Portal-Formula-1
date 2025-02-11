@@ -68,7 +68,7 @@
                                 th:text="'Ver Resultados'"
                                 th:attr="onclick= 'location.href=\'/votos/' + ${encuesta.permalink} + '/resultados'+ '\''">
                         </button>
-                        <button th:unless="${encuesta.fechaLimite < #temporals.createNow()}"
+                        <button th:unless="${encuesta.fechaLimite < #temporals.createNow()}" th:if="${session.usuario != null} and ${session.usuario.rol == T(com.portal.formula1.model.Rol).ADMIN}"
                                 th:text="'Editar'"
                                 th:attr="onclick= 'location.href=\'/encuestas/editarEncuesta/' + ${encuesta.permalink} + '\''">
                         </button>

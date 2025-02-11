@@ -7,6 +7,7 @@ import com.portal.formula1.repository.EncuestaArchivadaDAO;
 import com.portal.formula1.repository.EncuestaDAO;
 import com.portal.formula1.repository.PilotoDAO;
 import com.portal.formula1.repository.VotoDAO;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -86,5 +87,13 @@ public class VotoService {
             ranking = Collections.emptyList();
         }
         return ranking;
+    }
+
+    public List<Voto> obtenerVotosPorUsuario(String correo) {
+        return votoDAO.findVotoByCorreoVotante(correo);
+    }
+
+    public Voto obtenerVotoPorCorreoYEncuesta(@NotBlank(message = "El email no puede estar vacío.") String email, String permalink) {
+        return  votoDAO.findVotoByCorreoVotanteAndEncuesta_Permalink(email, permalink);
     }
 }

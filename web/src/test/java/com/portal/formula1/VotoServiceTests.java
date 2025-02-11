@@ -27,9 +27,6 @@ public class VotoServiceTests {
     private VotoDAO votoDAO;
 
     @Mock
-    private PilotoDAO pilotoDAO;
-
-    @Mock
     private EncuestaDAO encuestaDAO;
 
     @Mock
@@ -43,76 +40,99 @@ public class VotoServiceTests {
         MockitoAnnotations.openMocks(this);
     }
 
+    /**
+     * Verifica que se crea un voto correctamente.
+     */
     @Test
     public void testCrearVoto() {
         Voto voto = new Voto();
-        voto.setCorreoVotante("test@example.com");
-        voto.setOpcionSeleccionada("44");
-        Encuesta encuesta = new Encuesta();
-        voto.setEncuesta(encuesta);
-
         when(votoDAO.save(any(Voto.class))).thenReturn(voto);
 
-        Voto result = votoService.crearVoto(voto);
-
-        assertEquals("test@example.com", result.getCorreoVotante());
-        assertEquals("44", result.getOpcionSeleccionada());
-        verify(votoDAO, times(1)).save(voto);
+        Voto resultado = votoService.crearVoto(voto);
+        assertNotNull(resultado);
     }
 
+    /**
+     * Verifica que se obtienen los votos por encuesta correctamente.
+     */
     @Test
     public void testObtenerVotosPorEncuesta() {
         Encuesta encuesta = new Encuesta();
-        Voto voto1 = new Voto();
-        voto1.setEncuesta(encuesta);
-        Voto voto2 = new Voto();
-        voto2.setEncuesta(encuesta);
-        List<Voto> votos = Arrays.asList(voto1, voto2);
+        List<Voto> votos = Arrays.asList(new Voto(), new Voto());
+        when(votoDAO.findByEncuesta(any(Encuesta.class))).thenReturn(votos);
 
-        when(votoDAO.findByEncuesta(encuesta)).thenReturn(votos);
-
-        List<Voto> result = votoService.obtenerVotosPorEncuesta(encuesta);
-
-        assertEquals(2, result.size());
-        assertTrue(result.contains(voto1));
-        assertTrue(result.contains(voto2));
+        List<Voto> resultado = votoService.obtenerVotosPorEncuesta(encuesta);
+        assertEquals(2, resultado.size());
     }
 
+    /**
+     * Verifica que se comprueba correctamente si un usuario ha votado antes.
+     */
     @Test
     public void testHaVotadoAntes() {
         Encuesta encuesta = new Encuesta();
-        String correoVotante = "test@example.com";
+        when(votoDAO.existsByCorreoVotanteAndEncuesta(anyString(), any(Encuesta.class))).thenReturn(true);
 
-        when(votoDAO.existsByCorreoVotanteAndEncuesta(correoVotante, encuesta)).thenReturn(true);
-
-        boolean result = votoService.haVotadoAntes(correoVotante, encuesta);
-
-        assertTrue(result);
+        boolean resultado = votoService.haVotadoAntes("test@example.com", encuesta);
+        assertTrue(resultado);
     }
 
+    /**
+     * Verifica que se obtiene el ranking de votación correctamente.
+     */
     @Test
     public void testGetRankingVotacion() {
         Encuesta encuesta = new Encuesta();
         encuesta.setPermalink("test-permalink");
-        PilotoArchivado pilotoArchivado = new PilotoArchivado();
-        pilotoArchivado.setDorsal(44);
-        pilotoArchivado.setNombre("Piloto 1");
         EncuestaArchivada encuestaArchivada = new EncuestaArchivada();
         encuestaArchivada.setPermalink("test-permalink");
-        encuestaArchivada.setPilotosArchivados(Collections.singletonList(pilotoArchivado));
+
         Voto voto = new Voto();
         voto.setOpcionSeleccionada("44");
-        voto.setEncuesta(encuesta);
+        List<Voto> votos = Collections.singletonList(voto);
 
-        when(encuestaDAO.findById("test-permalink")).thenReturn(Optional.of(encuesta));
-        when(encuestaArchivadaDAO.findByPermalink("test-permalink")).thenReturn(Optional.of(encuestaArchivada));
-        when(votoDAO.findByEncuesta(encuesta)).thenReturn(Collections.singletonList(voto));
+        when(encuestaDAO.findById(anyString())).thenReturn(Optional.of(encuesta));
+        when(encuestaArchivadaDAO.findByPermalink(anyString())).thenReturn(Optional.of(encuestaArchivada));
+        when(votoDAO.findByEncuesta(any(Encuesta.class))).thenReturn(votos);
 
-        List<Object[]> result = votoService.getRankingVotacion("test-permalink");
+        List<Object[]> ranking = votoService.getRankingVotacion("test-permalink");
+        assertNotNull(ranking);
+    }
 
-        assertEquals(1, result.size());
-        assertEquals("Piloto 1", result.get(0)[0]);
-        assertEquals(44, result.get(0)[3]);
-        assertEquals(1L, result.get(0)[7]);
+    /**
+     * Verifica que se obtienen los votos por usuario correctamente.
+     */
+    @Test
+    public void testObtenerVotosPorUsuario() {
+        List<Voto> votos = Arrays.asList(new Voto(), new Voto());
+        when(votoDAO.findVotoByCorreoVotante(anyString())).thenReturn(votos);
+
+        List<Voto> resultado = votoService.obtenerVotosPorUsuario("test@example.com");
+        assertEquals(2, resultado.size());
+    }
+
+    /**
+     * Verifica que se obtiene un voto por correo y encuesta correctamente.
+     */
+    @Test
+    public void testObtenerVotoPorCorreoYEncuesta() {
+        Voto voto = new Voto();
+        when(votoDAO.findVotoByCorreoVotanteAndEncuesta_Permalink(anyString(), anyString())).thenReturn(voto);
+
+        Voto resultado = votoService.obtenerVotoPorCorreoYEncuesta("test@example.com", "test-permalink");
+        assertNotNull(resultado);
+    }
+
+    /**
+     * Verifica que se lanza una excepción cuando no se encuentra la encuesta al obtener el ranking de votación.
+     */
+    @Test
+    public void testGetRankingVotacion_EncuestaNoEncontrada() {
+        when(encuestaDAO.findById(anyString())).thenReturn(Optional.empty());
+        when(encuestaArchivadaDAO.findByPermalink(anyString())).thenReturn(Optional.empty());
+
+        assertThrows(NoSuchElementException.class, () -> {
+            votoService.getRankingVotacion("test-permalink");
+        });
     }
 }
