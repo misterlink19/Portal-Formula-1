@@ -1,22 +1,37 @@
 package com.portal.formula1.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
+
 @Entity
-public class ConsultaERS{
+public class ConsultaERS {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_consulta_ers", nullable = false, unique = true)
     private Long idConsultaERS;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_coche", nullable = false)
-    private Coches coche;
+    @Column(name = "id_circuito", nullable = false)
+    private Long idCircuito;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_circuito", nullable = false)
-    private Circuito circuito;
+    @Column(name = "codigo_coche", nullable = false, length = 50)
+    private String codigoCoche;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private LocalDate fechaConsulta;
+
+    @PrePersist
+    protected void onCreate() {
+        this.fechaConsulta = LocalDate.now();
+    }
+
+    @Column(name = "nombre_circuito", nullable = false, length = 100)
+    private String nombreCircuito;
+
+    @Column(name = "nombre_coche", nullable = false, length = 100)
+    private String nombreCoche;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_equipo", nullable = false)
@@ -43,10 +58,14 @@ public class ConsultaERS{
     // Constructores
     public ConsultaERS() {}
 
-    public ConsultaERS(Coches coche, Circuito circuito, Equipo equipo, Double ahorradorUnitario, Double ahorradorTotal,
-                       Double normalUnitario, Double normalTotal, Double deportivoUnitario, Double deportivoTotal) {
-        this.coche = coche;
-        this.circuito = circuito;
+    public ConsultaERS(LocalDate fechaConsulta, Long idCircuito, String codigoCoche, String nombreCircuito, String nombreCoche, Equipo equipo,
+                       Double ahorradorUnitario, Double ahorradorTotal, Double normalUnitario, Double normalTotal,
+                       Double deportivoUnitario, Double deportivoTotal) {
+        this.fechaConsulta = fechaConsulta;
+        this.idCircuito = idCircuito;
+        this.codigoCoche = codigoCoche;
+        this.nombreCircuito = nombreCircuito;
+        this.nombreCoche = nombreCoche;
         this.equipo = equipo;
         this.ahorradorUnitario = ahorradorUnitario;
         this.ahorradorTotal = ahorradorTotal;
@@ -65,20 +84,36 @@ public class ConsultaERS{
         this.idConsultaERS = idConsultaERS;
     }
 
-    public Coches getCoche() {
-        return coche;
+    public Long getIdCircuito() {
+        return idCircuito;
     }
 
-    public void setCoche(Coches coche) {
-        this.coche = coche;
+    public void setIdCircuito(Long idCircuito) {
+        this.idCircuito = idCircuito;
     }
 
-    public Circuito getCircuito() {
-        return circuito;
+    public String getCodigoCoche() {
+        return codigoCoche;
     }
 
-    public void setCircuito(Circuito circuito) {
-        this.circuito = circuito;
+    public void setCodigoCoche(String codigoCoche) {
+        this.codigoCoche = codigoCoche;
+    }
+
+    public String getNombreCircuito() {
+        return nombreCircuito;
+    }
+
+    public void setNombreCircuito(String nombreCircuito) {
+        this.nombreCircuito = nombreCircuito;
+    }
+
+    public String getNombreCoche() {
+        return nombreCoche;
+    }
+
+    public void setNombreCoche(String nombreCoche) {
+        this.nombreCoche = nombreCoche;
     }
 
     public Equipo getEquipo() {
@@ -135,5 +170,13 @@ public class ConsultaERS{
 
     public void setDeportivoTotal(Double deportivoTotal) {
         this.deportivoTotal = deportivoTotal;
+    }
+
+    public LocalDate getFechaConsulta() {
+        return fechaConsulta;
+    }
+
+    public void setFechaConsulta(LocalDate fechaConsulta) {
+        this.fechaConsulta = fechaConsulta;
     }
 }

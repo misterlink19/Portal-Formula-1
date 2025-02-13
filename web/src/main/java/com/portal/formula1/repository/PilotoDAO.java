@@ -12,4 +12,5 @@ public interface PilotoDAO extends JpaRepository<Piloto, Integer> {
     List<Piloto> findByEquipo_Id(Long equipoId);
     List<Piloto> findByEquipo_IdAndCocheIsNull(Long equipoId);
     Piloto findPilotoByDorsal(Integer dorsal);
+    Piloto findPilotoByCoche_Codigo(String codigoCoche);
 }

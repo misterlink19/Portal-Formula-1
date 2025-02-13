@@ -46,7 +46,7 @@
                 </div>
                 <div class="info-item">
                     <span class="label">Coche Asignado:</span>
-                    <span th:text="${piloto.coche.getNombre()}" class="value"></span>
+                    <span th:text="${piloto.coche != null ? piloto.coche.getNombre() : 'No asignado'}" class="value"></span>
                 </div>
             </div>
         </div>

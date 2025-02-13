@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const carSelect = document.getElementById("car-select");
     const consumoVueltaInput = document.getElementById("input-consumo-vuelta");
     const consumoTotalInput = document.getElementById("input-consumo-total");
+    const fechaConsulta = document.getElementById("input-fecha-consulta");
     const resultSection = document.getElementById("result-section");
     const resultConsumoVuelta = document.getElementById("result-consumo-vuelta");
     const resultCircuito = document.getElementById("result-circuito");
@@ -59,7 +60,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
             consumoVueltaInput.value = resultados.consumoPorVuelta;
             consumoTotalInput.value = resultados.consumoTotal;
-
             resultSection.classList.remove("hidden");
         }
     }

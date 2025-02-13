@@ -58,4 +58,8 @@ public class CocheService {
         cocheDAO.save(coche);
     }
 
+    public void eliminarCoche(String codigo) {
+        cocheDAO.deleteById(codigo);
+    }
+
 }

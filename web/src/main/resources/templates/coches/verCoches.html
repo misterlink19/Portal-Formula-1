@@ -34,20 +34,32 @@
                     <td th:text="${coche.ersCurvaMedia}">ERS Curva Media</td>
                     <td th:text="${coche.ersCurvaRapida}">ERS Curva Rápida</td>
                     <td th:text="${coche.consumo}">Consumo</td>
-                    <td th:text="${coche.piloto.getDorsal()}">Piloto Asignado</td>
+                    <td th:text="${coche.piloto != null ? coche.piloto.getDorsal() : 'No hay Piloto Asignado'}">Piloto Asignado</td>
 
                     <td>
                         <div class="button-group">
                             <a th:href="@{/coches/editar/{codigo}(codigo=${coche.codigo})}" class="button-accions button-accions-edit">Editar</a>
-                            <button class="button-accions button-accions-delete">Eliminar</button>
+                            <button class="button-accions button-accions-delete" th:attr="data-codigo=${coche.codigo}">Eliminar</button>
                         </div>
                     </td>
                 </tr>
                 </tbody>
             </table>
         </div>
+
+        <div class="dialog hidden">
+            <div class="dialog-content">
+                <h2>¿Está seguro?</h2>
+                <p>Esta acción no se puede deshacer. Se eliminará permanentemente el coche y todos sus datos asociados.</p>
+                <div class="dialog-actions">
+                    <button class="cancel-button">Cancelar</button>
+                    <button class="confirm-button">Eliminar</button>
+                </div>
+            </div>
+        </div>
     </div>
     <a th:href="@{/coches}" class="button-back">Volver a Coches</a>
 </div>
+<script th:src="@{/javascript/verCoche.js}" layout:fragment="scripts"></script>
 </body>
 </html>

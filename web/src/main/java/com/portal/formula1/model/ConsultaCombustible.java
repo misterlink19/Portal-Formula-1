@@ -1,6 +1,8 @@
 package com.portal.formula1.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
+import java.time.LocalDate;
 
 @Entity
 public class ConsultaCombustible {
@@ -10,13 +12,25 @@ public class ConsultaCombustible {
     @Column(name = "id_consulta", nullable = false, unique = true)
     private Long idConsulta;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_coche", nullable = false)
-    private Coches coche;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private LocalDate fechaConsulta;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_circuito", nullable = false)
-    private Circuito circuito;
+    @PrePersist
+    protected void onCreate() {
+        this.fechaConsulta = LocalDate.now();
+    }
+
+    @Column(name = "codigo_coche", nullable = false, length = 50)
+    private String codigoCoche;
+
+    @Column(name = "id_circuito", nullable = false)
+    private Long idCircuito;
+
+    @Column(name = "nombre_coche", nullable = false, length = 100)
+    private String nombreCoche;
+
+    @Column(name = "nombre_circuito", nullable = false, length = 100)
+    private String nombreCircuito;
 
     @Column(name = "consumo_vuelta", nullable = false)
     private Double consumoVuelta;
@@ -31,9 +45,12 @@ public class ConsultaCombustible {
     // Constructores
     public ConsultaCombustible() {}
 
-    public ConsultaCombustible(Coches coche, Circuito circuito, Double consumoVuelta, Double consumoTotal, Equipo equipo) {
-        this.coche = coche;
-        this.circuito = circuito;
+    public ConsultaCombustible(LocalDate fechaConsulta, String codigoCoche, Long idCircuito, String nombreCoche, String nombreCircuito, Double consumoVuelta, Double consumoTotal, Equipo equipo) {
+        this.fechaConsulta = fechaConsulta;
+        this.codigoCoche = codigoCoche;
+        this.idCircuito = idCircuito;
+        this.nombreCoche = nombreCoche;
+        this.nombreCircuito = nombreCircuito;
         this.consumoVuelta = consumoVuelta;
         this.consumoTotal = consumoTotal;
         this.equipo = equipo;
@@ -48,20 +65,44 @@ public class ConsultaCombustible {
         this.idConsulta = idConsulta;
     }
 
-    public Coches getCoche() {
-        return coche;
+    public LocalDate getFechaConsulta() {
+        return fechaConsulta;
     }
 
-    public void setCoche(Coches coche) {
-        this.coche = coche;
+    public void setFechaConsulta(LocalDate fechaConsulta) {
+        this.fechaConsulta = fechaConsulta;
     }
 
-    public Circuito getCircuito() {
-        return circuito;
+    public String getCodigoCoche() {
+        return codigoCoche;
     }
 
-    public void setCircuito(Circuito circuito) {
-        this.circuito = circuito;
+    public void setCodigoCoche(String codigoCoche) {
+        this.codigoCoche = codigoCoche;
+    }
+
+    public Long getIdCircuito() {
+        return idCircuito;
+    }
+
+    public void setIdCircuito(Long idCircuito) {
+        this.idCircuito = idCircuito;
+    }
+
+    public String getNombreCoche() {
+        return nombreCoche;
+    }
+
+    public void setNombreCoche(String nombreCoche) {
+        this.nombreCoche = nombreCoche;
+    }
+
+    public String getNombreCircuito() {
+        return nombreCircuito;
+    }
+
+    public void setNombreCircuito(String nombreCircuito) {
+        this.nombreCircuito = nombreCircuito;
     }
 
     public Double getConsumoVuelta() {

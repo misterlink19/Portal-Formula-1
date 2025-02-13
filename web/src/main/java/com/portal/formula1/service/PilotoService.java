@@ -61,4 +61,8 @@ public class PilotoService {
         piloto.setCoche(coche);
         cocheDAO.save(coche);
     }
+
+    public Piloto buscarPilotoPorCoche(String codigoCoche) {
+        return pilotoDAO.findPilotoByCoche_Codigo(codigoCoche);
+    }
 }

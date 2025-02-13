@@ -142,8 +142,10 @@ public class SimulacionController {
         }
 
         // Asignar los objetos a la entidad antes de guardarla
-        consultaCombustible.setCircuito(circuito);
-        consultaCombustible.setCoche(coche);
+        consultaCombustible.setIdCircuito(circuito.getId());
+        consultaCombustible.setNombreCircuito(circuito.getNombre());
+        consultaCombustible.setCodigoCoche(coche.getCodigo());
+        consultaCombustible.setNombreCoche(coche.getNombre());
         consultaCombustible.setEquipo(user.getEquipo());
 
         try {
@@ -247,8 +249,10 @@ public class SimulacionController {
         }
 
         // Asignar los objetos a la entidad antes de guardarla
-        consultaERS.setCircuito(circuito);
-        consultaERS.setCoche(coche);
+        consultaERS.setIdCircuito(circuito.getId());
+        consultaERS.setNombreCircuito(circuito.getNombre());
+        consultaERS.setCodigoCoche(coche.getCodigo());
+        consultaERS.setNombreCoche(coche.getNombre());
         consultaERS.setEquipo(user.getEquipo());
 
         try {

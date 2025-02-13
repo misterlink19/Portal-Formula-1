@@ -10,6 +10,8 @@ import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -323,4 +325,48 @@ public class CocheController {
 
         return mv;
     }
+
+    @GetMapping("/eliminar")
+    public ModelAndView eliminarCoche(HttpSession session) {
+        logger.debug("Entrando a eliminar Coches");
+        UsuarioRegistrado usuario = (UsuarioRegistrado) session.getAttribute("usuario");
+
+        // Verificar si el usuario es JEFE DE EQUIPO
+        if (usuario == null || (usuario.getRol() != Rol.JEFE_DE_EQUIPO )) {
+            return new ModelAndView("error").addObject("mensajeError", "Acceso denegado.");
+        }
+        ModelAndView mv = new ModelAndView("coches/eliminarCoche");
+
+        List<Coches> listaCoches = cocheService.listarCochesPorEquipos(usuario.getEquipo().getId());
+
+        if(!listaCoches.isEmpty()) {
+            mv.addObject("listaCoches", listaCoches);
+
+        }else{
+            mv.addObject("listaCoches", null);
+        }
+        mv.addObject("usuario", usuario);
+        return mv;
+    }
+
+    @DeleteMapping("/eliminar/{codigo}")
+    public ResponseEntity<?> eliminarCoche(@PathVariable("codigo") String cocheEliminar, HttpServletRequest request) {
+        UsuarioRegistrado user = (UsuarioRegistrado) request.getSession().getAttribute("usuario");
+
+        if (user == null || !(user.getRol() == Rol.ADMIN || user.getRol() == Rol.JEFE_DE_EQUIPO)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No tienes permisos para realizar esta acción.");
+        }
+
+        if (!cocheService.existeCocheByCodigo(cocheEliminar)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Coche no encontrado.");
+        }
+        Piloto pilotoDelCoche = pilotoService.buscarPilotoPorCoche(cocheEliminar);
+        if(pilotoDelCoche != null) {
+            pilotoDelCoche.setCoche(null);
+            pilotoService.guardarPiloto(pilotoDelCoche);
+        }
+        cocheService.eliminarCoche(cocheEliminar);
+        return ResponseEntity.ok("Coche eliminado correctamente//.");
+    }
+
 }
