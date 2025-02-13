@@ -21,4 +21,8 @@ public class ConsultaCombustibleService {
         return consultaCombustibleDAO.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Consulta no encontrada"));
     }
+
+    public List<ConsultaCombustible> consultaPorEquipo(Long idEquipo) {
+        return consultaCombustibleDAO.findAllByEquipo_Id(idEquipo);
+    }
 }

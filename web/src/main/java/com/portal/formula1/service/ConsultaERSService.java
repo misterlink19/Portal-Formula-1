@@ -24,4 +24,8 @@ public class ConsultaERSService {
         return consultaERSDAO.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Consulta no encontrada"));
     }
+
+    public List<ConsultaERS> consultaPorEquipo(Long idEquipo) {
+        return consultaERSDAO.findAllByEquipo_Id(idEquipo);
+    }
 }

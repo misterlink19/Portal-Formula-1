@@ -268,4 +268,34 @@ public class SimulacionController {
 
         return mv;
     }
+
+    @GetMapping("historico")
+    public ModelAndView verHistorico(HttpSession session) {
+        logger.debug("Entrando a la lista de consultas");
+        UsuarioRegistrado usuario = (UsuarioRegistrado) session.getAttribute("usuario");
+
+        // Verificar si el usuario es JEFE DE EQUIPO
+        if (usuario == null || (usuario.getRol() != Rol.JEFE_DE_EQUIPO )) {
+            return new ModelAndView("error").addObject("mensajeError", "Acceso denegado.");
+        }
+        ModelAndView mv = new ModelAndView("simulacion/verHistorico");
+
+        List<ConsultaERS> listaErs = consultaERSService.consultaPorEquipo(usuario.getEquipo().getId());
+        List<ConsultaCombustible> listaCombustible = consultaCombustibleService.consultaPorEquipo(usuario.getEquipo().getId());
+        mv.addObject("equipo", usuario.getEquipo());
+        if(!listaErs.isEmpty()) {
+            mv.addObject("listaErs", listaErs);
+
+        }else{
+            mv.addObject("listaErs", null);
+        }
+        if(!listaCombustible.isEmpty()) {
+            mv.addObject("listaCombustible", listaCombustible);
+
+        }else{
+            mv.addObject("listaCombustible", null);
+        }
+        mv.addObject("usuario", usuario);
+        return mv;
+    }
 }
