@@ -58,5 +58,10 @@ public class CalendarioEventoService {
 
     public CalendarioEvento obtenerEventoPorId(Long id) {
         Optional<CalendarioEvento> calendarioEventoOptional = calendarioEventoDAO.findById(id);
-        return calendarioEventoOptional.orElseThrow(() -> new NoSuchElementException("Evento no encontrado con id: " + id)); }
+        return calendarioEventoOptional.orElseThrow(() -> new NoSuchElementException("Evento no encontrado con id: " + id));
+    }
+    public boolean existsByCircuitoId(Long circuitoId) {
+        return calendarioEventoDAO.existsByCircuitoId(circuitoId);
+    }
+
 }

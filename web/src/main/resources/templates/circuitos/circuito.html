@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml" lang="es"
+      layout:decorate="~{layout}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Circuitos</title>
+</head>
+<body layout:fragment="body">
+<div class="container mt-5">
+  <div th:if="${mensaje}" class="alert alert-success alert-dismissible fade show" role="alert">
+    <span th:text="${mensaje}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+
+  <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <span th:text="${error}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+
+  <h1 class="text-center">Gestión de Circuitos</h1>
+  <div class="d-flex justify-content-center mb-4">
+    <a th:href="@{/admin/circuitos}" class="btn btn-primary me-2">Crear un Circuito</a>  <a th:href="@{/}" class="btn btn-secondary">Volver al Inicio</a>
+  </div>
+
+  <h2>Circuitos Actuales</h2>
+  <table class="table">
+    <thead>
+    <tr>
+      <th>Nombre</th>
+      <th>Ciudad</th>
+      <th>País</th>
+      <th>Longitud (m)</th>
+      <th>Acciones</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="circuito : ${circuitos}">  <td th:text="${circuito.nombre}">Nombre</td>
+      <td th:text="${circuito.ciudad}">Ciudad</td>
+      <td th:text="${circuito.pais}">País</td>
+      <td th:text="${circuito.longitud}">Longitud</td>
+      <td>
+        <a th:href="@{/admin/circuitos/eliminar/{id}(id=${circuito.id})}"
+           class="btn btn-danger"
+           onclick="return confirm('¿Está seguro de que desea eliminar este circuito?')">Eliminar</a>
+        <a th:href="@{/admin/circuitos/editar/{id}(id=${circuito.id})}" class="btn btn-warning">Editar</a>
+        <a th:href="@{/admin/circuitos/{id}(id=${circuito.id})}" class="btn btn-info">Ver Detalle</a>
+
+      </td>
+    </tr>
+    <tr th:if="${#lists.isEmpty(circuitos)}">
+      <td colspan="5" class="text-center">No hay circuitos registrados</td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+</body>
+</html>

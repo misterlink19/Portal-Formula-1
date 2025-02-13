@@ -12,4 +12,6 @@ import java.util.Optional;
 public interface CalendarioEventoDAO extends JpaRepository<CalendarioEvento, Long> {
     List<CalendarioEvento> findByFecha(LocalDate fecha);
     Optional<CalendarioEvento> findByNombreEventoAndFecha(String nombreEvento, LocalDate fecha);
+
+    boolean existsByCircuitoId(Long circuitoId);
 }
