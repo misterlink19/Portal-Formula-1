@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Editar Circuito</title>
 </head>
-<body layout:fragment="body" class="bg-light">
-<div class="container py-5">
+<body layout:fragment="body">
+<div class="container py-5 bg-light">
   <h1 class="text-center mb-4">Editar Circuito</h1>
 
   <!-- Mensaje de éxito -->
@@ -71,7 +71,8 @@
              th:value="${circuito.getNumeroCurvasRapidas()}" />
     </div>
     <div class="text-center">
-      <button type="submit" class="btn btn-primary w-100">Guardar Cambios</button>
+      <button type="submit" class="btn btn-primary">Registrar Circuito</button>
+      <a href="/admin/circuitos/listar" class="btn btn-secondary">Cancelar</a>
     </div>
   </form>
 </div>

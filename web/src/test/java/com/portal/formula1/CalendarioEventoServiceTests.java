@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -162,4 +163,57 @@ public class CalendarioEventoServiceTests {
 
         verify(calendarioEventoDAO, times(1)).findById(1L);
     }
+
+    /**
+     * Test para intentar guardar un evento existente.
+     */
+    @Test
+    public void testGuardarEventoExistente() {
+        CalendarioEvento evento = new CalendarioEvento("Evento Existente", LocalDate.now(), new Circuito());
+        when(calendarioEventoDAO.findByNombreEventoAndFecha(evento.getNombreEvento(), evento.getFecha())).thenReturn(Optional.of(evento));
+
+        assertThrows(IllegalArgumentException.class, () -> calendarioEventoService.guardarEvento(evento));
+
+        verify(calendarioEventoDAO, never()).save(any(CalendarioEvento.class)); // Verifica que no se llamó a save
+    }
+
+    /**
+     * Test para intentar editar un evento inexistente.
+     */
+    @Test
+    public void testEditarEventoNoExistente() {
+        CalendarioEvento nuevoEvento = new CalendarioEvento("Evento Editado", LocalDate.now().plusDays(1), new Circuito());
+        when(calendarioEventoDAO.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(NoSuchElementException.class, () -> calendarioEventoService.editarEvento(1L, nuevoEvento));
+
+        verify(calendarioEventoDAO, never()).save(any(CalendarioEvento.class));
+    }
+
+    /**
+     * Test para verificar si existe un evento por ID de circuito (existe).
+     */
+    @Test
+    public void testExistsByCircuitoId_exists() {
+        Long circuitoId = 1L;
+        when(calendarioEventoDAO.existsByCircuitoId(circuitoId)).thenReturn(true);
+
+        assertTrue(calendarioEventoService.existsByCircuitoId(circuitoId));
+
+        verify(calendarioEventoDAO, times(1)).existsByCircuitoId(circuitoId);
+    }
+
+    /**
+     * Test para verificar si existe un evento por ID de circuito (no existe).
+     */
+    @Test
+    public void testExistsByCircuitoId_notExists() {
+        Long circuitoId = 1L;
+        when(calendarioEventoDAO.existsByCircuitoId(circuitoId)).thenReturn(false);
+
+        assertFalse(calendarioEventoService.existsByCircuitoId(circuitoId));
+
+        verify(calendarioEventoDAO, times(1)).existsByCircuitoId(circuitoId);
+    }
+
 }

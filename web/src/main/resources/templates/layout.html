@@ -65,6 +65,9 @@
             <li class="nav-item" th:if="${session.usuario != null} and ${session.usuario.rol == T(com.portal.formula1.model.Rol).ADMIN}">
                 <a class="nav-link" th:href="@{/calendario/gestion}">Gestionar eventos</a>
             </li>
+            <li class="nav-item" th:if="${session.usuario != null} and ${session.usuario.rol == T(com.portal.formula1.model.Rol).ADMIN}">
+                <a class="nav-link" th:href="@{/admin/circuitos/listar}">Gestionar circuitos</a>
+            </li>
 
             <!-- Solo para Responsables de Equipo -->
             <li class="nav-item" th:if="${session.usuario != null} and ${session.usuario.rol == T(com.portal.formula1.model.Rol).JEFE_DE_EQUIPO}">
