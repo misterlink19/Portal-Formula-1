@@ -15,8 +15,9 @@
         <strong>No hay circuitos disponibles para crear un evento.</strong>
     </div>
 
-    <form th:action="@{/calendario/crear}" method="post" th:object="${evento}" th:if="${!#lists.isEmpty(circuitos)}">
-        <div class="mb-3">
+    <form th:action="@{${evento.id} == null ? '/calendario/crear' : '/calendario/editar'}" method="post" th:object="${evento}" th:if="${!#lists.isEmpty(circuitos)}">
+    <div class="mb-3">
+        <input type="hidden" th:field="*{id}"/>
             <label for="nombreEvento" class="form-label">Nombre del Evento</label>
             <input type="text" id="nombreEvento" th:field="*{nombreEvento}" class="form-control" required>
             <div th:if="${#fields.hasErrors('nombreEvento')}" class="text-danger">
@@ -37,7 +38,7 @@
             </select>
         </div>
         <div class="text-center">
-            <button type="submit" class="btn btn-primary">Crear Evento</button>
+            <button type="submit" class="btn btn-primary" th:text="${evento.id} == null ? 'Crear Evento' : 'Guardar Cambios'">Crear Evento</button>
             <a th:href="@{/calendario/gestion}" class="btn btn-secondary">Cancelar</a>
         </div>
     </form>

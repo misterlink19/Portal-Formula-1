@@ -6,13 +6,11 @@ package com.portal.formula1.controller;
 
 import java.util.*;
 
-import com.portal.formula1.model.Encuesta;
-import com.portal.formula1.model.Piloto;
-import com.portal.formula1.model.Rol;
-import com.portal.formula1.model.UsuarioRegistrado;
+import com.portal.formula1.model.*;
 import com.portal.formula1.repository.PilotoDAO;
 import com.portal.formula1.repository.VotoDAO;
 import com.portal.formula1.service.EncuestaService;
+import com.portal.formula1.service.VotoService;
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +33,7 @@ public class EncuestaController {
     private EncuestaService encuestaService;
 
     @Autowired
-    private VotoDAO votoDAO;
+    private VotoService votoService;
 
     @Autowired
     private PilotoDAO pilotoDAO;
@@ -74,6 +72,49 @@ public class EncuestaController {
         return mv;
     }
 
+    @GetMapping({"/editarEncuesta/{permalink}"})
+    public ModelAndView mostrarFormularioEdicion(@PathVariable String permalink,HttpSession session) {
+        logger.debug("Entrando a mostrarFormularioCreacion");
+        UsuarioRegistrado usuario = (UsuarioRegistrado) session.getAttribute("usuario");
+
+        if (usuario == null || usuario.getRol() != Rol.ADMIN) {
+            return new ModelAndView("error").addObject("mensajeError", "Acceso denegado.");
+        }
+        ModelAndView mv = new ModelAndView("encuestas/editarEncuesta");
+        try {
+            Encuesta encuesta = encuestaService.obtenerEncuestaPorPermalink(permalink);
+            List<Piloto> pilotos = pilotoDAO.findAll();
+            mv.addObject("encuesta", encuesta);
+            mv.addObject("pilotos", pilotos);
+        }catch (NoSuchElementException e) {
+            logger.error("Encuesta no encontrada con permalink: {}", permalink);
+            mv.setViewName("error");
+            mv.addObject("mensajeError", "Encuesta no encontrada.");
+        }
+        return mv;
+    }
+    @PostMapping("/editarEncuesta")
+    public ModelAndView editarEncuesta(@ModelAttribute Encuesta encuesta, @RequestParam Set<Integer> pilotosSeleccionados, HttpSession session) {
+        logger.debug("Entrando a editar Encuesta");
+        UsuarioRegistrado usuario = (UsuarioRegistrado) session.getAttribute("usuario");
+
+        if (usuario == null || usuario.getRol() != Rol.ADMIN) {
+            return new ModelAndView("error").addObject("mensajeError", "Acceso denegado.");
+        }
+
+        ModelAndView mv = new ModelAndView();
+        try {
+
+            Set<Integer> pilotoSet = new HashSet<>(pilotosSeleccionados);
+            Encuesta nuevaEncuesta = encuestaService.editarEncuesta(encuesta, pilotoSet);
+            mv.setViewName("redirect:/encuestas/" + nuevaEncuesta.getPermalink());
+        } catch (Exception e) {
+            logger.error("Error al crear la encuesta: ", e);
+            mv.setViewName("error");
+            mv.addObject("mensajeError", "Error al crear la encuesta.");
+        }
+        return mv;
+    }
     @PostMapping
     public ModelAndView crearEncuesta(@ModelAttribute Encuesta encuesta, @RequestParam Set<Integer> pilotosSeleccionados, HttpSession session) {
         logger.debug("Entrando a crearEncuesta");
@@ -127,6 +168,7 @@ public class EncuestaController {
 
         ModelAndView mv = new ModelAndView();
         // Obtener todas las encuestas
+        encuestaService.archivarEncuestasExpiradas();
         List<Encuesta> encuestas = encuestaService.getAllEncuestas();
 
         // Configurar la vista y pasar los datos
@@ -135,7 +177,29 @@ public class EncuestaController {
 
         return mv;
     }
+    @GetMapping("/listar/historial")
+    public ModelAndView mostrarListaHistorialDeEncuestas(HttpSession session) {
+        logger.debug("Entrando a mostrarListaHistorialDeEncuestas");
 
+        UsuarioRegistrado usuario = (UsuarioRegistrado) session.getAttribute("usuario");
+        String correo = usuario.getEmail();
+        ModelAndView mv = new ModelAndView();
+        // Obtener todas las encuestas
+        encuestaService.archivarEncuestasExpiradas();
+        List<Voto> votos = votoService.obtenerVotosPorUsuario(correo);
+        List<Encuesta> encuestas = new ArrayList<>();
+
+        for (Voto voto : votos) {
+        encuestas.add(encuestaService.obtenerEncuestaPorPermalink(voto.getEncuesta().getPermalink()));
+        }
+
+
+        // Configurar la vista y pasar los datos
+        mv.setViewName("encuestas/listadoEncuestas");
+        mv.addObject("encuestas", encuestas);
+
+        return mv;
+    }
     @DeleteMapping("/eliminar/{permalink}")
     public ModelAndView eliminarEncuesta(@PathVariable String permalink, HttpSession session, RedirectAttributes redirectAttributes) {
         logger.debug("Entrando a eliminarEncuesta con permalink: {}", permalink);

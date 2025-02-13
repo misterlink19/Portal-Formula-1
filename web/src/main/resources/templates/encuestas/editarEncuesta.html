@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crear Encuesta</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link type="text/css" th:href="@{/styles/crearEncuesta.css}" rel="stylesheet">
+</head>
+<body onload="setInitialDateTime()" layout:fragment="body">
+<h1 class="text-center">Crear Nueva Encuesta</h1>
+<form th:action="@{/encuestas/editarEncuesta}" th:object="${encuesta}" method="post" class="mt-4" onsubmit="return validarFormulario()">
+  <fieldset class="border p-4 text-center">
+    <div class="form-group row justify-content-center">
+      <div class="col-md-8">
+        <label for="titulo">Título</label>
+        <input type="text" class="form-control" th:field="*{titulo}" id="titulo" maxlength="255" required>
+      </div>
+    </div>
+    <div class="form-group row justify-content-center">
+      <div class="col-md-8">
+        <label for="descripcion">Descripción</label>
+        <textarea class="form-control" th:field="*{descripcion}" id="descripcion" maxlength="255" rows="4" required></textarea>
+      </div>
+    </div>
+    <div class="form-group row justify-content-center input-container">
+      <div class="col-md-4">
+        <label for="fechaInicio">Fecha de Inicio</label>
+        <input type="text" class="form-control" th:field="*{fechaInicio}" id="fechaInicio" required>
+      </div>
+      <div class="col-md-4">
+        <label for="fechaLimite">Fecha Límite</label>
+        <input type="text" class="form-control" th:field="*{fechaLimite}" id="fechaLimite" required>
+      </div>
+    </div>
+    <div class="form-group col-md-12">
+      <h2>Selecciona Pilotos</h2>
+      <p id="pilotosSeleccionadosCount">Pilotos seleccionados: 0</p>
+      <div class="scrollable-container" style="height:300px;overflow-y:auto">
+        <div class="row row-cols-1 row-cols-md-5 g-4">
+          <div class="col" th:each="piloto : ${pilotos}">
+            <div class="card h-100">
+              <div class="image-container">
+                <img th:src="@{'/uploads/' + ${piloto.rutaImagen}}" alt="Piloto" class="card-img-top img-thumbnail" style="object-fit:cover;height:150px">
+                <img th:src="@{'/images/pilotos/bandera/' + ${piloto.pais} + '.png'}" alt="Bandera" class="flag-icon">
+              </div>
+              <div class="card-body text-center">
+                <h5 class="card-title" th:text="${piloto.nombre} + ' ' + ${piloto.apellidos}"></h5>
+                <p class="card-text" th:text="'Equipo: ' + ${piloto.equipo.nombre}"></p>
+                <input type="checkbox" th:checked="${encuesta.pilotos.contains(piloto)}" th:name="pilotosSeleccionados" th:value="${piloto.dorsal}" onchange="actualizarContadorPilotos()">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="form-group col-md-12 mt-3">
+      <input type="submit" class="btn btn-primary" value="Guardar Cambios">
+      <input type="reset" class="btn btn-danger" value="Borrar los datos introducidos" onclick="reiniciarContadorPilotos(), setInitialDateTime()">
+    </div>
+  </fieldset>
+</form>
+<script layout:fragment="scripts" src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script layout:fragment="scripts" src="/javascript/crearEncuesta.js"></script>
+</body>
+</html>

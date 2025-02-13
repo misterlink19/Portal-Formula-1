@@ -38,13 +38,17 @@
             <li class="nav-item active"><a class="nav-link" th:href="@{/}">Inicio</a></li>
 
             <!-- Mostrar solo para el publico -->
-            <li class="nav-item" th:if="${session.usuario == null}">
+            <li class="nav-item" th:if="${session.usuario == null or (session.usuario != null and session.usuario.rol != T(com.portal.formula1.model.Rol).ADMIN)}">
                 <a class="nav-link" th:href="@{/encuestas/listar}">Lista de Encuestas</a>
             </li>
             <li class="nav-item" th:if="${session.usuario == null or (session.usuario != null and session.usuario.rol != T(com.portal.formula1.model.Rol).ADMIN)}">
                 <a class="nav-link" th:href="@{/noticias/listar}">Noticias</a>
             </li>
 
+            <!-- Solo para Usuario registrados -->
+            <li class="nav-item" th:if="${session.usuario != null} and ${session.usuario.rol == T(com.portal.formula1.model.Rol).USUARIO_BASICO}">
+                <a class="nav-link" th:href="@{/encuestas/listar/historial}">Historial de Encuestas</a>
+            </li>
             <!-- Solo para Administradores -->
             <li class="nav-item" th:if="${session.usuario != null} and ${session.usuario.rol == T(com.portal.formula1.model.Rol).ADMIN}">
                 <a class="nav-link" th:href="@{/encuestas}">Gestionar Encuestas</a>
@@ -54,9 +58,6 @@
             </li>
             <li class="nav-item" th:if="${session.usuario != null} and ${session.usuario.rol == T(com.portal.formula1.model.Rol).ADMIN}">
                 <a class="nav-link" th:href="@{/equipos}">Gestionar Equipos</a>
-            </li>
-            <li class="nav-item" th:if="${session.usuario != null} and ${session.usuario.rol == T(com.portal.formula1.model.Rol).ADMIN}">
-                <a class="nav-link" th:href="@{/admin/usuarios}">Gestionar Usuarios</a>
             </li>
             <li class="nav-item" th:if="${session.usuario != null} and ${session.usuario.rol == T(com.portal.formula1.model.Rol).ADMIN}">
                 <a class="nav-link" th:href="@{/admin/usuarios}">Gestionar Usuarios</a>

@@ -13,9 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
@@ -40,12 +37,60 @@ public class CircuitoControllerTest {
     }
 
     @Test
-    public void testMostrarFormulario() {
-        String viewName = circuitoController.mostrarFormulario();
+    public void testMostrarFormularioEditar_Success() {
+        Long circuitoId = 1L;
+        Circuito circuito = new Circuito();
+        when(circuitoService.obtenerCircuitoPorId(circuitoId)).thenReturn(circuito);
 
-        assertEquals("circuitos/crearCircuito", viewName, "La vista no coincide");
+        String result = circuitoController.mostrarFormularioEditar(circuitoId, model);
+
+        assertEquals("circuitos/editarCircuito", result);
+        verify(model).addAttribute("circuito", circuito);
     }
 
+    @Test
+    public void testEditarCircuito_Success() throws IOException {
+        Circuito circuito = new Circuito();
+        when(mockFile.isEmpty()).thenReturn(false);
+        when(mockFile.getOriginalFilename()).thenReturn("example.png");
+        InputStream inputStream = mock(InputStream.class);
+        when(mockFile.getInputStream()).thenReturn(inputStream);
+
+        String result = circuitoController.editarCircuito(circuito, mockFile, model);
+
+        verify(circuitoService, times(1)).crearOActualizarCircuito(circuito);
+        verify(model, times(1)).addAttribute(eq("mensaje"), anyString());
+
+        assertEquals("circuitos/editarCircuito", result);
+    }
+
+    @Test
+    public void testEditarCircuito_EmptyFile() {
+        Circuito circuito = new Circuito();
+        when(mockFile.isEmpty()).thenReturn(true);
+
+        String result = circuitoController.editarCircuito(circuito, mockFile, model);
+
+        verify(circuitoService, times(1)).crearOActualizarCircuito(circuito);
+        assertEquals(null, circuito.getTrazado(), "El trazado debe ser null si no hay archivo");
+
+        verify(model, times(1)).addAttribute(eq("mensaje"), eq("Circuito editado exitosamente!"));
+
+        assertEquals("circuitos/editarCircuito", result);
+    }
+
+    @Test
+    public void testEditarCircuito_FileCopyError() throws IOException {
+        Circuito circuito = new Circuito();
+        when(mockFile.isEmpty()).thenReturn(false);
+        when(mockFile.getOriginalFilename()).thenReturn("example.png");
+        doThrow(IOException.class).when(mockFile).getInputStream();
+
+        String result = circuitoController.editarCircuito(circuito, mockFile, model);
+
+        assertEquals("circuitos/editarCircuito", result);
+        verify(model).addAttribute("error", "Hubo un error al guardar el trazado.");
+    }
 
     @Test
     public void testRegistrarCircuitoExitoso() throws IOException {
@@ -54,11 +99,8 @@ public class CircuitoControllerTest {
 
         when(mockFile.isEmpty()).thenReturn(false);
         when(mockFile.getOriginalFilename()).thenReturn("trazado.png");
-        InputStream inputStream = mock(InputStream.class); // Simulamos un InputStream
+        InputStream inputStream = mock(InputStream.class);
         when(mockFile.getInputStream()).thenReturn(inputStream);
-
-        Path rutaArchivo = Paths.get("src/main/resources/static/uploads/circuitos").resolve("dummy_path");
-        mockStatic(Files.class).when(() -> Files.copy(eq(inputStream), eq(rutaArchivo), any())).thenReturn(1L);
 
         String viewName = circuitoController.registrarCircuito(circuito, mockFile, model);
 
@@ -84,6 +126,7 @@ public class CircuitoControllerTest {
 
         assertEquals("circuitos/crearCircuito", viewName, "La vista no coincide");
     }
+
     @Test
     public void testMostrarCircuito() {
         Circuito circuito = new Circuito();
@@ -91,9 +134,9 @@ public class CircuitoControllerTest {
         circuito.setNombre("Circuito de Monza");
 
         when(circuitoService.obtenerCircuitoPorId(1L)).thenReturn(circuito);
-        String viewName = circuitoController.mostrarCircuito(1L,model);
-        when(mockFile.isEmpty()).thenReturn(true);
-        assertEquals("circuitos/verCircuito", viewName, "La vista no coincide");
-    }
+        String viewName = circuitoController.mostrarCircuito(1L, model);
 
+        assertEquals("circuitos/verCircuito", viewName, "La vista no coincide");
+        verify(model).addAttribute("circuito", circuito);
+    }
 }
