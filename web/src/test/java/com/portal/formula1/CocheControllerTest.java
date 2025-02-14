@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Optional;
 
@@ -91,7 +92,9 @@ public class CocheControllerTest {
         when(autentificacionService.checkUser(anyString())).thenReturn(user);
         when(bindingResult.hasErrors()).thenReturn(false);
 
-        ModelAndView mv = cocheController.editarCoche(coche, bindingResult, null, request);
+        RedirectAttributes redirectAttributes = mock(RedirectAttributes.class);
+
+        ModelAndView mv = cocheController.editarCoche(coche, bindingResult, redirectAttributes, request);
 
         assertEquals("redirect:/coches", mv.getViewName());
         verify(cocheService, times(1)).actualizarCoche(coche);

@@ -9,7 +9,7 @@
 </head>
 <body layout:fragment="body">
 <div class="container mt-5">
-    <h1 class="text-center">Crear Nuevo Evento</h1>
+    <h1 class="text-center" th:text="${title}">Crear Nuevo Evento</h1>
     <!-- Mostrar mensaje si no hay circuitos -->
     <div th:if="${#lists.isEmpty(circuitos)}" class="alert alert-warning text-center">
         <strong>No hay circuitos disponibles para crear un evento.</strong>

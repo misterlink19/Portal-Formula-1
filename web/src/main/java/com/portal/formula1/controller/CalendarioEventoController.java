@@ -66,6 +66,7 @@ public class CalendarioEventoController {
         try {
             mv.addObject("evento", new CalendarioEvento());
             mv.addObject("circuitos", circuitoService.listarCircuitos());
+            mv.addObject("title","Crear Nuevo Evento");
         } catch (Exception e) {
             logger.error("Error al cargar el formulario de creación: ", e);
             mv.setViewName("error");
@@ -161,6 +162,7 @@ public class CalendarioEventoController {
             }
             mv.addObject("evento", evento);
             mv.addObject("circuitos", circuitoService.listarCircuitos());
+            mv.addObject("title","Editar Evento");
         } catch (NoSuchElementException e) {
             logger.error("Evento no encontrado con id:{}", id);
             mv.setViewName("error");

@@ -174,6 +174,7 @@ public class EncuestaController {
         // Configurar la vista y pasar los datos
         mv.setViewName("encuestas/listadoEncuestas");
         mv.addObject("encuestas", encuestas);
+        mv.addObject("title","Votaciones Disponibles");
 
         return mv;
     }
@@ -197,6 +198,7 @@ public class EncuestaController {
         // Configurar la vista y pasar los datos
         mv.setViewName("encuestas/listadoEncuestas");
         mv.addObject("encuestas", encuestas);
+        mv.addObject("title","Historial de encuestas");
 
         return mv;
     }
