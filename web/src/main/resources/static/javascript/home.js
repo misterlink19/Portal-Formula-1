@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
         buttonText: {
             today: 'Hoy'
         },
-        events: eventos,
+        events: typeof eventos !== "undefined" && eventos.length > 0 ? eventos : [],
         height: 600,
         contentHeight: 570,
         eventClick: function (info) {
