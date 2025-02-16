@@ -14,7 +14,7 @@
   <h1>Gestión de Equipos</h1>
   <div class="d-flex justify-content-start">
     <!-- Botón "Crear un Equipo" -->
-    <a th:href="@{/equipos/crear}" class="btn btn-primary mr-4">Crear un Equipo</a>
+    <a th:href="@{/equipos/crear}" class="btn btn-primary mr-4" th:if="${usuario.rol == T(com.portal.formula1.model.Rol).JEFE_DE_EQUIPO}" >Crear un Equipo</a>
 
     <!-- Botón "Ver Listado de Equipos" solo para administradores -->
     <a th:if="${usuario.rol == T(com.portal.formula1.model.Rol).ADMIN}"
