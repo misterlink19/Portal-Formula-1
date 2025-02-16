@@ -27,11 +27,11 @@
                     </div>
                 </div>
                 <div class="card-footer d-flex justify-content-between align-items-center">
-                    <span class="badge bg-primary" th:text="${#lists.size(equipo.responsables)}  + ' Responsables'"></span>
+                    <span class="badge bg-primary" th:text="${#lists.size(equipo.responsables)}  + ' Responsables'" th:if="${session.usuario != null} and ${session.usuario.rol == T(com.portal.formula1.model.Rol).ADMIN}"></span>
                     <div>
                         <a th:href="@{/equipos/{id}(id=${equipo.id})}" class="btn btn-outline-primary btn-sm me-2">Ver detalles</a>
-                        <a th:href="@{/equipos/editar/{id}(id=${equipo.id})}" class="btn btn-outline-warning btn-sm me-2">Editar</a>
-                        <button type="button" class="btn btn-outline-danger btn-sm delete-btn" th:attr="data-id=${equipo.id}" onclick="mostrarModal(this)">
+                        <a th:href="@{/equipos/editar/{id}(id=${equipo.id})}" class="btn btn-outline-warning btn-sm me-2" th:if="${session.usuario != null} and ${session.usuario.rol == T(com.portal.formula1.model.Rol).ADMIN}">Editar</a>
+                        <button type="button" class="btn btn-outline-danger btn-sm delete-btn" th:attr="data-id=${equipo.id}"  th:if="${session.usuario != null} and ${session.usuario.rol == T(com.portal.formula1.model.Rol).ADMIN}" onclick="mostrarModal(this)">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>

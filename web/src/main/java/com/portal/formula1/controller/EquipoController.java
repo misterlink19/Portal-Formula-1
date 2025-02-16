@@ -170,32 +170,21 @@ public class EquipoController {
     }
 
     @GetMapping("/{id}")
-    public ModelAndView mostrarEquipo(@PathVariable Long id, @RequestParam(value = "mensaje", required = false) String mensaje, HttpServletRequest request) {
+    public ModelAndView mostrarEquipo(@PathVariable Long id, HttpServletRequest request) {
         logger.debug("Entrando a mostrarEquipo con id: {}", id);
         ModelAndView mv = new ModelAndView("equipos/verEquipo");
-
         try {
             UsuarioRegistrado user = (UsuarioRegistrado) request.getSession().getAttribute("usuario");
-            if (user == null) {
-                throw new AccessDeniedException("Usuario no autenticado.");
-            }
 
             Equipo equipo = equipoService.obtenerEquipoPorId(id)
                     .orElseThrow(() -> new NoSuchElementException("Equipo no encontrado"));
 
-            boolean esResponsable = equipo.getResponsables().stream()
-                    .anyMatch(responsable -> responsable.getUsuario().equals(user.getUsuario()));
-            if (!esResponsable && user.getRol() != Rol.ADMIN) {
+            // Si es Jefe de equipo, solo puede ver su propio equipo
+            if (user != null && user.getRol() == Rol.JEFE_DE_EQUIPO && !equipo.getId().equals(user.getEquipo().getId())) {
                 throw new AccessDeniedException("No tienes permisos para ver este equipo.");
             }
 
             mv.addObject("equipo", equipo);
-
-            // Añadir el mensaje al modelo si existe
-            if (mensaje != null && !mensaje.isEmpty()) {
-                mv.addObject("mensaje", mensaje);
-            }
-
         } catch (NoSuchElementException e) {
             logger.error("Equipo no encontrado con id: {}", id);
             mv.setViewName("error");
@@ -209,7 +198,6 @@ public class EquipoController {
             mv.setViewName("error");
             mv.addObject("mensajeError", "Error al mostrar el equipo.");
         }
-
         return mv;
     }
 
@@ -251,6 +239,7 @@ public class EquipoController {
 
         return mv;
     }
+
     @Transactional
     @PostMapping("eliminar/{id}")
     public ModelAndView eliminarEquipo(@PathVariable Long id, @ModelAttribute("mensaje") String mensaje, HttpServletRequest request) {
@@ -274,8 +263,8 @@ public class EquipoController {
                 for (Piloto p : equipo.getPilotos()) {
                     pilotoService.eliminarPiloto(p.getDorsal());
                 }
-            }catch(Exception e){
-                logger.error("Error al eliminar un piloto del equipo",e);
+            } catch (Exception e) {
+                logger.error("Error al eliminar un piloto del equipo", e);
                 mv.setViewName("error");
                 mv.addObject("mensajeError", "Error al eliminar un piloto del equipo.");
             }
@@ -295,6 +284,7 @@ public class EquipoController {
         }
         return mv;
     }
+
     @PostMapping("/editar/{id}")
     public ModelAndView editarEquipo(@PathVariable Long id,
                                      @Valid @ModelAttribute("equipo") Equipo equipo,
@@ -371,23 +361,26 @@ public class EquipoController {
     public ModelAndView listarEquipos(HttpSession session) {
         logger.debug("Entrando a Listado de Equipos");
         UsuarioRegistrado usuario = (UsuarioRegistrado) session.getAttribute("usuario");
-
-        // Verificar si el usuario es ADMIN o JEFE DE EQUIPO
-        if (usuario == null || (usuario.getRol() != Rol.ADMIN && usuario.getRol() != Rol.JEFE_DE_EQUIPO )) {
-            return new ModelAndView("error").addObject("mensajeError", "Acceso denegado.");
-        }
         ModelAndView mv = new ModelAndView("equipos/listadoEquipos");
-        if(usuario.getRol() == Rol.ADMIN) {
+
+
+        // Si el usuario es un JEFE_DE_EQUIPO, solo podrá ver su propio equipo
+        if (usuario != null && usuario.getRol() == Rol.JEFE_DE_EQUIPO  ) {
+            if (usuario.getEquipo() != null) {
+                Optional<Equipo> equipo = equipoService.obtenerEquipoPorId(usuario.getEquipo().getId());
+                equipo.ifPresentOrElse(
+                        e -> mv.addObject("equipos", List.of(e)),
+                        () -> mv.addObject("equipos", List.of())
+                );
+            } else {
+                mv.addObject("equipos", List.of());
+            }
+        } else {
+            // Si el usuario es público o admin, puede ver todos los equipos
             List<Equipo> equipos = equipoService.obtenerTodosLosEquipos();
             mv.addObject("equipos", equipos);
-        }else if(usuario.getRol() == Rol.JEFE_DE_EQUIPO) {
-            Optional<Equipo> equipo = equipoService.obtenerEquipoPorId(usuario.getEquipo().getId());
-            if(equipo.isPresent()) {
-                mv.addObject("equipos", equipo);
-            }else{
-                mv.addObject("equipos", null);
-            }
         }
+
         mv.addObject("usuario", usuario);
         return mv;
     }
@@ -421,7 +414,7 @@ public class EquipoController {
     @DeleteMapping("/eliminar/{usuario}")
     public ResponseEntity<?> eliminarResponsable(@PathVariable("usuario") String usuarioEliminar, HttpServletRequest request) {
         UsuarioRegistrado user = (UsuarioRegistrado) request.getSession().getAttribute("usuario");
-        if (user == null || (user.getRol() != Rol.ADMIN && user.getRol() != Rol.JEFE_DE_EQUIPO )) {
+        if (user == null || (user.getRol() != Rol.ADMIN && user.getRol() != Rol.JEFE_DE_EQUIPO)) {
             return ResponseEntity.badRequest().body("No puedes acceder.");
         } else {
             usuarioService.eliminarUsuarioRespondable(usuarioEliminar);

@@ -44,6 +44,9 @@
             <li class="nav-item" th:if="${session.usuario == null or (session.usuario != null and session.usuario.rol != T(com.portal.formula1.model.Rol).ADMIN)}">
                 <a class="nav-link" th:href="@{/noticias/listar}">Noticias</a>
             </li>
+            <li class="nav-item" th:if="${session.usuario == null or (session.usuario != null and session.usuario.rol != T(com.portal.formula1.model.Rol).ADMIN and session.usuario.rol != T(com.portal.formula1.model.Rol).JEFE_DE_EQUIPO)}">
+                <a class="nav-link" th:href="@{/equipos/listar}">Equipos</a>
+            </li>
 
             <!-- Solo para Usuario registrados -->
             <li class="nav-item" th:if="${session.usuario != null} and ${session.usuario.rol == T(com.portal.formula1.model.Rol).USUARIO_BASICO}">
