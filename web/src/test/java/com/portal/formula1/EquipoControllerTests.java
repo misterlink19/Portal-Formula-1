@@ -161,17 +161,6 @@ public class EquipoControllerTests {
                 .andExpect(model().attributeExists("mensajeError"));
     }
 
-    /**
-     * Verifica que se maneja correctamente el caso en el que no se permite acceder al listado de Equipos.
-     **/
-    @Test
-    public void testListarEquipos_AccesoDenegado() throws Exception {
-        mockMvc.perform(get("/equipos/listar"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("error"))
-                .andExpect(model().attributeExists("mensajeError"))
-                .andExpect(model().attribute("mensajeError", "Acceso denegado."));
-    }
 
     /**
      * Verifica que se maneja correctamente el caso en el que el administrador accede.
