@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}" >
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listado de Encuestas</title>
+    <link type="text/css" th:href="@{/styles/listadoEncuestas.css}" rel="stylesheet">
+</head>
+<body>
+<div layout:fragment="body">
+    <main role="main" class="container mt-5">
+
+        <!-- Mostrar mensaje de éxito si existe -->
+        <div th:if="${mensaje}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <span th:text="${mensaje}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <!-- Mostrar mensaje de error si existe -->
+        <div th:if="${mensajeError}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${mensajeError}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <h2 th:text="${title}">Votaciones Disponibles</h2>
+        <div class="filters">
+            <input class="filters-input" type="text" id="busqueda" placeholder="Buscar por título o palabra clave">
+            <select class="filters-select" id="estado">
+                <option value="todos">Todos</option>
+                <option value="disponible">Disponible</option>
+                <option value="no disponible">No disponible</option>
+            </select>
+            <input class="filters-date" type="date" id="fecha" placeholder="Fecha límite">
+        </div>
+
+        <!-- Mostrar mensaje si no hay encuestas registradas -->
+        <div th:if="${#lists.isEmpty(encuestas)}">
+            <p class="alert alert-warning">No hay encuestas registradas en este momento.</p>
+        </div>
+
+        <!-- Mostrar las encuestas si hay registros -->
+        <div th:if="${!#lists.isEmpty(encuestas)}">
+            <div id="votaciones" class="votaciones">
+                <p id="no-coincidencias" class="no-coincidencias">No hay encuestas que coincidan con el filtro</p>
+
+                <div th:each="encuesta : ${encuestas}" class="votacion" th:data-titulo="${encuesta.titulo}"
+                     th:data-descripcion="${encuesta.descripcion}"
+                     th:data-fecha-limite="${#temporals.format(encuesta.fechaLimite, 'yyyy-MM-dd')}"
+                     th:data-disponible="${encuesta.fechaLimite >= #temporals.createNow()}">
+                    <div class="votacion-header">
+                        <h3 class="votacion-title" th:text="${encuesta.titulo}">Título de la encuesta</h3>
+                    </div>
+                    <div class="votacion-content">
+                        <p class="votacion-description" th:text="${encuesta.descripcion}">Descripción de la encuesta</p>
+                        <p class="votacion-date" th:text="'Fecha límite: ' + ${#temporals.format(encuesta.fechaLimite, 'yyyy-MM-dd')}">Fecha límite</p>
+                    </div>
+                    <div class="votacion-footer">
+                        <p class="estado" th:classappend="${encuesta.fechaLimite >= #temporals.createNow()} ? 'disponible' : 'no-disponible'" th:text="${encuesta.fechaLimite >= #temporals.createNow() ? 'Disponible' : 'No disponible'}"></p>
+
+                        <button th:if="${encuesta.fechaLimite >= #temporals.createNow()}"
+                                th:text="'Realizar votación'"
+                                th:attr="onclick= 'location.href=\'/votos/' + ${encuesta.permalink} + '/votar'+ '\''">
+                        </button>
+
+                        <button th:unless="${encuesta.fechaLimite >= #temporals.createNow()}"
+                                th:text="'Ver Resultados'"
+                                th:attr="onclick= 'location.href=\'/votos/' + ${encuesta.permalink} + '/resultados'+ '\''">
+                        </button>
+                        <button th:unless="${encuesta.fechaLimite < #temporals.createNow()}" th:if="${session.usuario != null} and ${session.usuario.rol == T(com.portal.formula1.model.Rol).ADMIN}"
+                                th:text="'Editar'"
+                                th:attr="onclick= 'location.href=\'/encuestas/editarEncuesta/' + ${encuesta.permalink} + '\''">
+                        </button>
+                        <!-- Botón de eliminación solo visible para administradores -->
+                        <form th:if="${session.usuario != null and session.usuario.rol == T(com.portal.formula1.model.Rol).ADMIN}"
+                              th:action="@{/encuestas/eliminar/{permalink}(permalink=${encuesta.permalink})}" method="post"
+                              onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta encuesta? Esta acción no se puede deshacer.');">
+                            <input type="hidden" name="_method" value="delete" />
+                            <button type="submit" class="btn btn-danger text-black text-bg-danger">Eliminar Encuesta</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <a th:href="@{/encuestas}" class="btn btn-secondary mt-3">Volver a Encuestas</a>
+    </main>
+</div>
+<script th:src="@{/javascript/listadoEncuestas.js}" layout:fragment="scripts"></script>
+</body>
+</html>

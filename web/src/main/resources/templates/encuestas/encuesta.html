@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+layout:decorate="~{layout}"  lang="es">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <title>Gestión de Encuestas</title>
+</head>
+<body >
+
+  <div layout:fragment="body" >
+    <h1>Gestión de Encuestas</h1>
+    <a th:href="@{/encuestas/crearEncuestas}" class="btn btn-primary">Crear una Encuesta</a>
+    <a th:href="@{/encuestas/listar}" class="btn btn-primary">Ver todas las Encuestas</a>
+    <a onclick="history.back()" class="btn btn-danger">Salir al Menú Anterior</a>
+  </div>
+
+</body>
+</html>

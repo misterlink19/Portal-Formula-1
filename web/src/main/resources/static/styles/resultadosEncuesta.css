@@ -1,0 +1,66 @@
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+h1 {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+.resultados {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 2rem;
+}
+.piloto {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 1rem;
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+.piloto:hover {
+    transform: translateY(-5px);
+}
+.piloto img {
+    min-width: 150px;
+    min-height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+}
+.piloto h2 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+.piloto p {
+    margin: 0.5rem 0;
+}
+.piloto .votos {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #007bff;
+}
+.ganador {
+    order: -1;
+    background-color: #ffd700;
+    transform: scale(1.05);
+}
+.ganador:hover {
+    transform: scale(1.1);
+}
+.ganador::before {
+    content: "🏆";
+    font-size: 2rem;
+    position: absolute;
+    top: -1rem;
+    left: 50%;
+    transform: translateX(-50%);
+}
+@media (max-width: 768px) {
+    .resultados {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+}

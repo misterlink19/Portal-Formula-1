@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Usuarios</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body layout:fragment="body">
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Lista de Usuarios</h1>
+
+    <!-- Filtros -->
+    <form class="mb-4" th:action="@{/admin/usuarios}" method="get">
+        <div class="row">
+            <div class="col-md-4">
+                <input type="text" name="nombre" class="form-control" placeholder="Buscar por nombre" th:value="${param.nombre}" />
+            </div>
+            <div class="col-md-3">
+                <select name="rol" class="form-select">
+                    <option value="">Todos los roles</option>
+                    <option value="ADMIN" th:selected="${param.rol == 'ADMIN'}">Administrador</option>
+                    <option value="JEFE_DE_EQUIPO" th:selected="${param.rol == 'JEFE_DE_EQUIPO'}">Jefe de equipo</option>
+                    <option value="USUARIO_BASICO" th:selected="${param.rol == 'USUARIO_BASICO'}">Usuario Básico</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="validacion" class="form-select">
+                    <option value="">Todos</option>
+                    <option value="true" th:selected="${param.validacion == 'true'}">Verificado</option>
+                    <option value="false" th:selected="${param.validacion == 'false'}">No Verificado</option>
+                </select>
+            </div>
+
+            <!-- Nueva opción de ordenación -->
+            <div class="col-md-2">
+                <select name="orden" class="form-select">
+                    <option value="">Ordenar por</option>
+                    <option value="fecha" th:selected="${param.orden == 'fecha'}">Fecha de Registro</option>
+                    <option value="nombre" th:selected="${param.orden == 'nombre'}">Nombre</option>
+                </select>
+            </div>
+
+
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Tabla de usuarios -->
+    <form id="miFormulario" th:action="@{/admin/usuarios/validar}" method="post">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>
+                    <input type="checkbox" id="selectAll" onclick="toggleSelection()" />
+                </th>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Rol</th>
+                <th>Rol Solicitado</th>
+                <th>Verificación</th>
+                <th>Acciones</th>
+                <th>Fecha de Registro</th>
+                <th>Equipo</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="usuario : ${usuarios}">
+                <td>
+                    <input type="checkbox" name="usuariosIds" th:value="${usuario.usuario}" />
+                </td>
+                <td th:text="${usuario.nombre}"></td>
+                <td th:text="${usuario.email}"></td>
+                <td th:text="${usuario.rol}"></td>
+                <td th:text="${usuario.rolSolicitado != null ? usuario.rolSolicitado : '-'}"></td>
+                <td>
+                    <span th:if="${usuario.validacion}" class="badge bg-success">Verificado</span>
+                    <span th:if="${!usuario.validacion}" class="badge bg-danger">No Verificado</span>
+                </td>
+
+                <td>
+                    <a th:href="@{/admin/usuarios/{usuario}(usuario=${usuario.usuario})}" class="btn btn-info btn-sm">Ver Detalles</a>
+
+                    <button type="button"
+                            class="btn btn-danger btn-sm"
+                            th:attr="data-usuario=${usuario.usuario},data-nombre=${usuario.nombre}"
+                            onclick="mostrarModalConfirmacion(this.getAttribute('data-usuario'), this.getAttribute('data-nombre'))">
+                        Eliminar
+                    </button>
+
+                </td>
+                <td th:text="${usuario.fechaRegistro}"></td>
+
+                <td>
+                    <span th:if="${usuario.equipo != null}" th:text="${usuario.equipo.nombre}">equipo</span>
+                    <span th:unless="${usuario.equipo != null}">----</span>
+                </td>
+
+
+            </tr>
+            </tbody>
+        </table>
+
+
+        <!-- Botón de validación -->
+        <div class="d-flex justify-content-end">
+            <button id="botonValidarUsuarios" type="submit" class="btn btn-success">Validar seleccionados</button>
+        </div>
+        <!-- Botón de validación de roles-->
+        <div class="d-flex justify-content-end">
+            <button id="botonValidarRoles" type="submit" class="btn btn-success mt-5">Validar Roles seleccionados</button>
+        </div>
+        <!-- volver a la página principal-->
+        <div class="d-flex justify-content-start">
+            <a th:href="@{/}" class="btn btn-secondary mt-3">Volver al menú principal</a>
+        </div>
+
+    </form>
+
+    <!-- Mensaje si no hay usuarios -->
+    <p th:if="${usuarios.isEmpty()}" class="text-center text-muted">No hay usuarios registrados.</p>
+
+    <!-- Paginación -->
+    <nav aria-label="Page navigation" th:if="${totalPaginas > 1}">
+        <ul class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${paginaActual == 1} ? 'disabled'">
+                <a class="page-link" th:href="@{/admin/usuarios(page=${paginaActual - 1}, nombre=${param.nombre}, rol=${param.rol}, validacion=${param.validacion})}">Anterior</a>
+            </li>
+            <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPaginas)}" th:classappend="${i == paginaActual} ? 'active'">
+                <a class="page-link" th:href="@{/admin/usuarios(page=${i}, nombre=${param.nombre}, rol=${param.rol}, validacion=${param.validacion})}" th:text="${i}"></a>
+            </li>
+            <li class="page-item" th:classappend="${paginaActual == totalPaginas} ? 'disabled'">
+                <a class="page-link" th:href="@{/admin/usuarios(page=${paginaActual + 1}, nombre=${param.nombre}, rol=${param.rol}, validacion=${param.validacion})}">Siguiente</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<!-- Modal de confirmación -->
+<div class="modal fade" id="confirmarEliminacion" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                ¿Está seguro de que desea eliminar al usuario <span id="nombreUsuario"></span>?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" onclick="eliminarUsuario()">Eliminar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function toggleSelection() {
+        const checkboxes = document.querySelectorAll('input[name="usuariosIds"]');
+        const selectAll = document.getElementById('selectAll');
+        checkboxes.forEach(checkbox => checkbox.checked = selectAll.checked);
+    }
+    document.getElementById('botonValidarUsuarios').addEventListener('click', function(event) {
+        event.preventDefault();
+
+        const formulario = document.getElementById('miFormulario');
+        formulario.action = '/admin/usuarios/validar';
+
+        formulario.submit();
+    });
+    document.getElementById('botonValidarRoles').addEventListener('click', function(event) {
+        event.preventDefault();
+
+        const formulario = document.getElementById('miFormulario');
+        formulario.action = '/admin/usuarios/validarRol';
+
+        formulario.submit();
+    });
+
+    let usuarioAEliminar = '';
+
+    function mostrarModalConfirmacion(usuario, nombre) {
+        usuarioAEliminar = usuario;
+        document.getElementById('nombreUsuario').textContent = nombre;
+        new bootstrap.Modal(document.getElementById('confirmarEliminacion')).show();
+    }
+
+    function eliminarUsuario() {
+        fetch(`/admin/usuarios/eliminar/${usuarioAEliminar}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    location.reload();
+                }
+            })
+            .catch(error => {
+                alert('Error al eliminar el usuario');
+            });
+        // Cerrar el modal después de la eliminación
+        const modal = bootstrap.Modal.getInstance(document.getElementById('confirmarEliminacion'));
+        modal.hide();
+    }
+
+</script>
+</body>
+</html>
+

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Eliminar Coche</title>
+  <link rel="stylesheet" th:href="@{/styles/eliminarCoche.css}">
+</head>
+<body layout:fragment="body">
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <h3>Eliminar Coche</h3>
+    </div>
+    <div class="card-content">
+      <!-- Select vehicle Section -->
+      <div class="form-group">
+        <label for="car-select">Seleccionar Coche</label>
+          <select id="car-select" class="select">
+              <option value="">Seleccione un coche</option>
+              <th:block th:each="coche : ${listaCoches}">
+                  <option
+                          th:value="${coche.codigo}"
+                          th:data-nombre="${coche.nombre}"
+                          th:data-ers-curva-lenta="${coche.ersCurvaLenta}"
+                          th:data-ers-curva-media="${coche.ersCurvaMedia}"
+                          th:data-ers-curva-rapida="${coche.ersCurvaRapida}"
+                          th:data-consumo="${coche.consumo}"
+                          th:data-equipo-id="${coche.equipo.id}"
+                          th:data-piloto-id="${coche.piloto != null ? coche.piloto.getDorsal() : ''}"
+                          th:text="${coche.nombre}">
+                  </option>
+              </th:block>
+          </select>
+      </div>
+
+        <!-- Sección de detalles del coche -->
+        <div class="car-details">
+            <div class="detail">
+                <label>Nombre</label>
+                <p id="detalle-nombre"></p>
+            </div>
+            <div class="detail">
+                <label>ERS Curva Lenta</label>
+                <p id="detalle-ers-curva-lenta"></p>
+            </div>
+            <div class="detail">
+                <label>ERS Curva Media</label>
+                <p id="detalle-ers-curva-media"></p>
+            </div>
+            <div class="detail">
+                <label>ERS Curva Rápida</label>
+                <p id="detalle-ers-curva-rapida"></p>
+            </div>
+            <div class="detail">
+                <label>Consumo</label>
+                <p id="detalle-consumo"></p>
+            </div>
+            <div class="detail">
+                <label>ID de Equipo</label>
+                <p id="detalle-equipo-id"></p>
+            </div>
+            <div class="detail">
+                <label>Dorsal de Piloto</label>
+                <p id="detalle-piloto-id"></p>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer">
+      <button class="delete-button">Eliminar Coche</button>
+    </div>
+
+    <div class="dialog hidden">
+        <div class="dialog-content">
+          <h2>¿Está seguro?</h2>
+          <p>Esta acción no se puede deshacer. Se eliminará permanentemente el coche y todos sus datos asociados.</p>
+          <div class="dialog-actions">
+            <button class="cancel-button">Cancelar</button>
+            <button class="confirm-button">Eliminar</button>
+          </div>
+        </div>
+    </div>
+  </div>
+</div>
+
+<script src="/javascript/eliminarCoche.js"></script>
+</body>
+</html>

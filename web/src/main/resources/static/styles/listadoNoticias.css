@@ -1,0 +1,128 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f2f5;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 80%;
+    margin: 20px auto;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+    font-size: 2em;
+    margin-bottom: 20px;
+}
+
+.noticia-item {
+    background-color: #ffffff;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.noticia-content {
+    flex: 1;
+    margin-right: 20px;
+}
+
+.noticia-title {
+    font-size: 1.5em;
+    color: #0066cc;
+    font-weight: bold;
+    margin: 0;
+    margin-bottom: 10px;
+}
+
+.noticia-title a {
+    text-decoration: none;
+    color: #0066cc;
+}
+
+.noticia-title a:hover {
+    text-decoration: underline;
+}
+
+.noticia-description {
+    font-size: 1em;
+    color: #555;
+    line-height: 1.5;
+    margin-bottom: 10px;
+}
+
+.noticia-footer {
+    font-size: 0.9em;
+    color: #888;
+}
+
+.noticia-image {
+    flex-shrink: 0;
+    width: 150px;
+    height: auto;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.button-container {
+    text-align: right;
+}
+
+.button-container button {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    font-size: 0.9em;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.button-container button:hover {
+    background-color: #c82333;
+}
+
+body {
+    background-color: #f8f9fa;
+    font-family: 'Arial', sans-serif;
+}
+.noticia-card {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+.noticia-title a {
+    text-decoration: none;
+    color: #007bff;
+}
+.noticia-title a:hover {
+    color: #0056b3;
+}
+.noticia-description {
+    color: #6c757d;
+}
+.noticia-footer {
+    font-size: 0.85em;
+    color: #adb5bd;
+}
+.search-bar {
+    margin-bottom: 20px;
+}
+
+#crearNoticia {
+    margin-top: -109px;
+    margin-left: -50px;
+}
+
+.noticia-card .btn {
+    margin-top: 10px;
+    margin-right: 5px;
+}

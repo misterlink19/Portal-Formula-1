@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}" >
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ver Coches</title>
+    <link type="text/css" th:href="@{/styles/verCoches.css}" rel="stylesheet">
+</head>
+<body>
+<div layout:fragment="body" class="main">
+    <div class="containerList">
+        <h1>Lista de Coches</h1>
+        <div class="table-container">
+            <table>
+                <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Nombre</th>
+                    <th>ERS Curva Lenta</th>
+                    <th>ERS Curva Media</th>
+                    <th>ERS Curva Rápida</th>
+                    <th>Consumo (L/100km)</th>
+                    <th>Piloto Asignado</th>
+                    <th>Operaciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="coche : ${listaCoches}">
+                    <td th:text="${coche.codigo}">Código</td>
+                    <td th:text="${coche.nombre}">Nombre</td>
+                    <td th:text="${coche.ersCurvaLenta}">ERS Curva Lenta</td>
+                    <td th:text="${coche.ersCurvaMedia}">ERS Curva Media</td>
+                    <td th:text="${coche.ersCurvaRapida}">ERS Curva Rápida</td>
+                    <td th:text="${coche.consumo}">Consumo</td>
+                    <td th:text="${coche.piloto != null ? coche.piloto.getDorsal() : 'No hay Piloto Asignado'}">Piloto Asignado</td>
+
+                    <td>
+                        <div class="button-group">
+                            <a th:href="@{/coches/editar/{codigo}(codigo=${coche.codigo})}" class="button-accions button-accions-edit">Editar</a>
+                            <button class="button-accions button-accions-delete" th:attr="data-codigo=${coche.codigo}">Eliminar</button>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="dialog hidden">
+            <div class="dialog-content">
+                <h2>¿Está seguro?</h2>
+                <p>Esta acción no se puede deshacer. Se eliminará permanentemente el coche y todos sus datos asociados.</p>
+                <div class="dialog-actions">
+                    <button class="cancel-button">Cancelar</button>
+                    <button class="confirm-button">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <a th:href="@{/coches}" class="button-back">Volver a Coches</a>
+</div>
+<script th:src="@{/javascript/verCoche.js}" layout:fragment="scripts"></script>
+</body>
+</html>

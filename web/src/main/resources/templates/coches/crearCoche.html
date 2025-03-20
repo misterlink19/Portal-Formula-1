@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}" >
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Coche</title>
+    <link type="text/css" th:href="@{/styles/crearCoche.css}" rel="stylesheet">
+</head>
+<body>
+<div layout:fragment="body" class="main">
+    <div class="card">
+        <h1 class="card-title">Crear Nuevo Coche</h1>
+        <form id="carForm" th:action="@{/coches/crear}" th:object="${coche}" method="post">
+            <div class="form-group">
+                <label for="codigo">Código</label>
+                <input
+                        type="text"
+                        th:field="*{codigo}"
+                        id="codigo"
+                        name="codigo"
+                        maxlength="50"
+                        placeholder="Ej: SF21"
+                        required
+                >
+                <p class="description">Código interno único para identificar el vehículo</p>
+                <p class="description-error"></p>
+            </div>
+
+            <div class="form-group">
+                <label for="nombre">Nombre</label>
+                <input
+                        type="text"
+                        th:field="*{nombre}"
+                        id="nombre"
+                        name="nombre"
+                        maxlength="100"
+                        placeholder="Ej: Ferrari SF21"
+                        required
+                >
+                <p class="description">Nombre público del coche</p>
+            </div>
+
+            <div class="form-group">
+                <label for="ers_curva_lenta">ERS Curva Lenta (kWh)</label>
+                <input
+                        type="number"
+                        th:field="*{ersCurvaLenta}"
+                        id="ers_curva_lenta"
+                        name="ers_curva_lenta"
+                        step="0.01"
+                        min="0.01"
+                        max="0.06"
+                        placeholder="0.01-0.06"
+                        required
+                >
+                <p class="description">Ganancia de potencia en curvas lentas (entre 0.01 y 0.06 kWh)</p>
+                <p class="description-error"></p>
+            </div>
+
+            <div class="form-group">
+                <label for="ers_curva_media">ERS Curva Media (kWh)</label>
+                <input
+                        type="number"
+                        th:field="*{ersCurvaMedia}"
+                        id="ers_curva_media"
+                        name="ers_curva_media"
+                        step="0.01"
+                        min="0.01"
+                        max="0.06"
+                        placeholder="0.01-0.06"
+                        required
+                >
+                <p class="description">Ganancia de potencia en curvas de velocidad media (entre 0.01 y 0.06 kWh)</p>
+                <p class="description-error"></p>
+            </div>
+
+            <div class="form-group">
+                <label for="ers_curva_rapida">ERS Curva Rápida (kWh)</label>
+                <input
+                        type="number"
+                        th:field="*{ersCurvaRapida}"
+                        id="ers_curva_rapida"
+                        name="ers_curva_rapida"
+                        step="0.01"
+                        min="0.01"
+                        max="0.06"
+                        placeholder="0.01-0.06"
+                        required
+                >
+                <p class="description">Ganancia de potencia en curvas rápidas (entre 0.01 y 0.06 kWh)</p>
+                <p class="description-error"></p>
+            </div>
+
+            <div class="form-group">
+                <label for="consumo">Consumo (L/100km)</label>
+                <input
+                        type="number"
+                        th:field="*{consumo}"
+                        id="consumo"
+                        name="consumo"
+                        step="0.01"
+                        min="0"
+                        placeholder="Ej: 34"
+                        required
+                >
+                <p class="description">Consumo de combustible en litros cada 100 kilómetros</p>
+                <p class="description-error"></p>
+            </div>
+
+            <div class="button-group">
+                <button type="submit">Crear Coche</button>
+                <button type="reset">Borrar los datos introducidos</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script th:src="@{/javascript/crearCoche.js}" layout:fragment="scripts"></script>
+</body>
+</html>

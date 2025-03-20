@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}" >
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asignar Coche</title>
+    <link type="text/css" th:href="@{/styles/calculoCombustible.css}" rel="stylesheet">
+</head>
+<body>
+<div layout:fragment="body" class="main">
+    <div class="card">
+        <div class="card-header">
+            <h3>Herramienta de Calculo del Combustible</h3>
+        </div>
+        <div class="card-body">
+            <form id="calculo-form" th:action="@{/simulacion/ERS}" th:object="${consultaERS}" method="post">
+                <div class="form-group">
+                    <label for="circuito-select">Seleccionar Circuito</label>
+                    <select id="circuito-select" name="idCircuito" class="select-input" required>
+                        <option value="">Seleccione un Circuito</option>
+                        <option th:each="circuito : ${listaCircuito}"
+                                th:value="${circuito.id}"
+                                th:data-num-vueltas="${circuito.numeroVueltas}"
+                                th:data-longitud="${circuito.longitud}"
+                                th:data-numero-curvas-lentas="${circuito.numeroCurvasLentas}"
+                                th:data-numero-curvas-media="${circuito.numeroCurvasMedia}"
+                                th:data-numero-curvas-rapida="${circuito.numeroCurvasRapidas}"
+                                th:data-numero-total="${circuito.numeroVueltas}"
+                                th:text="${circuito.nombre} + ' ' + ${circuito.pais}">
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="car-select">Seleccionar Coche</label>
+                    <select id="car-select" name="idCoche" class="select-input" required>
+                        <option value="">Seleccione un coche</option>
+                        <option th:each="coche : ${listaCoches}"
+                                th:value="${coche.codigo}"
+                                th:data-consumo="${coche.consumo}"
+                                th:data-ers-curva-lenta="${coche.ersCurvaLenta}"
+                                th:data-ers-curva-media="${coche.ersCurvaMedia}"
+                                th:data-ers-curva-rapida="${coche.ersCurvaRapida}"
+                                th:text="${coche.nombre} + ' #' + ${coche.codigo}">
+                        </option>
+                    </select>
+                </div>
+
+                <input type="hidden" th:field="*{ahorradorUnitario}" id="input-ahorrador-unitario">
+                <input type="hidden" th:field="*{ahorradorTotal}" id="input-ahorrador-total">
+                <input type="hidden" th:field="*{normalUnitario}" id="input-normal-unitario">
+                <input type="hidden" th:field="*{normalTotal}" id="input-normal-total">
+                <input type="hidden" th:field="*{deportivoUnitario}" id="input-deportivo-unitario">
+                <input type="hidden" th:field="*{deportivoTotal}" id="input-deportivo-total">
+                <input type="hidden" th:field="*{equipo}" id="input-id-equipo">
+
+                <div id="result-section" class="result-section hidden">
+                    <h4>Resultados del Cálculo del ERS</h4>
+
+                    <p><strong>Circuito:</strong> <span id="result-circuito"></span></p>
+                    <p><strong>Coche:</strong> <span id="result-coche"></span></p>
+
+                    <h5>Modo Ahorrador</h5>
+                    <p><strong>Energía recuperada por vuelta:</strong> <span id="result-ahorrador-unitario"></span></p>
+                    <p><strong>Vueltas necesarias para carga completa:</strong> <span id="result-ahorrador-total"></span></p>
+
+                    <h5>Modo Normal</h5>
+                    <p><strong>Energía recuperada por vuelta:</strong> <span id="result-normal-unitario"></span></p>
+                    <p><strong>Vueltas necesarias para carga completa:</strong> <span id="result-normal-total"></span></p>
+
+                    <h5>Modo Deportivo</h5>
+                    <p><strong>Energía recuperada por vuelta:</strong> <span id="result-deportivo-unitario"></span></p>
+                    <p><strong>Vueltas necesarias para carga completa:</strong> <span id="result-deportivo-total"></span></p>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" id="save-button" class="btn-primary" disabled>
+                        Guardar Consulta
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script th:src="@{/javascript/calculoERS.js}" layout:fragment="scripts"></script>
+</body>
+</html>

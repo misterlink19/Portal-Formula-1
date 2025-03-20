@@ -1,0 +1,24 @@
+.container {
+    text-align: center; /* Centra el contenido del contenedor principal */
+}
+
+.card {
+    margin: auto; /* Centra la tarjeta en el contenedor principal */
+    max-width: 600px; /* Ajusta el ancho máximo de la tarjeta */
+}
+
+.logo-container {
+    margin: auto; /* Centra la imagen del logo */
+}
+
+.logo-container img {
+    width: 150px; /* Ancho de la imagen */
+    height: auto; /* Mantiene la proporción */
+    max-height: 150px; /* Altura máxima */
+    object-fit: contain; /* Ajusta la imagen para que no se recorte */
+}
+.card-img-top img-thumbnail {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+}

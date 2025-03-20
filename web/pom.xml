@@ -17,7 +17,11 @@
     <properties>
         <java.version>23</java.version>
     </properties>
-   <dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
@@ -44,7 +48,7 @@
             <groupId>org.springframework.session</groupId>
             <artifactId>spring-session-jdbc</artifactId>
         </dependency>
-        
+
         <!-- Dependencia de conexión a MySQL -->
         <dependency>
             <groupId>com.mysql</groupId>
@@ -64,15 +68,41 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+            <version>1.1.0.Final</version>
+            <type>jar</type>
+        </dependency>
         <!-- Dependencia de Spring Security -->
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-core</artifactId>
         </dependency>
-    </dependencies>
+       <!-- Dependencia del Layout -->
+       <dependency>
+           <groupId>nz.net.ultraq.thymeleaf</groupId>
+           <artifactId>thymeleaf-layout-dialect</artifactId>
+       </dependency>
 
-
+       <!--- Dependencias para pruebas con mockito -->
+    <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+    <groupId>org.mockito</groupId>
+    <artifactId>mockito-junit-jupiter</artifactId>
+    <scope>test</scope>
+    </dependency>
+        <!-- Spring Security Test -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+   </dependencies>
     <build>
         <plugins>
             <plugin>
@@ -89,5 +119,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

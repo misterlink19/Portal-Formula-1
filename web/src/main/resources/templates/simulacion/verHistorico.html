@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}" >
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Historial de Consultas</title>
+  <link type="text/css" th:href="@{/styles/historico.css}" rel="stylesheet">
+</head>
+<body>
+<div layout:fragment="body" class="main">
+
+  <!-- Historial de Combustible -->
+  <div class="containerList">
+    <h1>Historial de Consultas de Combustible</h1>
+    <div class="table-container">
+      <table th:if="${listaCombustible != null and not #lists.isEmpty(listaCombustible)}">
+        <thead>
+        <tr>
+          <th>ID Consulta</th>
+          <th>Fecha</th>
+          <th>Nombre del Circuito</th>
+          <th>Nombre del Coche</th>
+          <th>Consumo Total (L)</th>
+          <th>Consumo por Vuelta (L)</th>
+          <th>Equipo</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="consulta : ${listaCombustible}">
+          <td th:text="${consulta.idConsulta}">ID Consulta</td>
+          <td th:text="${consulta.fechaConsulta}">Fecha</td>
+          <td th:text="${consulta.nombreCircuito}">Circuito</td>
+          <td th:text="${consulta.nombreCoche}">Coche</td>
+          <td th:text="${consulta.consumoTotal}">Consumo Total</td>
+          <td th:text="${consulta.consumoVuelta}">Consumo por Vuelta</td>
+          <td th:text="${consulta.equipo.nombre}">Equipo</td>
+        </tr>
+        </tbody>
+      </table>
+      <!-- Si no hay datos de combustible, mostrar mensaje -->
+      <p th:if="${listaCombustible == null or #lists.isEmpty(listaCombustible)}" class="no-data">
+        No hay cálculos históricos de combustible.
+      </p>
+    </div>
+  </div>
+
+  <!-- Historial de ERS -->
+  <div class="containerList">
+    <h1>Historial de Consultas de ERS</h1>
+    <div class="table-container">
+      <table th:if="${listaErs != null and not #lists.isEmpty(listaErs)}">
+        <thead>
+        <tr>
+          <th>ID Consulta</th>
+          <th>Fecha</th>
+          <th>Nombre del Circuito</th>
+          <th>Nombre del Coche</th>
+          <th>Energía recuperada en modo Ahorrador (kWh)</th>
+          <th>Vueltas necesarias en modo Ahorrador</th>
+          <th>Energía recuperada en modo Normal (kWh)</th>
+          <th>Vueltas necesarias en modo Normal</th>
+          <th>Energía recuperada en modo Deportivo (kWh)</th>
+          <th>Vueltas necesarias en modo Deportivo</th>
+          <th>Equipo</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="consulta : ${listaErs}">
+          <td th:text="${consulta.idConsultaERS}">ID Consulta</td>
+          <td th:text="${consulta.fechaConsulta}">Fecha</td>
+          <td th:text="${consulta.nombreCircuito}">Circuito</td>
+          <td th:text="${consulta.nombreCoche}">Coche</td>
+          <td th:text="${consulta.ahorradorTotal}">Ahorrador Total</td>
+          <td th:text="${consulta.ahorradorUnitario}">Vueltas Ahorrador</td>
+          <td th:text="${consulta.normalTotal}">Normal Total</td>
+          <td th:text="${consulta.normalUnitario}">Vueltas Normal</td>
+          <td th:text="${consulta.deportivoTotal}">Deportivo Total</td>
+          <td th:text="${consulta.deportivoUnitario}">Vueltas Deportivo</td>
+          <td th:text="${consulta.equipo.nombre}">Equipo</td>
+        </tr>
+        </tbody>
+      </table>
+      <!-- Si no hay datos de ERS, mostrar mensaje -->
+      <p th:if="${listaErs == null or #lists.isEmpty(listaErs)}" class="no-data">
+        No hay cálculos históricos de ERS.
+      </p>
+    </div>
+  </div>
+
+  <a th:href="@{/simulacion}" class="button-back">Volver</a>
+</div>
+<script th:src="@{/javascript/verHistorico.js}" layout:fragment="scripts"></script>
+</body>
+</html>

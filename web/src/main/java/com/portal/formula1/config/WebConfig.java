@@ -9,7 +9,10 @@ import com.portal.formula1.interceptors.SessionInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.filter.HiddenHttpMethodFilter;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
@@ -20,11 +23,31 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(sessionInterceptor)
-                .addPathPatterns("/**").excludePathPatterns("/")
+                .addPathPatterns("/**")
+                .excludePathPatterns("/")
+                .excludePathPatterns("/login")
+                .excludePathPatterns("/calendario/evento/**")
+                .excludePathPatterns("/equipos/listar**")
+                .excludePathPatterns("/equipos/{id}")
+                .excludePathPatterns("/encuestas/**")
+                .excludePathPatterns("/noticias/**")
                 .excludePathPatterns("/styles/**")
                 .excludePathPatterns("/javascript/**")
                 .excludePathPatterns("/images/**")
-                .excludePathPatterns("/favicon.ico");
+                .excludePathPatterns("/favicon.ico")
+                .excludePathPatterns("/votos/**")
+                .excludePathPatterns("/registro/**")
+                .excludePathPatterns("/uploads/**");
     }
-    
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations("file:uploads/")
+                .addResourceLocations("file:src/main/resources/static/uploads/"); // Con esto carga las imagenes que estan en uploads dentro de static;
+    }
+    // Agrega este Bean para manejar métodos HTTP ocultos
+    @Bean
+    public HiddenHttpMethodFilter hiddenHttpMethodFilter() {
+        return new HiddenHttpMethodFilter();
+    }
 }

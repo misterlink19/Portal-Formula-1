@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}" >
+<head>
+    <title>Detalle de Noticia</title>
+</head>
+<body layout:fragment="body">
+<h1 th:text="${noticia.titulo}">Título de la Noticia</h1>
+
+<div>
+    <p th:text="${noticia.texto}"></p>
+    <p><small>Publicado el: <span th:text="${noticia.fechaPublicacion}"></span></small></p>
+    <div th:if="${noticia.imagen}">
+        <img th:src="@{'/uploads/' + ${noticia.imagen}}" alt="Imagen de la noticia" />
+    </div>
+</div>
+
+<a th:href="@{/noticias/listar}">Volver al listado de noticias</a>
+</body>
+</html>

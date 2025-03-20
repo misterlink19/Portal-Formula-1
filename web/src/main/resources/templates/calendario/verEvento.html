@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml" lang="es" layout:decorate="~{layout}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalles del Evento</title>
+    <link type="text/css" th:href="@{/styles/eventDetails.css}" rel="stylesheet">
+</head>
+<body layout:fragment="body">
+<div class="container py-5">
+    <h1 class="text-center mb-4">Detalles del Evento</h1>
+
+    <div class="p-4 border bg-white rounded shadow">
+        <div class="row">
+            <div class="col-md-8 event-details">
+                <h2 th:text="${evento.nombreEvento}"></h2>
+                <p><strong>Fecha:</strong> <span th:text="${evento.fecha}"></span></p>
+                <p><strong>Circuito:</strong> <span th:text="${evento.circuito.nombre}"></span></p>
+                <p><strong>Ciudad:</strong> <span th:text="${evento.circuito.ciudad}"></span></p>
+                <p><strong>País:</strong> <span th:text="${evento.circuito.pais}"></span></p>
+                <p><strong>Longitud:</strong> <span th:text="${evento.circuito.longitud}"></span> metros</p>
+                <p><strong>Número de vueltas:</strong> <span th:text="${evento.circuito.numeroVueltas}"></span></p>
+                <p><strong>Curvas:</strong></p>
+                <ul>
+                    <li>Lentas: <span th:text="${evento.circuito.numeroCurvasLentas}"></span></li>
+                    <li>Medias: <span th:text="${evento.circuito.numeroCurvasMedia}"></span></li>
+                    <li>Rápidas: <span th:text="${evento.circuito.numeroCurvasRapidas}"></span></li>
+                </ul>
+
+                <div class="text-center mt-4">
+                    <a href="/" class="btn btn-secondary">Volver al Inicio</a>
+                </div>
+            </div>
+
+            <div class="col-md-4 circuit-image">
+                <h3 class="mt-4">Trazado del Circuito</h3>
+                <img th:src="@{'/uploads/circuitos/' + ${evento.circuito.trazado}}"
+                     alt="Trazado del circuito"
+                     class="img-fluid rounded shadow"
+                     style="max-height: 400px;">
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

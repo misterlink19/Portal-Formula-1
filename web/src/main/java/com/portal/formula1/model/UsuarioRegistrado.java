@@ -1,76 +1,88 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.portal.formula1.model;
 
-import jakarta.persistence.Basic;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
 import lombok.Setter;
+import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
+import java.lang.annotation.Annotation;
+import java.time.LocalDateTime;
 
-/**
- *
- * @author fjavi
- */
 @Entity
 @Table(name = "usuarios_registrados")
 public class UsuarioRegistrado implements Serializable {
-    
+
     private static final long serialVersionUID = 1L;
-    
+
+    @Getter
     @Setter
     @Id
     @Column(name = "usuario", unique = true, nullable = false)
     private String usuario;
 
+    @Getter
     @Setter
-    @Basic(optional = false)
-    @Column(name = "nombre")
+    @Column(name = "nombre", nullable = false)
     @NotBlank(message = "El nombre no puede estar vacío.")
     private String nombre;
 
+    @Getter
     @Setter
-    @Basic(optional = false)
-    @Column(name = "email")
+    @Column(name = "email", nullable = false)
     @NotBlank(message = "El email no puede estar vacío.")
     private String email;
 
+    @Getter
     @Setter
-    @Basic(optional = false)
-    @Column(name = "contrasena")
+    @Column(name = "contrasena", nullable = false)
     @NotBlank(message = "La contraseña no puede estar vacía.")
     private String contrasena;
 
+    @Getter
     @Setter
-    @Basic(optional = false)
-    @Column(name = "rol")
-    @NotBlank(message = "El campo rol no puede estar vacío.")
-    private String rol;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "rol", nullable = false)
+    @NotNull(message = "El campo rol no puede ser nulo.")
+    private Rol rol;
 
-    public String getUsuario() {
-        return usuario;
+    @Getter
+    @Setter
+    @Enumerated(EnumType.STRING)
+    @Column(name = "rol_solicitado", nullable = true)
+    private Rol rolSolicitado;
+
+    @Getter
+    @Setter
+    @Column(name = "fecha_registro", nullable = false, updatable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime fechaRegistro;
+
+
+    @Getter
+    @Setter
+    @Column(name = "validacion", nullable = false)
+    private Boolean validacion = false;
+
+    @Getter
+    @Setter
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "equipo_id")
+    private Equipo equipo;
+
+    public UsuarioRegistrado() {
+        this.validacion = false;
+        this.fechaRegistro = LocalDateTime.now();
+    }
+    public UsuarioRegistrado(String usuario, Rol rol) {
+        super();
+        this.usuario = usuario;
+        this.rol = rol;
     }
 
-    public String getNombre() {
-        return nombre;
+    public boolean isValidacion() {
+        return this.validacion;
     }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getContrasena() {
-        return contrasena;
-    }
-
-    public String getRol() {
-        return rol;
-    }
-
 }

@@ -1,0 +1,84 @@
+.main {
+    min-width: 100vh;
+    margin-top: 5rem;
+    padding: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: start;
+}
+
+/* Tarjeta */
+.card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ddd;
+    width: 100%;
+    max-width: 600px;
+}
+
+/* Encabezado de la tarjeta */
+.card-header {
+    padding: 16px;
+    border-bottom: 1px solid #ddd;
+}
+
+.card-header h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* Cuerpo de la tarjeta */
+.card-body {
+    padding: 16px;
+}
+
+/* Estilos de los grupos de formularios */
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+/* Estilos para los select */
+.select-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+/* Botón primario */
+.btn-primary {
+    padding: 10px 15px;
+    background-color: #1d4ed8;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btn-primary:hover {
+    background-color: #1e40af;
+}
+
+/* Botón deshabilitado */
+.btn-primary:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+}
+
+/* Sección de acciones del formulario */
+.form-actions {
+    text-align: right;
+    padding: 16px;
+    border-top: 1px solid #ddd;
+}
