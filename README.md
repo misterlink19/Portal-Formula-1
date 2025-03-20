@@ -1,6 +1,10 @@
 # Portal de Fórmula 1
 
-Este proyecto es una aplicación web para la gestión de un portal de Fórmula 1, desarrollada como parte de un máster, donde se aplicaron la metodología SCRUM y el patrón de diseño MVC. Este proyecto se centra en la implementación de metodologías ágiles en el desarrollo de una aplicación web para la gestión de un portal de Fórmula 1, permitiendo a los aficionados acceder a noticias y votaciones, a los equipos realizar cálculos de rendimiento, y a los administradores gestionar el contenido y los usuarios del sitio.
+Este proyecto es una aplicación web para la gestión de un portal de Fórmula 1, desarrollada como parte de un máster, donde se aplicaron la metodología SCRUM y el patrón de diseño MVC.
+
+## Descripción del Proyecto
+
+Aplicación web para la gestión de un portal de Fórmula 1, permitiendo a los aficionados acceder a noticias y votaciones, a los equipos realizar cálculos de rendimiento, y a los administradores gestionar el contenido y los usuarios del sitio.
 
 ## Tecnologías Utilizadas
 
